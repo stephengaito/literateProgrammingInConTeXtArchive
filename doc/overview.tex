@@ -1,0 +1,123 @@
+% A ConTeXt document [master document: literateModules.tex]
+
+\startchapter[title=Overview] 
+
+\section{Why is literate programming important?}
+
+This is a very simple start of a seemingly overly long shaggy dog story. 
+The ultimate moral of this story is the sum total of how we \emph{do} 
+Philosophy, Mathematics, Science and Engineering. We \emph{are 
+essentially} building Leibniz's philosophical calculus. (See \quote{The 
+art of Discovery}) 
+
+Not surprisingly, then, one of the subtexts of this story is \quote{what 
+is (mathematical) rigour}? What can be deduced and what must be inferred? 
+
+A more surprising subtext is \quote{mathematics is programming}, or more 
+to the point, \quote{mathematics is the continual creation of 
+\quotation{\emph{useful}}, provably correct, programming languages and 
+computations using these languages}. 
+
+While there are some noted exceptions, at the moment, mathematical rigour, 
+consists of many mathematicians reading other mathematician's linguistic 
+arguments, searching for understanding or errors. Our ultimate goal is, 
+essentially, to \emph{implement} Leibniz's imperative to calculate, but to 
+do so using provably correct methods. However, in this endeavour it is 
+critical to \emph{satisfy} the mathematician's need to \emph{understand} 
+what is happening, as opposed to simply overwhelm them with 
+\quote{meaningless} calculations. For any mathematician, understanding the 
+mathematical intent and process of an argument is paramount. If the 
+understanding is communicated, merely technical errors in the overall 
+argument can usually be fixed if and when they are discovered. Without 
+understanding, there is no knowledge of where errors might be let alone 
+how to fix them. 
+
+Through out this necessarily long shaggy dog story, one of the key 
+distinctions is between those ideas which can be deduced and those which 
+must be inferred from experience. The key distinction here will be that 
+suitably detailed mathematical proofs of correctness of suitably defined 
+deductive knowledge can be computed by finite entities, but that the 
+correctness of knowledge inferred from experience can only ever be refuted 
+by necessarily limited testing. 
+
+While \emph{this} particular document can not begin to capture these 
+ideas, it is important to start as we mean to carry on. While we will 
+assume the correctness of the underlying \ConTeXt\LuaTeX\ \quote{document} 
+preparation system, it is important to provide a \emph{literate} 
+understanding of all other extensions we will use. 
+
+Through the course of telling this shaggy dog story, we will need to 
+develop a number of specialist \ConTeXt\ modules to help make the creation 
+of mathematical languages easier. Since these \emph{are} intended to be 
+\emph{mathematical} languages, we need to ensure that both the correctness 
+and understanding of what these tools do, is kept as clear as possible.
+
+\section{Why choose \ConTeXt?}
+
+If the primary task of a mathematically literate philosopher, 
+mathematician, scientist or engineer is to create, evolve and use new 
+mathematical languages, while communicating intent and understanding, they 
+need a flexible environment in which to easily provide new mathematical 
+symbols and calculations with which to communicate their argument. This 
+was the original intent of the \TeX\ family of text processing tools.
+
+More importantly, one of our goals is to provide an environment in which 
+the computation of a \quotation{proof's} correctness, is seamlessly 
+integrated with the communication of its meaning.
+
+There are a number of ways in which we \emph{can} implement the 
+\emph{calculation} the correctness of a mathematical argument. Currently 
+such calcualtions take place in a specialized \quote{theorem proving 
+tool}, such as ... Sometimes, these tools provide ways to output the 
+resulting \quote{proof} into \LaTeX. However, with this approach, the 
+integration of the mathematical discussion with the computational proof is 
+very far from seamless or natural. 
+
+We could instead use a mathematically literate text processing tool which 
+has been extended with the ability to either internally or externally 
+compute the correctness of a suitably formated argument. The \TeX\ family 
+of text processing tools provide tools to easily extend and use 
+mathematical notation. Unfortunately \quote{programming} inside either 
+native \TeX\ or \LaTeX\ is prohibitively difficult. While \TeX\ is 
+computationally complete, its \quote{macro programming} language is very 
+far from most typical programming languages as to make programatic 
+extension of either \TeX\ or \LaTeX\ very difficult except for highly 
+experienced \TeX\ programmers. \ConTeXt\ is based upon \LuaTeX\ which is 
+the \pdfTeX\ variant of \TeX\ in which the programming language Lua has 
+been embedded. This makes adding programatic extensions to \ConTeXt\ 
+fairly straight forward. While \LaTeX\ can be used inside \LuaTeX\, 
+\LaTeX\ does not yet make any use of the embedded Lua interpreter. More 
+importantly, \ConTeXt\, has a much better internal structure with which to 
+make use of Lua to add extensions. 
+
+Our approach then, which will only reach fruition after much more work, is 
+to use \ConTeXt, \LuaTeX, and Lua to embed one or more extensions of the 
+JoyLoL language to compute the correctness of a given deductive argument. 
+The JoyLoL language has been designed to \emph{be} the \emph{fixed point} 
+of the semantics functor. This means that JoyLoL provides its own semantic 
+\quote{meaning}. That is, JoyLoL \emph{provides} a computational 
+foundation of Mathematics. Deductive proofs of correctness are simply 
+computations in JoyLoL or one of its proven correct extensions. 
+
+While, at the moment, \LaTeX\ is definitely the more popular variant of 
+\TeX\ used by the mathematical community, embedding JoyLoL computations 
+inside \LaTeX\ is prohibitively difficult. Doing the same thing inside 
+\ConTeXt\ is fairly straight forward. 
+
+\section{Why produce another literate module format?} 
+
+The \ConTeXt\ MkII and MkIV modules are already built using an existing 
+literate programming format. I would strongly recommend any \ConTeXt\ 
+module builder to \emph{read} the MkIV code. It is both well structured 
+and well documented. However this documentation rarely covers the 
+relationship between the \LuaTeX\ and Lua code used to implment a 
+\ConTeXt\ command, nor does it provide an integrated collection of tests.
+
+By using \ConTeXt\ itself to provide a unified description of a given 
+\ConTeXt\ module. In one file, we have, intent, documentation, code (both 
+MkIV and Lua) as well as tests. 
+
+\section{How to be a literate module programmer?} 
+
+\stopchapter 
+
