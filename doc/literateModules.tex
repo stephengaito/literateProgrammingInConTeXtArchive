@@ -23,7 +23,7 @@
 % indent paragraphs after formulas if there is a blank space in between
 \setupformulas[indentnext=auto] 
 
-\usebtxdataset[joyLoLBib.lua]
+\usebtxdataset[literateModulesBib.lua]
 \usebtxdefinitions[apa]
 \setupbtxlist[apa][
   alternative=paragraph,
@@ -37,6 +37,22 @@
 \startdocument[title=Literate programming of \ConTeXt\ modules]
 
 \component overview
+
+\component preamble
+
+\component mkivCode
+
+\component mkivTests
+
+\component luaCode
+
+\component luaTests
+
+\component luaTemplates
+
+\component luaTemplateTests
+
+\component lakefiles
 
 \startbackmatter
   \startchapter[title=Bibliography]

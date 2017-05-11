@@ -1,0 +1,46 @@
+% A ConTeXt document [master document: literateModules.tex]
+
+\startchapter[title=MkIV code]
+
+%\startMkIVCode
+
+%%D \section{MkIV code environment}
+%
+%%D \subsection{Examples}
+%
+%%D \subsection{Implementation: start}
+%
+%\definetyping[MkIVCode]
+%\setuptyping[MkIVCode][option=lua]
+%
+%%D \subsection{Implementation: stop}
+%
+%\let\oldStartMkIVCode=\stopMkIVCode
+%\def\stopMkIVCode{%
+%  \oldStopMkIVCode%
+%  \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
+%  
+%D \subsection{Implementation: createFile}
+%
+%\def\createMkIVFile[#1]{
+%  \directlua{thirddata.literateModules.createMkIVFile(#1)}
+%}
+
+%\stopMkIVCode
+
+\startLuaCode
+function litMods.addMkIVCode(bufferName)
+  table_insert(code.mkiv, buffers.getcontent(bufferName))
+end
+
+function litMods.createMkIVFile(aFilePath)
+  renderFile(aFilePath, litMods.templates.mkIVFile)
+end
+\stopLuaCode
+
+\startLuaTemplate
+
+
+\stopLuaTemplate
+
+\stopchapter

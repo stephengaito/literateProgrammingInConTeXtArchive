@@ -1,0 +1,118 @@
+% ConTeXt MkIV module
+%D \module
+%D   [     file=t-literate-modules,
+%D      version=2017.05.10,
+%D        title=\CONTEXT\ User module,
+%D     subtitle=Literate \ConTeXt\ modules,
+%D       author=Stephen Gaito,
+%D         date=\currentdate,
+%D    copyright=PerceptiSys Ltd (Stephen Gaito),
+%D        email=stephen@perceptisys.co.uk,
+%D      license=MIT License]
+
+%C Copyright (C) 2017 PerceptiSys Ltd (Stephen Gaito)
+%C
+%C Permission is hereby granted, free of charge, to any person obtaining a 
+%C copy of this software and associated documentation files (the 
+%C "Software"), to deal in the Software without restriction, including 
+%C without limitation the rights to use, copy, modify, merge, publish, 
+%C distribute, sublicense, and/or sell copies of the Software, and to 
+%C permit persons to whom the Software is furnished to do so, subject to 
+%C the following conditions: 
+%C
+%C The above copyright notice and this permission notice shall be included 
+%C in all copies or substantial portions of the Software. 
+%C
+%C THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+%C OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+%C MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+%C IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+%C CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+%C TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+%C SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
+% begin info
+%
+% title   : JoyLoL CoAlgebra definitions
+% comment : Provides structured document and code generation
+% status  : under development, mkiv only
+%
+% end info
+
+%M \usemodule[literate-modules]
+
+\usemodule[t-high-cpp]
+\usemodule[t-contests]
+
+\unprotect
+
+\ctxloadluafile{t-literate-modules}
+\ctxloadluafile{t-literate-modules-templates}
+
+%D \section{MkIV code environment}
+
+%D \subsection{Examples}
+
+%D \subsection{Implementation: start}
+
+\definetyping[MkIVCode]
+\setuptyping[MkIVCode][option=tex]
+
+%D \subsection{Implementation: stop}
+
+%\let\oldStopMkIVCode=\stopMkIVCode
+%\def\stopMkIVCode{%
+%  \oldStopMkIVCode%
+%  \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
+  
+%D \subsection{Implementation: createFile}
+
+\def\createMkIVFile[#1]{
+  \directlua{thirddata.literateModules.createMkIVFile(#1)}
+}
+
+%D \section{Lua code environment}
+
+%D \subsection{Examples}
+
+%D \subsection{Implementation: start}
+
+\definetyping[LuaCode]
+\setuptyping[LuaCode][option=lua]
+
+%D \subsection{Implementation: stop}
+
+\let\oldStopLuaCode=\stopLuaCode
+\def\stopLuaCode{%
+  \oldStopLuaCode%
+  \directlua{thirddata.literateModules.addLuaCode('_typing_')}}
+
+%D \subsection{Implementation: createFile}
+
+\def\createLuaFile[#1]{
+  \directlua{thirddata.literateModules.createLuaFile(#1)}
+}
+
+%D \section{Template environment}
+
+%D \subsection{Examples}
+
+%D \subsection{Implementation: start}
+
+\definetyping[LuaTemplate]
+\setuptyping[Template][option=lua]
+
+%D \subsection{Implementation: stop}
+
+\let\oldStopLuaTemplate=\stopLuaTemplate
+\def\stopLuaTemplate{%
+  \oldStopLuaTemplate%
+  \directlua{thirddata.literateModules.addLuaTemplate('_typing_')}}
+
+%D \subsection{Implementation: createFile}
+
+\def\createTemplateFile[#1]{
+  \directlua{thirddata.literateModules.createLuaTemplateFile(#1)}
+}
+
+\protect \endinput
