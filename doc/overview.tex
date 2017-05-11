@@ -16,7 +16,9 @@ is (mathematical) rigour}? What can be deduced and what must be inferred?
 A more surprising subtext is \quote{mathematics is programming}, or more 
 to the point, \quote{mathematics is the continual creation of 
 \quotation{\emph{useful}}, provably correct, programming languages and 
-computations using these languages}. 
+computations using these languages}. Conversely, what humans can 
+\emph{know} is deeply influenced by the limits of finite computational 
+devices. 
 
 While there are some noted exceptions, at the moment, mathematical rigour, 
 consists of many mathematicians reading other mathematician's linguistic 
@@ -42,9 +44,9 @@ by necessarily limited testing.
 
 While \emph{this} particular document can not begin to capture these 
 ideas, it is important to start as we mean to carry on. While we will 
-assume the correctness of the underlying \ConTeXt\LuaTeX\ \quote{document} 
-preparation system, it is important to provide a \emph{literate} 
-understanding of all other extensions we will use. 
+assume the correctness of the underlying \ConTeXt\ and \LuaTeX\ 
+\quote{document} preparation system, it is important to provide a 
+\emph{literate} understanding of all other extensions we will use. 
 
 Through the course of telling this shaggy dog story, we will need to 
 develop a number of specialist \ConTeXt\ modules to help make the creation 
@@ -66,10 +68,10 @@ the computation of a \quotation{proof's} correctness, is seamlessly
 integrated with the communication of its meaning.
 
 There are a number of ways in which we \emph{can} implement the 
-\emph{calculation} the correctness of a mathematical argument. Currently 
-such calcualtions take place in a specialized \quote{theorem proving 
-tool}, such as ... Sometimes, these tools provide ways to output the 
-resulting \quote{proof} into \LaTeX. However, with this approach, the 
+\emph{calculation} of the correctness of a mathematical argument. 
+Currently such calcualtions take place in a specialized \quote{theorem 
+proving tool}, such as ... Sometimes, these tools provide ways to output 
+the resulting \quote{proof} into \LaTeX. However, with this approach, the 
 integration of the mathematical discussion with the computational proof is 
 very far from seamless or natural. 
 
@@ -80,15 +82,16 @@ of text processing tools provide tools to easily extend and use
 mathematical notation. Unfortunately \quote{programming} inside either 
 native \TeX\ or \LaTeX\ is prohibitively difficult. While \TeX\ is 
 computationally complete, its \quote{macro programming} language is very 
-far from most typical programming languages as to make programatic 
+far from most typical programming languages as to make programmatic 
 extension of either \TeX\ or \LaTeX\ very difficult except for highly 
-experienced \TeX\ programmers. \ConTeXt\ is based upon \LuaTeX\ which is 
-the \pdfTeX\ variant of \TeX\ in which the programming language Lua has 
-been embedded. This makes adding programatic extensions to \ConTeXt\ 
-fairly straight forward. While \LaTeX\ can be used inside \LuaTeX\, 
-\LaTeX\ does not yet make any use of the embedded Lua interpreter. More 
-importantly, \ConTeXt\, has a much better internal structure with which to 
-make use of Lua to add extensions. 
+experienced \TeX\ programmers.
+
+\ConTeXt\ is based upon \LuaTeX\ which is the \pdfTeX\ variant of \TeX\ in 
+which the programming language Lua has been embedded. This makes adding 
+programmatic extensions to \ConTeXt\ fairly straight forward. While \LaTeX\ 
+can be used inside \LuaTeX, \LaTeX\ does not yet make any use of the 
+embedded Lua interpreter. More importantly, \ConTeXt\, has a much better 
+internal structure with which to make use of Lua to add extensions. 
 
 Our approach then, which will only reach fruition after much more work, is 
 to use \ConTeXt, \LuaTeX, and Lua to embed one or more extensions of the 
@@ -110,14 +113,62 @@ The \ConTeXt\ MkII and MkIV modules are already built using an existing
 literate programming format. I would strongly recommend any \ConTeXt\ 
 module builder to \emph{read} the MkIV code. It is both well structured 
 and well documented. However this documentation rarely covers the 
-relationship between the \LuaTeX\ and Lua code used to implment a 
-\ConTeXt\ command, nor does it provide an integrated collection of tests.
+relationship between the \LuaTeX\ and Lua code used to implement a 
+\ConTeXt\ command, nor does it provide a comprehensive integrated 
+collection of tests. 
 
 By using \ConTeXt\ itself to provide a unified description of a given 
-\ConTeXt\ module. In one file, we have, intent, documentation, code (both 
-MkIV and Lua) as well as tests. 
+\ConTeXt\ module, we have, all in one file, intent, documentation, code 
+(both MkIV and Lua) as well as tests. 
 
 \section{How to be a literate module programmer?} 
+
+To communicate intent, understanding as well as computation, we need the 
+ability to typeset computational fragments inside an on going discussion 
+in a given natural human language. We must also be able to capture these 
+computational fragments and commit them to disk files in a structure which 
+the compiler of one or more programming languages can turn these 
+computational fragments into executable code. This \emph{is} Donald 
+Knuth's vision, \cite{knuth1984literateProgramming}, and \TeX\ and its 
+corresponding \type{WEB} was the original implementation of this vision. 
+
+\ConTeXt\ provides a very much more modern tool in which to implement 
+literate programming. The MkIV implementation of the \type{typing} 
+environment captures the computational fragment into a \quote{Lua buffer} 
+before ultimately typesetting this fragment into \TeX\footnote{The code 
+which implements the \type{typing} environment can be found in the 
+files:\\ 
+\midaligned{\type{tex/texmf-context/tex/context/base/mkiv/buff-*}}\\ 
+located in the \ConTeXt\ standalone installation.}. A literate programming 
+tool, implemented in \ConTeXt\, can then, using Lua, access the contents 
+of these typing buffers and use them to format an appropriate collection 
+of files which can then be compiled using appropriate compilers. 
+
+\emph{This} \type{t-literate-modules} module captures these buffers and 
+creates the MkIV and Lua files which together implement the module being 
+described. It also creates Lunatest files with which to actively test the 
+implementation described in the code fragments. Finally, the 
+\type{t-literate-modules} module creates the Lua Lakefiles required to 
+orchestrate the overall creation, compilation, testing and installation 
+of the described module. 
+
+To capture a given \ConTeXt\ module, we need, at the very least, 
+\type{typing} environments which capture both MkIV, Lua code as well as 
+MkIV and Lua based tests. To make the formating code and test files 
+easier, we also need a collection of (Lua based) templates. This suggests 
+we also need \type{typing} environments which capture these templates and 
+their associated tests. In subsequent chapters we will describe the 
+following environments: 
+%
+\startitemize
+\item MkIV code
+\item MkIV tests
+\item Lua code
+\item Lua tests
+\item Lua templates
+\item Lua template tests
+\item Lakefiles
+\stopitemize
 
 \stopchapter 
 
