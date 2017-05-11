@@ -49,21 +49,21 @@
 \ctxloadluafile{t-literate-modules}
 \ctxloadluafile{t-literate-modules-templates}
 
-%D \section{MkIV code environment}
+%D \section{Module code environment}
 
 %D \subsection{Examples}
 
 %D \subsection{Implementation: start}
 
-\definetyping[MkIVCode]
-\setuptyping[MkIVCode][option=tex]
+\definetyping[SillyCode]
+\setuptyping [SillyCode][option=tex]
 
 %D \subsection{Implementation: stop}
 
-%\let\oldStopMkIVCode=\stopMkIVCode
-%\def\stopMkIVCode{%
-%  \oldStopMkIVCode%
-%  \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
+%\let\oldStopSillyCode=\stopSillyCode
+%\def\stopSillyCode{%
+%  \oldStopSillyCode%
+%  \directlua{thirddata.literateModules.addModuleCode('_typing_')}}
   
 %D \subsection{Implementation: createFile}
 

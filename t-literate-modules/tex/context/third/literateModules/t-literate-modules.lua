@@ -14,7 +14,7 @@ thirddata.literateModules = thirddata.literateModules or {}
 local litMods  = thirddata.literateModules
 litMods.code   = {}
 local code     = litMods.code
-code.mkiv      = {}
+code.module    = {}
 code.lua       = {}
 code.templates = {}
 
@@ -89,12 +89,12 @@ local function renderFile(aFilePath, baseTemplate)
   outFile:close()
 end
 
-function litMods.addMkIVCode(bufferName)
-  table_insert(code.mkiv, buffers.getcontent(bufferName))
+function litMods.addModuleCode(bufferName)
+  table_insert(code.module, buffers.getcontent(bufferName))
 end
 
-function litMods.createMkIVFile(aFilePath)
-  renderFile(aFilePath, litMods.templates.mkIVFile)
+function litMods.createModuleFile(aFilePath)
+  renderFile(aFilePath, litMods.templates.moduleFile)
 end
 
 function litMods.addLuaCode(bufferName)
