@@ -1,8 +1,8 @@
 -- A Lua file (the lua code associated with t-literate-modules.mkiv)
 
-if not modules then modules = { } end modules ['t-joylol-coalg'] = {
+if not modules then modules = { } end modules ['t-literate-modules'] = {
     version   = 1.000,
-    comment   = "Literate MkIV ConTeXt modules",
+    comment   = "Literate MkIV ConTeXt modules - lua",
     author    = "PerceptiSys Ltd (Stephen Gaito)",
     copyright = "PerceptiSys Ltd (Stephen Gaito)",
     license   = "MIT License"
@@ -14,7 +14,7 @@ thirddata.literateModules = thirddata.literateModules or {}
 local litMods  = thirddata.literateModules
 litMods.code   = {}
 local code     = litMods.code
-code.module    = {}
+code.mkiv      = {}
 code.lua       = {}
 code.templates = {}
 
@@ -89,12 +89,12 @@ local function renderFile(aFilePath, baseTemplate)
   outFile:close()
 end
 
-function litMods.addModuleCode(bufferName)
-  table_insert(code.module, buffers.getcontent(bufferName))
+function litMods.addMkIVCode(bufferName)
+  table_insert(code.mkiv, buffers.getcontent(bufferName))
 end
 
-function litMods.createModuleFile(aFilePath)
-  renderFile(aFilePath, litMods.templates.moduleFile)
+function litMods.createMkIVFile(aFilePath)
+  renderFile(aFilePath, litMods.templates.mkivFile)
 end
 
 function litMods.addLuaCode(bufferName)

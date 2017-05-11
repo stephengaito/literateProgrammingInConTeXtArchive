@@ -83,7 +83,7 @@
 %D \subsection{Implementation: createFile}
 
 \def\createMkIVFile[#1]{
-  \directlua{thirddata.literateModules.createMkIVFile(#1)}
+  \directlua{thirddata.literateModules.createMkIVFile('#1')}
 }
 
 %D \section{Lua code environment}
@@ -105,7 +105,7 @@
 %D \subsection{Implementation: createFile}
 
 \def\createLuaFile[#1]{
-  \directlua{thirddata.literateModules.createLuaFile(#1)}
+  \directlua{thirddata.literateModules.createLuaFile('#1')}
 }
 
 %D \section{Template environment}
@@ -127,7 +127,7 @@
 %D \subsection{Implementation: createFile}
 
 \def\createTemplateFile[#1]{
-  \directlua{thirddata.literateModules.createLuaTemplateFile(#1)}
+  \directlua{thirddata.literateModules.createLuaTemplateFile('#1')}
 }
 
 \protect \endinput

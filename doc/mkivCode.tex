@@ -10,8 +10,8 @@
 
 %D \subsection{Implementation: start (MkIV)}
 
-%\definetyping[MkIVCode]
-%\setuptyping[MkIVode][option=lua]
+\definetyping[MkIVCode]
+\setuptyping[MkIVode][option=lua]
 
 \stopMkIVCode
 
@@ -19,10 +19,10 @@
 
 %D \subsection{Implementation: stop (MkIV)}
 
-%\let\oldStopMkIVCode=\stopMkIVCode
-%def\stopMkIVCode{%
-%  \oldStopMkIVCode%
-% \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
+\let\oldStopMkIVCode=\stopMkIVCode
+\def\stopMkIVCode{%
+  \oldStopMkIVCode%
+ \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
 
 \stopMkIVAltCode
 
@@ -30,21 +30,21 @@
 
 %D \subsection{Implementation: start (MkIVAlt)}
 
-%\definetyping[MkIVAltCode]
-%\setuptyping[MkIVAltCode][option=lua]
+\definetyping[MkIVAltCode]
+\setuptyping[MkIVAltCode][option=lua]
 
 %D \subsection{Implementation: stop (MkIVAlt)}
 
-%\let\oldStopMkIVAltCode=\stopMkIVAltCode
-%def\stopMkIVAltCode{%
-%  \oldStopMkIVAltCode%
-% \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
+\let\oldStopMkIVAltCode=\stopMkIVAltCode
+\def\stopMkIVAltCode{%
+  \oldStopMkIVAltCode%
+ \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
 
 %D \subsection{Implementation: createFile}
 
-%\def\createMkIVFile[#1]{
-%  \directlua{thirddata.literateModules.createMkIVFile(#1)}
-%}
+\def\createMkIVFile[#1]{
+  \directlua{thirddata.literateModules.createMkIVFile(#1)}
+}
 
 \stopMkIVCode
 
