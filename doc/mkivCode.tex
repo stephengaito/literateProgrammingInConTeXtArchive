@@ -2,11 +2,33 @@
 
 \startchapter[title=MkIV code]
 
+Any \ConTeXt\ module consists of two distinct types of code which can be 
+broken into multiple distinct files. Every module contains \ConTeXt\ 
+\type{MkIV} code, which is basically plain \TeX\ macros together with a 
+collection of \ConTeXt\ specific \quote{helper} macros which together 
+provide consistent interfaces for end-users. 
+
+In this and the next chapter, we cover the description and testing of the 
+\type{MkIV} code. 
+
 \startMkIVCode
 
 %D \section{MkIV code environment}
 
-%D \subsection{Examples}
+\stopMkIVCode
+
+As mentioned previously, we use the standard \ConTeXt\ \type{typing} 
+environment to both capture and typeset the \type{MkIV} code. 
+
+To use the \type{typing} environment, we invoke the \ConTeXt\ 
+\type{\definetyping} and \type{\setuptyping} macros with the name of the 
+desired \type{typing} environment, in our case \type{MkIVCode}, as well as 
+any particular default values for the environment's setup. In our case 
+this creates the \type{\startMkIVCode} and \type{\stopMkIVCode} macros 
+together with the whole \type{\setupMkIVCode} interface tailored to our 
+specific name. 
+
+\startMkIVCode
 
 %D \subsection{Implementation: start (MkIV)}
 
@@ -14,6 +36,48 @@
 \setuptyping[MkIVode][option=lua]
 
 \stopMkIVCode
+
+If we only cared about the \emph{typesetting} of the MkIVCode, this is all 
+we need to do, as \ConTeXt\ is already competent at typesetting \TeX\ and 
+Lua code fragments. However, we \emph{also} want to store the code chunk 
+in Lua tables for further rendering to an executable file format. To do 
+this we need to redefine the \type{\stopMkIVCode} macro by adding a call 
+to our Lua function \type{addMkIVCode}, while at the same time invoking 
+all of the standard \TeX\ macros associated with the \quote{original} 
+\type{\stopMkIVCode} macro. We do this by \type{\let}ing 
+\type{\oldStopMkIVCode} be the original macro \type{\stopMkIVCode} and 
+then redefining \type{\stopMkIVCode} to be an invokation of the original 
+\type{\stopMkIVCode} followed by our call to the Lua function 
+\type{addMkIVCode}. 
+
+The \type{typing} environment of necessity changes \TeX's cat-codes in 
+such a way that \TeX\ respects all white-space. This allows the 
+\type{typing} environment to capture the complete verbatim layout of the 
+contents of the \type{typing} environment. However it also means that, in 
+our case, the implementation actively scans for the particular 
+\emph{string} \type{\stopMkIVCode}.
+
+Since, in our literate modules approach to the creation of \ConTeXt\ 
+modules, we are \emph{defining} the \type{\stopMkIVCode} macro using the 
+\quote{MkIVCode} \type{typing} environment itself, we seriously confuse 
+\ConTeXt's \type{typing} environment's search for the \emph{string} 
+\type{\stopMkIVCode}. This is because we need to embed an instance of the 
+string \type{\stopMkIVCode} inside the \type{typing} environment. To avoid 
+this confustion, we actually define \emph{two} \type{MkIVCode} 
+environments, \type{MkIVCode} (itself) as well as \type{MkIVAltCode}. This 
+allows use to define each environment inside the other environment. 
+
+\startMkIVCode
+
+%D \subsection{Implementation: start (MkIVAlt)}
+
+\definetyping[MkIVAltCode]
+\setuptyping[MkIVAltCode][option=lua]
+
+\stopMkIVCode
+
+We can now define the \type{\stopMkIVCode} macro using the 
+\type{MkIVAltCode} environment. 
 
 \startMkIVAltCode
 
@@ -26,12 +90,10 @@
 
 \stopMkIVAltCode
 
+Having defined the \type{\stopMkIVCode}, we can now define the 
+\type{\stopMkIVAltCode} macro using the \type{MkIVCode} environment. 
+
 \startMkIVCode
-
-%D \subsection{Implementation: start (MkIVAlt)}
-
-\definetyping[MkIVAltCode]
-\setuptyping[MkIVAltCode][option=lua]
 
 %D \subsection{Implementation: stop (MkIVAlt)}
 
@@ -40,7 +102,33 @@
   \oldStopMkIVAltCode%
  \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
 
-%D \subsection{Implementation: createFile}
+ \stopMkIVCode
+
+ Once the \type{MkIV} code has been captured and typeset, we need to 
+specify where we want to store it until we ultimately render it via 
+templates into the corresponding \type{MkIV} files. To do this we define 
+the \type{addMkIVCode} function in Lua, inside the \type{litMods} table. 
+The \type{addMkIVCode} function is invoked by the \type{\stopMkIVCode} 
+macro and takes the \ConTeXt\ buffer name, in this case always 
+\quote{_typing_}, from which to extract the last \quote{chunk} of 
+\type{MkIV} code. The \type{addMkIVCode} takes the contents of the buffer 
+and inserts it at the end of the \type{code.mkiv} array. 
+
+\startLuaCode
+function litMods.addMkIVCode(bufferName)
+  table_insert(code.mkiv, buffers.getcontent(bufferName))
+end
+\stopLuaCode
+
+ 
+To actually initiate the rendering of the \type{MkIV} code into a specific 
+file, the module writer actively invokes the \type{\createMkIVFile} macro, 
+and supplies the output file's relative path and file name complete with 
+extension. 
+
+\startMkIVCode
+
+ %D \subsection{Implementation: createFile}
 
 \def\createMkIVFile[#1]{
   \directlua{thirddata.literateModules.createMkIVFile(#1)}
@@ -48,11 +136,10 @@
 
 \stopMkIVCode
 
-\startLuaCode
-function litMods.addMkIVCode(bufferName)
-  table_insert(code.mkiv, buffers.getcontent(bufferName))
-end
+The \type{\createMkIVFile} macro in turn invokes the \type{createMkIVFile} 
+Lua function. 
 
+\startLuaCode
 function litMods.createMkIVFile(aFilePath)
   renderFile(aFilePath, litMods.templates.mkIVFile)
 end
