@@ -1,0 +1,158 @@
+% A ConTeXt document [master document: literateModules.tex]
+
+\startchapter[title=The Lua Rendering Engine]
+
+\startLuaCode
+
+-- We need a simple Lua based template engine
+-- Our template engine has been inspired by:
+--   https://john.nachtimwald.com/2014/08/06/using-lua-as-a-templating-engine/
+-- (via the minLua JoyLoL template engine)
+
+function litMods.renderNextChunk(prevChunk, renderedText, curTemplate)
+  local result = ""
+  
+  if prevChunk
+    and type(prevChunk) == 'string'
+    and 0 < #prevChunk then
+    table_insert(renderedText, prevChunk)
+  end
+  
+  if type(curTemplate) == 'string' and (0 < #curTemplate) then
+    if curTemplate:find('{{') then
+      local position  = 1
+      local textChunk = curTemplate:match('^.*{{', position)
+      if textChunk then 
+        local textChunkLen = #textChunk
+        textChunk = textChunk:sub(1, textChunkLen-2)
+        if 0 < #textChunk then table_insert(renderedText, textChunk) end
+        position = position + textChunkLen
+      end
+      
+      local luaChunk = curTemplate:match('^.+}}', position)
+      if luaChunk then
+        local luaChunkLen = #luaChunk
+        luaChunk = luaChunk:sub(1, luaChunkLen-2)
+        position = position + luaChunkLen
+        curTemplate = curTemplate:sub(position, #curTemplate)
+        local newChunk = ""
+        if not luaChunk:match('^%s*$') then
+          -- consider using an PCall here....
+          local luaFunc, errMessage = load(luaChunk)
+          if luaFunc then
+            newChunk = luaFunc(litMods)
+          end
+        end
+        result = litMods.renderNextChunck(newChunk, renderedText, curTemplate)
+      end
+    else -- there is no '{{' in the template
+      table_insert(renderedText, curTemplate)
+      result = table_concat(renderedText)
+    end
+  else
+    -- nothing to do...
+    result = table_concat(renderedText)
+  end
+  return result
+end
+
+function litMods.render(aTemplate)
+  return litMods.renderNextChunk("", { }, aTemplate)
+end
+
+-- Now we need the code that captures and creates a given code/file type 
+
+local function renderFile(aFilePath, baseTemplate)
+  local outFile = io.open(aFilePath, 'w')
+  outFile:write(pp.write(litMods))
+  local renderedBaseTemplate = litMods.renderNextChunk("", {}, baseTemplate)
+  outFile:write('\n--------------\n')
+  outFile:write(renderedBaseTemplate)
+  outFile:close()
+end
+
+\stopLuaCode
+
+\section[title=Testing the rendering engine]
+
+Given the moderate complexity of the Lua rendering engine, we need to 
+provide justifications of its correctness. While Theoretical Computer 
+Science does provide tools which could be used to attempt to \emph{prove} 
+the above Lua code correct these tools are not really integral to the Lua 
+language. Our primary aim in creating this cycle of tools is to develop 
+the JoyLoL language in which these tools of \emph{deductive} proof are 
+integral, to the language. In the JoyLoL language, the distinction between 
+deductive proof and inductive testing is much clearer. For the moment we 
+will only provide \quote{inductive} tests of correctness for the above Lua 
+code. 
+
+\def\startLunaTestSuite{\relax}
+\def\stopLunaTestSuite{\relax}
+\def\startLunaTestCase{\relax}
+\def\stopLunaTestCase{\relax}
+\definetyping[LunaTests]
+\setuptyping[LunaTests][option=lua]
+
+\startLunaTestSuite
+
+At the moment, the critical complexity is contained in the 
+\type{renderNextChunk} function, so we will focus upon testing this 
+function. Our strategy will be simple, we will invoke the 
+\type{renderNextChunk} function on a number of example arguments, chosen 
+to ensure all of the \quote{main} paths of the function are taken in at 
+least one of the invocations. Associated with each invocation, we will 
+make a number of simple assertions about that invocation’s returned value. 
+If all of the assertions are true, we consider the \type{renderNextChunk} 
+function \quote{inductively} correct. 
+
+\startLunaTestCase
+
+The \type{renderNextChunk} function is recursive, so in our first test 
+case, it is important to test that this recursion \emph{does} stop. To do 
+this we provide arguments which have a simple previous chunk 
+(\type{prevChunk}), a simple previously rendered text 
+(\type{renderedText}), as well as an \emph{empty} currently remaining 
+template (\type{curTemplate}). 
+
+\startLunaTests
+  local result = renderNextChunk("this is a simple text", { }, "")
+\stopLunaTests
+
+The result of this invocation, should be a Lua string which consists 
+of the \type{preChunk}. 
+
+\startLunaTests
+  assert_string(result)
+  assert_equal("this is a simple text", result)
+\stopLunaTests
+\stopLunaTestCase
+
+\startLunaTestCase
+
+We next need to show that more complex collections of previously rendered 
+text are handled correctly. 
+
+\startLunaTests
+  local result = renderNextChunk("this is a final text", {
+    "this is the first text",
+    "this is the second text"
+  }, "")
+\stopLunaTests
+
+The result should be the texts contained in the rendered text together 
+with the \type{prevChunck} all concatenated \emph{with no additional 
+white-space}. 
+
+\startLunaTests
+  assert_string(result)
+  assert_equal(
+    "this is the first textthis is the second textthis is a final text",
+    result
+  )
+\stopLunaTests
+
+\stopLunaTestCase
+
+\stopLunaTestSuite
+
+\stopchapter
