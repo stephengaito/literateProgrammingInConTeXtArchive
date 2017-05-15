@@ -86,14 +86,14 @@ deductive proof and inductive testing is much clearer. For the moment we
 will only provide \quote{inductive} tests of correctness for the above Lua 
 code. 
 
-\def\startLunaTestSuite{\relax}
-\def\stopLunaTestSuite{\relax}
-\def\startLunaTestCase{\relax}
-\def\stopLunaTestCase{\relax}
-\definetyping[LunaTests]
-\setuptyping[LunaTests][option=lua]
+\def\startTestSuite{\subsection}
+\def\stopTestSuite{\relax}
+\def\startTestCase{\subsubsection}
+\def\stopTestCase{\relax}
+\definetyping[LuaTest]
+\setuptyping[LuaTest][option=lua]
 
-\startLunaTestSuite
+\startTestSuite[title=renderNextChunk]
 
 At the moment, the critical complexity is contained in the 
 \type{renderNextChunk} function, so we will focus upon testing this 
@@ -105,7 +105,7 @@ make a number of simple assertions about that invocation’s returned value.
 If all of the assertions are true, we consider the \type{renderNextChunk} 
 function \quote{inductively} correct. 
 
-\startLunaTestCase
+\startTestCase[title=should stop]
 
 The \type{renderNextChunk} function is recursive, so in our first test 
 case, it is important to test that this recursion \emph{does} stop. To do 
@@ -114,45 +114,45 @@ this we provide arguments which have a simple previous chunk
 (\type{renderedText}), as well as an \emph{empty} currently remaining 
 template (\type{curTemplate}). 
 
-\startLunaTests
+\startLuaTest
   local result = renderNextChunk("this is a simple text", { }, "")
-\stopLunaTests
+\stopLuaTest
 
 The result of this invocation, should be a Lua string which consists 
 of the \type{preChunk}. 
 
-\startLunaTests
+\startLuaTest
   assert_string(result)
   assert_equal("this is a simple text", result)
-\stopLunaTests
-\stopLunaTestCase
+\stopLuaTest
+\stopTestCase
 
-\startLunaTestCase
+\startTestCase[title=should combine previously rendered text]
 
 We next need to show that more complex collections of previously rendered 
 text are handled correctly. 
 
-\startLunaTests
+\startLuaTest
   local result = renderNextChunk("this is a final text", {
     "this is the first text",
     "this is the second text"
   }, "")
-\stopLunaTests
+\stopLuaTest
 
 The result should be the texts contained in the rendered text together 
 with the \type{prevChunck} all concatenated \emph{with no additional 
 white-space}. 
 
-\startLunaTests
+\startLuaTest
   assert_string(result)
   assert_equal(
     "this is the first textthis is the second textthis is a final text",
     result
   )
-\stopLunaTests
+\stopLuaTest
 
-\stopLunaTestCase
+\stopTestCase
 
-\stopLunaTestSuite
+\stopTestSuite
 
 \stopchapter
