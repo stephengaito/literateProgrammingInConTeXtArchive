@@ -27,7 +27,7 @@ local table_concat = table.concat
 --   https://john.nachtimwald.com/2014/08/06/using-lua-as-a-templating-engine/
 -- (via the minLua JoyLoL template engine)
 
-function litMods.renderNextChunk(prevChunk, renderedText, curtemplate)
+function litMods.renderNextChunk(prevChunk, renderedText, curTemplate)
   local result = ""
   
   if prevChunk
@@ -61,7 +61,7 @@ function litMods.renderNextChunk(prevChunk, renderedText, curtemplate)
             newChunk = luaFunc(litMods)
           end
         end
-        result = litMods.renderNextChunck(newChunk, renderedText, curTemplate)
+        result = litMods.renderNextChunk(newChunk, renderedText, curTemplate)
       end
     else -- there is no '{{' in the template
       table_insert(renderedText, curTemplate)
@@ -90,25 +90,28 @@ local function renderFile(aFilePath, baseTemplate)
 end
 
 function litMods.addMkIVCode(bufferName)
-  table_insert(code.mkiv, buffers.getcontent(bufferName))
+  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
+  table_insert(code.mkiv, bufferContents)
 end
 
 function litMods.createMkIVFile(aFilePath)
-  renderFile(aFilePath, litMods.templates.mkivFile)
+  renderFile(aFilePath, litMods.templates.mkiv.file)
 end
 
 function litMods.addLuaCode(bufferName)
-  table_insert(code.lua, buffers.getcontent(bufferName))
+  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
+  table_insert(code.lua, bufferContents)
 end
 
 function litMods.createLuaFile(aFilePath)
-  renderFile(aFilePath, litMods.templates.luaFile)
+  renderFile(aFilePath, litMods.templates.lua.file)
 end
 
 function litMods.addLuaTemplate(bufferName)
-  table_insert(code.templates, buffers.getcontent(bufferName))
+  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
+  table_insert(code.templates, bufferContents)
 end
 
-function litMods.creteLuaTemplateFile(aFilePath)
-  renderFile(aFilePath, litMods.templates.templateFile)
+function litMods.createLuaTemplateFile(aFilePath)
+  renderFile(aFilePath, litMods.templates.templates.file)
 end

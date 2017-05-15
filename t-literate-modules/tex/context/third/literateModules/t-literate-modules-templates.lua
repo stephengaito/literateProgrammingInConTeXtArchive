@@ -24,3 +24,14 @@ local pp = require('pl/pretty')
 local table_insert = table.insert
 local table_concat = table.concat
 
+templates.mkiv.file = [=[
+{{ return table.concat(thirddata.literateModules.code.mkiv, "\n\n") }}
+]=]
+
+templates.lua.file = [=[
+{{ return table.concat(thirddata.literateModules.code.lua, "\n\n") }}
+]=]
+
+templates.templates.file = [=[
+{{ return table.concat(thirddata.literateModules.code.templates, "\n\n") }}
+]=]
