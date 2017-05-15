@@ -1,0 +1,47 @@
+-- A Lua Lakefile
+
+local docDir = 't-literate-modules/doc/third/literateModules'
+
+local srcFiles = {
+  docDir..'/literateModules.tex',
+  docDir..'/overview.tex',
+  docDir..'/preamble.tex',
+  docDir..'/rendering.tex',
+  docDir..'/mkivCode.tex',
+  docDir..'/mkivTests.tex',
+  docDir..'/luaCode.tex',
+  docDir..'/luaTests.tex',
+  docDir..'/luaTemplates.tex',
+  docDir..'/luaTemplateTests.tex',
+  docDir..'/lakefiles.tex',
+  docDir..'/conclusion.tex'
+}
+
+local contextDoc = 
+  'cd '..docDir..' ; context literateModules.tex '
+
+local mkivFile = target(
+  'build/t-literate-modules.mkiv',
+  srcFiles,
+  contextDoc
+)
+
+local luaFile = target(
+  'build/t-literate-modules.lua',
+  srcFiles,
+  contextDoc
+)
+
+local templateFile = target(
+  'build/t-literate-modules-templates.lua',
+  srcFiles,
+  contextDoc
+)
+
+local lakefileFile = target(
+  'build/lakefile',
+  srcFiles,
+  contextDoc
+)
+
+default{ mkivFile, luaFile, templateFile, lakefileFile }

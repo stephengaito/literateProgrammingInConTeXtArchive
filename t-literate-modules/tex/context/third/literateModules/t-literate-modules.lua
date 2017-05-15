@@ -17,6 +17,7 @@ local code     = litMods.code
 code.mkiv      = {}
 code.lua       = {}
 code.templates = {}
+code.lakefile  = {}
 
 local pp = require('pl/pretty')
 local table_insert = table.insert
@@ -114,6 +115,15 @@ end
 
 function litMods.createLuaTemplateFile(aFilePath)
   renderFile(aFilePath, litMods.templates.templates.file)
+end
+
+function litMods.addLakefile(bufferName)
+  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
+  table_insert(code.lakefile, bufferContents)
+end
+
+function litMods.createLakefile(aFilePath)
+  renderFile(aFilePath, litMods.templates.lakefile.file)
 end
 
 function litMods.dumpLitModsTable()

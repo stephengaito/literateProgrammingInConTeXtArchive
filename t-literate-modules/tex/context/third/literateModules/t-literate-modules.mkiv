@@ -79,7 +79,7 @@
   \oldStopMkIVAltCode%
   \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
   
-%D \subsection{Implementation: createFile}
+%D \subsection{Implementation: create file}
 
 \def\createMkIVFile[#1]{
   \directlua{thirddata.literateModules.createMkIVFile('#1')}
@@ -101,7 +101,7 @@
   \oldStopLuaCode%
   \directlua{thirddata.literateModules.addLuaCode('_typing_')}}
 
-%D \subsection{Implementation: createFile}
+%D \subsection{Implementation: create file}
 
 \def\createLuaFile[#1]{
   \directlua{thirddata.literateModules.createLuaFile('#1')}
@@ -123,11 +123,35 @@
   \oldStopLuaTemplate%
   \directlua{thirddata.literateModules.addLuaTemplate('_typing_')}}
 
-%D \subsection{Implementation: createFile}
+%D \subsection{Implementation: create file}
 
 \def\createTemplateFile[#1]{
   \directlua{thirddata.literateModules.createLuaTemplateFile('#1')}
 }
+
+%D \section{Lakefile environment}
+
+%D \subsection{Implementation: start}
+
+\definetyping[Lakefile]
+\setuptyping[Lakefile][option=lua]
+
+%D \subsection{Implementation: stop}
+
+\let\oldStopLakefile=\stopLakefile
+\def\stopLakefile{%
+  \oldStopLakefile%
+  \directlua{thirddata.literateModules.addLakefile('_typing_')}}
+
+%D \subsection{Implementation: create file}
+
+\def\createLakefile[#1]{
+  \directlua{thirddata.literateModules.createLakefile('#1')}
+}
+
+%D \section{Literate Modules Table}
+
+%D \subsection{Implementation: create file}
 
 \def\createLitModsTableFile[#1]{
   \directlua{thirddata.literateModules.createLitModsTableFile('#1')}

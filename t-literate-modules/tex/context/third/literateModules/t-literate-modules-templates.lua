@@ -19,6 +19,7 @@ local templates        = litMods.templates
 templates.mkiv         = {}
 templates.lua          = {}
 templates.templates    = {}
+templates.lakefile     = {}
 templates.litModsTable = {}
 
 local pp = require('pl/pretty')
@@ -35,6 +36,10 @@ templates.lua.file = [=[
 
 templates.templates.file = [=[
 {{ return table.concat(thirddata.literateModules.code.templates, "\n\n") }}
+]=]
+
+templates.lakefile.file = [=[
+{{ return table.concat(thirddata.literateModules.code.lakefile, "\n\n") }}
 ]=]
 
 templates.litModsTable.file = [=[
