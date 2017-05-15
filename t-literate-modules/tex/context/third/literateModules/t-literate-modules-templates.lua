@@ -13,12 +13,13 @@ if not modules then modules = { } end modules ['t-literate-modules-templates'] =
 thirddata                 = thirddata                 or {}
 thirddata.literateModules = thirddata.literateModules or {}
 
-local litMods       = thirddata.literateModules
-litMods.templates   = {}
-local templates     = litMods.templates
-templates.mkiv      = {}
-templates.lua       = {}
-templates.templates = {}
+local litMods          = thirddata.literateModules
+litMods.templates      = {}
+local templates        = litMods.templates
+templates.mkiv         = {}
+templates.lua          = {}
+templates.templates    = {}
+templates.litModsTable = {}
 
 local pp = require('pl/pretty')
 local table_insert = table.insert
@@ -34,4 +35,8 @@ templates.lua.file = [=[
 
 templates.templates.file = [=[
 {{ return table.concat(thirddata.literateModules.code.templates, "\n\n") }}
+]=]
+
+templates.litModsTable.file = [=[
+{{ return thirddata.literateModules.dumpLitModsTable() }}
 ]=]

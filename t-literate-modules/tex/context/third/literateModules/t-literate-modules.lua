@@ -82,9 +82,9 @@ end
 
 local function renderFile(aFilePath, baseTemplate)
   local outFile = io.open(aFilePath, 'w')
-  outFile:write(pp.write(litMods))
+  --outFile:write(pp.write(litMods))
   local renderedBaseTemplate = litMods.renderNextChunk("", {}, baseTemplate)
-  outFile:write('\n--------------\n')
+  --outFile:write('\n--------------\n')
   outFile:write(renderedBaseTemplate)
   outFile:close()
 end
@@ -114,4 +114,12 @@ end
 
 function litMods.createLuaTemplateFile(aFilePath)
   renderFile(aFilePath, litMods.templates.templates.file)
+end
+
+function litMods.dumpLitModsTable()
+  return pp.write(litMods)
+end
+
+function litMods.createLitModsTableFile(aFilePath)
+  renderFile(aFilePath, litMods.templates.litModsTable.file)
 end
