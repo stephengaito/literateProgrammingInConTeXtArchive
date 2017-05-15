@@ -1,7 +1,5 @@
 -- A Lua file of t-literate-module templates
 
--- A Lua file (the lua code associated with t-literate-modules.mkiv)
-
 if not modules then modules = { } end modules ['t-literate-modules-templates'] = {
     version   = 1.000,
     comment   = "Literate MkIV ConTeXt modules - templates",
@@ -22,7 +20,6 @@ templates.templates    = {}
 templates.lakefile     = {}
 templates.litModsTable = {}
 
-local pp = require('pl/pretty')
 local table_insert = table.insert
 local table_concat = table.concat
 

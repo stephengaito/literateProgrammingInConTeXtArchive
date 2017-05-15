@@ -43,7 +43,7 @@ function litMods.renderNextChunk(prevChunk, renderedText, curTemplate)
             newChunk = luaFunc(litMods)
           end
         end
-        result = litMods.renderNextChunck(newChunk, renderedText, curTemplate)
+        result = litMods.renderNextChunk(newChunk, renderedText, curTemplate)
       end
     else -- there is no '{{' in the template
       table_insert(renderedText, curTemplate)
@@ -64,9 +64,9 @@ end
 
 local function renderFile(aFilePath, baseTemplate)
   local outFile = io.open(aFilePath, 'w')
-  outFile:write(pp.write(litMods))
+  --outFile:write(pp.write(litMods))
   local renderedBaseTemplate = litMods.renderNextChunk("", {}, baseTemplate)
-  outFile:write('\n--------------\n')
+  --outFile:write('\n--------------\n')
   outFile:write(renderedBaseTemplate)
   outFile:close()
 end

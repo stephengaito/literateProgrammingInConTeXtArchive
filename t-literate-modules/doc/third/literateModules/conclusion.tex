@@ -2,6 +2,49 @@
 
 \startchapter[title=Conclusion]
 
+\section[title=Finalizing code]
+
+We need to finalize each of the module files. We take this oportunity to 
+provide a \quote{pretty printed} version of the literate modules code that 
+has been captured. This will greatly help in any required debugging of the 
+module creation code. 
+
+\startMkIVCode
+
+%D \section{Literate Modules Table}
+
+%D \subsection{Implementation: create file}
+
+\def\createLitModsTableFile[#1]{
+  \directlua{thirddata.literateModules.createLitModsTableFile('#1')}
+}
+
+\protect \endinput
+
+\stopMkIVCode
+
+\startLuaCode
+
+function litMods.dumpLitModsTable()
+  return pp.write(litMods)
+end
+
+function litMods.createLitModsTableFile(aFilePath)
+  renderFile(aFilePath, litMods.templates.litModsTable.file)
+end
+
+\stopLuaCode
+
+\startLuaTemplate
+
+templates.litModsTable.file = [=[
+{{ return thirddata.literateModules.dumpLitModsTable() }}
+]=]
+
+\stopLuaTemplate
+
+\section[title=Creating module files]
+
 \createMkIVFile[../../../../build/t-literate-modules.mkiv]
 
 \createLuaFile[../../../../build/t-literate-modules.lua]

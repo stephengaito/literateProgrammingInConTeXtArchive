@@ -30,24 +30,24 @@ local table_concat = table.concat
 
 function litMods.renderNextChunk(prevChunk, renderedText, curTemplate)
   local result = ""
-  
+ 
   if prevChunk
     and type(prevChunk) == 'string'
     and 0 < #prevChunk then
     table_insert(renderedText, prevChunk)
   end
-  
+ 
   if type(curTemplate) == 'string' and (0 < #curTemplate) then
     if curTemplate:find('{{') then
       local position  = 1
       local textChunk = curTemplate:match('^.*{{', position)
-      if textChunk then 
+      if textChunk then
         local textChunkLen = #textChunk
         textChunk = textChunk:sub(1, textChunkLen-2)
         if 0 < #textChunk then table_insert(renderedText, textChunk) end
         position = position + textChunkLen
       end
-      
+ 
       local luaChunk = curTemplate:match('^.+}}', position)
       if luaChunk then
         local luaChunkLen = #luaChunk
@@ -79,7 +79,7 @@ function litMods.render(aTemplate)
   return litMods.renderNextChunk("", { }, aTemplate)
 end
 
--- Now we need the code that captures and creates a given code/file type 
+-- Now we need the code that captures and creates a given code/file type
 
 local function renderFile(aFilePath, baseTemplate)
   local outFile = io.open(aFilePath, 'w')

@@ -33,7 +33,7 @@ specific name.
 %D \subsection{Implementation: start (MkIV)}
 
 \definetyping[MkIVCode]
-\setuptyping[MkIVode][option=lua]
+\setuptyping[MkIVCode][option=tex]
 
 \stopMkIVCode
 
@@ -72,7 +72,7 @@ allows use to define each environment inside the other environment.
 %D \subsection{Implementation: start (MkIVAlt)}
 
 \definetyping[MkIVAltCode]
-\setuptyping[MkIVAltCode][option=lua]
+\setuptyping[MkIVAltCode][option=tex]
 
 \stopMkIVCode
 
@@ -100,9 +100,9 @@ Having defined the \type{\stopMkIVCode}, we can now define the
 \let\oldStopMkIVAltCode=\stopMkIVAltCode
 \def\stopMkIVAltCode{%
   \oldStopMkIVAltCode%
- \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
+  \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
 
- \stopMkIVCode
+\stopMkIVCode
 
  Once the \type{MkIV} code has been captured and typeset, we need to 
 specify where we want to store it until we ultimately render it via 
@@ -116,7 +116,8 @@ and inserts it at the end of the \type{code.mkiv} array.
 
 \startLuaCode
 function litMods.addMkIVCode(bufferName)
-  table_insert(code.mkiv, buffers.getcontent(bufferName))
+  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
+  table_insert(code.mkiv, bufferContents)
 end
 \stopLuaCode
 
@@ -131,7 +132,7 @@ extension.
  %D \subsection{Implementation: createFile}
 
 \def\createMkIVFile[#1]{
-  \directlua{thirddata.literateModules.createMkIVFile(#1)}
+  \directlua{thirddata.literateModules.createMkIVFile('#1')}
 }
 
 \stopMkIVCode
@@ -141,12 +142,15 @@ Lua function.
 
 \startLuaCode
 function litMods.createMkIVFile(aFilePath)
-  renderFile(aFilePath, litMods.templates.mkIVFile)
+  renderFile(aFilePath, litMods.templates.mkiv.file)
 end
 \stopLuaCode
 
 \startLuaTemplate
 
+templates.mkiv.file = [=[
+{{ return table.concat(thirddata.literateModules.code.mkiv, "\n\n") }}
+]=]
 
 \stopLuaTemplate
 

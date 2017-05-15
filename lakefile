@@ -1,7 +1,7 @@
 -- A Lua Lakefile
 
 local docDir = 't-literate-modules/doc/third/literateModules'
-
+local moduleDir = 't-literate-modules/tex/context/third/literateModules'
 local srcFiles = {
   docDir..'/literateModules.tex',
   docDir..'/overview.tex',
@@ -17,31 +17,60 @@ local srcFiles = {
   docDir..'/conclusion.tex'
 }
 
-local contextDoc = 
+local contextDoc =
   'cd '..docDir..' ; context literateModules.tex '
 
-local mkivFile = target(
-  'build/t-literate-modules.mkiv',
-  srcFiles,
-  contextDoc
-)
+local moduleTargets = {
+  't-literate-modules.mkiv',
+  't-literate-modules.lua',
+  't-literate-modules-templates.lua'
+}
 
-local luaFile = target(
-  'build/t-literate-modules.lua',
-  srcFiles,
-  contextDoc
-)
+local buildTargets   = { }
+local diffTargets    = { }
+local installTargets = { }
 
-local templateFile = target(
-  'build/t-literate-modules-templates.lua',
-  srcFiles,
-  contextDoc
-)
+for i, aTarget in ipairs(moduleTargets) do
 
-local lakefileFile = target(
+  table.insert(buildTargets, target(
+    'build/'..aTarget,
+    srcFiles,
+    contextDoc
+  ))
+
+  table.insert(diffTargets, target(
+    'diff-'..aTarget,
+    'build/'..aTarget,
+    'diff $(DEPENDS) '..moduleDir..'/'..aTarget
+  ))
+
+  table.insert(installTargets, target(
+    moduleDir..'/'..aTarget,
+    'build/'..aTarget,
+    'cp $(DEPENDS) $(TARGET)'
+  ))
+end
+
+table.insert(buildTargets, target(
   'build/lakefile',
   srcFiles,
   contextDoc
-)
+))
 
-default{ mkivFile, luaFile, templateFile, lakefileFile }
+table.insert(diffTargets, target(
+  'diff-lakefile',
+  'build/lakefile',
+  'diff $(DEPENDS) lakefile'
+))
+
+table.insert(installTargets, target(
+  'lakefile',
+  'build/lakefile',
+  'cp $(DEPENDS) $(TARGET)'
+))
+
+target('install', installTargets)
+
+target('diff', diffTargets)
+
+default(buildTargets)

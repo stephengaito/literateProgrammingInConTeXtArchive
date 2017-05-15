@@ -14,7 +14,6 @@ respective preambles provide:
 \stopitemize
 
 \startMkIVCode
-
 % ConTeXt MkIV module
 %D \module
 %D   [     file=t-literate-modules,
@@ -64,11 +63,9 @@ respective preambles provide:
 
 \ctxloadluafile{t-literate-modules}
 \ctxloadluafile{t-literate-modules-templates}
-
 \stopMkIVCode
 
 \startLuaCode
-
 -- A Lua file (the lua code associated with t-literate-modules.mkiv)
 
 if not modules then modules = { } end modules ['t-literate-modules'] = {
@@ -88,11 +85,39 @@ local code     = litMods.code
 code.mkiv      = {}
 code.lua       = {}
 code.templates = {}
+code.lakefile  = {}
 
 local pp = require('pl/pretty')
 local table_insert = table.insert
 local table_concat = table.concat
-
 \stopLuaCode
+
+\startLuaTemplate
+-- A Lua file of t-literate-module templates
+
+if not modules then modules = { } end modules ['t-literate-modules-templates'] = {
+    version   = 1.000,
+    comment   = "Literate MkIV ConTeXt modules - templates",
+    author    = "PerceptiSys Ltd (Stephen Gaito)",
+    copyright = "PerceptiSys Ltd (Stephen Gaito)",
+    license   = "MIT License"
+}
+
+thirddata                 = thirddata                 or {}
+thirddata.literateModules = thirddata.literateModules or {}
+
+local litMods          = thirddata.literateModules
+litMods.templates      = {}
+local templates        = litMods.templates
+templates.mkiv         = {}
+templates.lua          = {}
+templates.templates    = {}
+templates.lakefile     = {}
+templates.litModsTable = {}
+
+local table_insert = table.insert
+local table_concat = table.concat
+
+\stopLuaTemplate
 
 \stopchapter

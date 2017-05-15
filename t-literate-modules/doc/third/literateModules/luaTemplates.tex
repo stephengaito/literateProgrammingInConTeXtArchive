@@ -1,1 +1,52 @@
 % A ConTeXt document [master document: literateModules.tex]
+
+\startchapter[title=Lua Templates]
+
+\startMkIVCode
+
+%D \section{Template environment}
+
+%D \subsection{Examples}
+
+%D \subsection{Implementation: start}
+
+\definetyping[LuaTemplate]
+\setuptyping[Template][option=lua]
+
+%D \subsection{Implementation: stop}
+
+\let\oldStopLuaTemplate=\stopLuaTemplate
+\def\stopLuaTemplate{%
+  \oldStopLuaTemplate%
+  \directlua{thirddata.literateModules.addLuaTemplate('_typing_')}}
+
+%D \subsection{Implementation: create file}
+
+\def\createTemplateFile[#1]{
+  \directlua{thirddata.literateModules.createLuaTemplateFile('#1')}
+}
+
+\stopMkIVCode
+
+\startLuaCode
+
+function litMods.addLuaTemplate(bufferName)
+  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
+  table_insert(code.templates, bufferContents)
+end
+
+function litMods.createLuaTemplateFile(aFilePath)
+  renderFile(aFilePath, litMods.templates.templates.file)
+end
+
+\stopLuaCode
+
+\startLuaTemplate
+
+templates.templates.file = [=[
+{{ return table.concat(thirddata.literateModules.code.templates, "\n\n") }}
+]=]
+
+\stopLuaTemplate
+
+\stopchapter
