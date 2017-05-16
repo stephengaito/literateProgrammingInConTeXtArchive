@@ -1,6 +1,6 @@
 -- A Lua Lakefile
 
-local docDir = 't-literate-modules/doc/third/literateModules'
+local docDir    = 't-literate-modules/doc/context/third/literateModules'
 local moduleDir = 't-literate-modules/tex/context/third/literateModules'
 local srcFiles = {
   docDir..'/literateModules.tex',
