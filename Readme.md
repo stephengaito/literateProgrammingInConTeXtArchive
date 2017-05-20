@@ -1,5 +1,3 @@
-# Literate programming of ConTeXt MkIV modules
-
 # Literate Programming in ConTeXt
 
 Literate programming in ConTeXt is an exploration of the concepts and 
