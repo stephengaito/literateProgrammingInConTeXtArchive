@@ -1,5 +1,11 @@
 # Literate programming of ConTeXt MkIV modules
 
+# Literate Programming in ConTeXt
+
+Literate programming in ConTeXt is an exploration of the concepts and 
+tools required to provide a literate exposition of the DiSimplex project 
+including its core programming language JoyLoL.
+
 ## License
 
 All C, Lua, and ConTeXt code (*.c, *.h, *.lua, *.mkiv files) is, except 
