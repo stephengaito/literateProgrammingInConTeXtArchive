@@ -9,19 +9,24 @@
 \installcommandhandler \????LitProgs {LitProgs} \????LitProgs
 
 \appendtoks
-  \let\csname oldStop \something\endcsname=\csname \e!stop \something\endcsname
-  \def\csname \e!stop \something\endcsname{%
-    \csname oldStop \something\endcsname%
-    \directlua{thirddata.literateProgs.addCode(\something,
-                                               \somethingelse,
-                                               '_typing_')}
-  }
-  \def\csname create\something File\endcsname[#1]{%
-    \directlua{thirddata.literateProgs.createCodeFile(\something,
-                                                      \somethingElse,
-                                                      '#1')}
-  }
+  \letvalue{oldStop\currentLitProgs}=\getvalue{\e!stop\currentLitProgs}
+  \setuevalue{\e!stop \currentLitProgs}{%
+    \getvalue{oldStop \currentLitProgs}%
+    \addLitProgsCode[\currentLitProgs]}
+  \setuevalue{create\currentLitProgs File}{\createLitProgs[\currentLitProgs]}
 \to \everydefineLitProgs
+
+\def\addLitProgsCode{%
+  \directlua{thirddata.literateProgs.addCode(\currentLitProgs,
+                                             \somethingelse,
+                                             '_typing_')}
+}
+
+\def\createLitProgsFile{%
+  \directlua{thirddata.literateProgs.createCodeFile(\currentLitProgs,
+                                                    \somethingElse,
+                                                    '#1')}
+}
 
 \stopMkIVCode
 
