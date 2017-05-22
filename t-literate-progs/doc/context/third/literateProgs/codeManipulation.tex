@@ -1,0 +1,48 @@
+% A ConTeXt document [master document: literateProgs.tex]
+
+\startchapter[title=The capture and manipulation of code]
+
+\startMkIVCode
+
+\installnamespac{LitProgs}
+
+\installcommandhandler \????LitProgs {LitProgs} \????LitProgs
+
+\appendtoks
+  \let\csname oldStop \something\endcsname=\csname \e!stop \something\endcsname
+  \def\csname \e!stop \something\endcsname{%
+    \csname oldStop \something\endcsname%
+    \directlua{thirddata.literateProgs.addCode(\something,
+                                               \somethingelse,
+                                               '_typing_')}
+  }
+  \def\csname create\something File\endcsname[#1]{%
+    \directlua{thirddata.literateProgs.createCodeFile(\something,
+                                                      \somethingElse,
+                                                      '#1')}
+  }
+\to \everydefineLitProgs
+
+\stopMkIVCode
+
+\startLuaCode
+
+function litProgs.addCode(cType, cSubType, bufferName)
+  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
+  code[cType]          = code[cType] or { }
+  local codeType       = code[codeType]
+  codeType[cSubType]   = codeType[cSubType] or { }
+  local codeSubType    = codeType[cSubType]
+  table_insert(codeSubType, bufferContents)
+end
+
+function litProgs.createCodeFile(cType, cSubType, aFilePath)
+  -- here be dragons! -- how do we pass in cType and cSubType
+  renderFile(aFilePath, litProgs.templates.lua.file)
+  -- here be dragons!
+end
+
+
+\stopLuaCode
+
+\stopchapter
