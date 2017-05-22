@@ -1,4 +1,4 @@
-% A ConTeXt document [master document: literateProgramming.tex]
+% A ConTeXt document [master document: literateProgs.tex]
 
 \startchapter[title=Overview] 
 
@@ -69,7 +69,7 @@ integrated with the communication of its meaning.
 
 There are a number of ways in which we \emph{can} implement the 
 \emph{calculation} of the correctness of a mathematical argument. 
-Currently such calcualtions take place in a specialized \quote{theorem 
+Currently such calculations take place in a specialized \quote{theorem 
 proving tool}, such as ... Sometimes, these tools provide ways to output 
 the resulting \quote{proof} into \LaTeX. However, with this approach, the 
 integration of the mathematical discussion with the computational proof is 
@@ -77,7 +77,7 @@ very far from seamless or natural.
 
 We could instead use a mathematically literate text processing tool which 
 has been extended with the ability to either internally or externally 
-compute the correctness of a suitably formated argument. The \TeX\ family 
+compute the correctness of a suitably formatted argument. The \TeX\ family 
 of text processing tools provide tools to easily extend and use 
 mathematical notation. Unfortunately \quote{programming} inside either 
 native \TeX\ or \LaTeX\ is prohibitively difficult. While \TeX\ is 
@@ -107,7 +107,7 @@ While, at the moment, \LaTeX\ is definitely the more popular variant of
 inside \LaTeX\ is prohibitively difficult. Doing the same thing inside 
 \ConTeXt\ is fairly straight forward. 
 
-\section{Why produce another literate module format?} 
+\section{Why produce another literate programming format?} 
 
 The \ConTeXt\ MkII and MkIV modules are already built using an existing 
 literate programming format. I would strongly recommend any \ConTeXt\ 
@@ -118,15 +118,15 @@ relationship between the \LuaTeX\ and Lua code used to implement a
 collection of tests. 
 
 By using \ConTeXt\ itself to provide a unified description of a given 
-\ConTeXt\ module, we have, all in one file, intent, documentation, code 
-(both MkIV and Lua) as well as tests\footnote{One of the definite 
-drawbacks of our \type{t-literate-modules} approach is that the inevitable 
-error message line numbers do not directly correspond to those in the code 
-fragments in the literate module description. This is definitely a good 
-reason for \emph{most} \ConTeXt\ modules to be written using the existing 
-literate style. However, for our purposes providing a fluid description 
-for all of our artefacts out weighs the slight inconsistencies in error 
-message line numbers.}. 
+programming artefact, we have, all in one file, intent, documentation, 
+code as well as tests\footnote{One of the definite drawbacks of our 
+\type{t-literate-progs} approach is that the inevitable error message line 
+numbers do not directly correspond to those in the code fragments in the 
+literate module description. This is definitely a good reason for 
+\emph{most} \ConTeXt\ modules to be written using the existing literate 
+style. However, for our purposes providing a fluid description for all of 
+our artefacts out weighs the slight inconsistencies in error message line 
+numbers.}. 
 
 \section{How to be a literate module programmer?} 
 
@@ -137,7 +137,8 @@ computational fragments and commit them to disk files in a structure which
 the compiler of one or more programming languages can turn these 
 computational fragments into executable code. This \emph{is} Donald 
 Knuth's vision, \cite{knuth1984literateProgramming}, and \TeX\ and its 
-corresponding \type{WEB} was the original implementation of this vision. 
+corresponding \type{WEB} literate programming system was the original 
+implementation of this vision. 
 
 \ConTeXt\ provides a very much more modern tool in which to implement 
 literate programming. The MkIV implementation of the \type{typing} 
@@ -151,31 +152,32 @@ tool, implemented in \ConTeXt\, can then, using Lua, access the contents
 of these typing buffers and use them to format an appropriate collection 
 of files which can then be compiled using appropriate compilers. 
 
-\emph{This} \type{t-literate-modules} module captures these buffers and 
-creates the MkIV and Lua files which together implement the module being 
-described. It also creates Lunatest files with which to actively test the 
-implementation described in the code fragments. Finally, the 
-\type{t-literate-modules} module creates the Lua Lakefiles required to 
-orchestrate the overall creation, compilation, testing and installation 
-of the described module. 
+\emph{This} \type{t-literate-progs} module captures these buffers and 
+creates the code files which together implement the programming artefact 
+being described. It also creates Lunatest files with which to actively 
+test the implementation described in the code fragments. Finally, the 
+\type{t-literate-progs} module creates the Lua Lakefiles required to 
+orchestrate the overall creation, compilation, testing and installation of 
+the described module. 
 
-To capture a given \ConTeXt\ module, we need, at the very least, 
-\type{typing} environments which capture both MkIV, Lua code as well as 
-MkIV and Lua based tests. To make the formating code and test files 
-easier, we also need a collection of (Lua based) templates. This suggests 
-we also need \type{typing} environments which capture these templates and 
-their associated tests. In subsequent chapters we will describe the 
-following environments: 
-%
+To capture a given programming artefact, we need, at the very least, 
+\type{typing} environments which capture the code as well as associated 
+tests. To make the formating code and test files easier, we also need a 
+collection of (Lua based) templates. This suggests we also need 
+\type{typing} environments which capture these templates and their 
+associated tests. In subsequent chapters we will describe the following 
+environments:
+
+
 \startitemize
-\item MkIV code
-\item MkIV tests
-\item Lua code
-\item Lua tests
-\item Lua templates
-\item Lua template tests
-\item Lakefiles
-\stopitemize
+  \item MkIV code
+  \item MkIV tests
+  \item Lua code
+  \item Lua tests
+  \item Lua templates
+  \item Lua template tests
+  \item Lakefiles
+\stopitemize 
 
 \stopchapter 
 

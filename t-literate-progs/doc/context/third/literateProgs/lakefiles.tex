@@ -1,10 +1,10 @@
-% A ConTeXt document [master document: literateProgramming.tex]
+% A ConTeXt document [master document: literateProgs.tex]
 
 \startchapter[title=Lakefile]
 
 We use a slightly updated version of Steve Donovan's Lakefile tool to 
 drive the creation of the various files required by any given 
-\type{t-literate-modules} managed \ConTeXt\ module. 
+\type{t-literate-progs} managed \ConTeXt\ program. 
 
 \startMkIVCode
 
@@ -20,25 +20,25 @@ drive the creation of the various files required by any given
 \let\oldStopLakefile=\stopLakefile
 \def\stopLakefile{%
   \oldStopLakefile%
-  \directlua{thirddata.literateModules.addLakefile('_typing_')}}
+  \directlua{thirddata.literateProgs.addLakefile('_typing_')}}
 
 %D \subsection{Implementation: create file}
 
 \def\createLakefile[#1]{
-  \directlua{thirddata.literateModules.createLakefile('#1')}
+  \directlua{thirddata.literateProgs.createLakefile('#1')}
 }
 
 \stopMkIVCode
 
 \startLuaCode
 
-function litMods.addLakefile(bufferName)
+function litProgs.addLakefile(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
   table_insert(code.lakefile, bufferContents)
 end
 
-function litMods.createLakefile(aFilePath)
-  renderFile(aFilePath, litMods.templates.lakefile.file)
+function litProgs.createLakefile(aFilePath)
+  renderFile(aFilePath, litProgs.templates.lakefile.file)
 end
 
 \stopLuaCode
@@ -46,7 +46,7 @@ end
 \startLuaTemplate
 
 templates.lakefile.file = [=[
-{{ return table.concat(thirddata.literateModules.code.lakefile, "\n\n") }}
+{{ return table.concat(thirddata.literateProgs.code.lakefile, "\n\n") }}
 ]=]
 
 \stopLuaTemplate
@@ -55,11 +55,11 @@ templates.lakefile.file = [=[
 -- A Lua Lakefile
 
 local docDir    =
-  't-literate-programming/doc/context/third/literateProgramming'
+  't-literate-progs/doc/context/third/literateProgs'
 local moduleDir =
-  't-literate-programming/tex/context/third/literateProgramming'
+  't-literate-progs/tex/context/third/literateProgs'
 local srcFiles = {
-  docDir..'/literateProgramming.tex',
+  docDir..'/literateProgs.tex',
   docDir..'/overview.tex',
   docDir..'/preamble.tex',
   docDir..'/rendering.tex',
@@ -74,12 +74,12 @@ local srcFiles = {
 }
 
 local contextDoc = 
-  'cd '..docDir..' ; context literateProgramming.tex '
+  'cd '..docDir..' ; context literateProgs.tex '
 
 local moduleTargets = {
-  't-literate-programming.mkiv',
-  't-literate-programming.lua',
-  't-literate-programming-templates.lua'
+  't-literate-progs.mkiv',
+  't-literate-progs.lua',
+  't-literate-progs-templates.lua'
 }
 
 local buildTargets   = { }

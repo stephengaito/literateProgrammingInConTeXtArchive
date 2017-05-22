@@ -1,4 +1,4 @@
-% A ConTeXt document [master document: literateProgramming.tex]
+% A ConTeXt document [master document: literateProgs.tex]
 
 \startchapter[title=Lua Templates]
 
@@ -18,25 +18,25 @@
 \let\oldStopLuaTemplate=\stopLuaTemplate
 \def\stopLuaTemplate{%
   \oldStopLuaTemplate%
-  \directlua{thirddata.literateModules.addLuaTemplate('_typing_')}}
+  \directlua{thirddata.literateProgs.addLuaTemplate('_typing_')}}
 
 %D \subsection{Implementation: create file}
 
 \def\createTemplateFile[#1]{
-  \directlua{thirddata.literateModules.createLuaTemplateFile('#1')}
+  \directlua{thirddata.literateProgs.createLuaTemplateFile('#1')}
 }
 
 \stopMkIVCode
 
 \startLuaCode
 
-function litMods.addLuaTemplate(bufferName)
+function litProgs.addLuaTemplate(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
   table_insert(code.templates, bufferContents)
 end
 
-function litMods.createLuaTemplateFile(aFilePath)
-  renderFile(aFilePath, litMods.templates.templates.file)
+function litProgs.createLuaTemplateFile(aFilePath)
+  renderFile(aFilePath, litProgs.templates.templates.file)
 end
 
 \stopLuaCode
@@ -44,7 +44,7 @@ end
 \startLuaTemplate
 
 templates.templates.file = [=[
-{{ return table.concat(thirddata.literateModules.code.templates, "\n\n") }}
+{{ return table.concat(thirddata.literateProgs.code.templates, "\n\n") }}
 ]=]
 
 \stopLuaTemplate

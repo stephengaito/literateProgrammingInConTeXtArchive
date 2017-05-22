@@ -1,4 +1,4 @@
-% A ConTeXt document [master document: literateProgramming.tex]
+% A ConTeXt document [master document: literateProgs.tex]
 
 \startchapter[title=Preamble]
 
@@ -16,10 +16,10 @@ respective preambles provide:
 \startMkIVCode
 % ConTeXt MkIV module
 %D \module
-%D   [     file=t-literate-modules,
+%D   [     file=t-literate-progs,
 %D      version=2017.05.10,
 %D        title=\CONTEXT\ User module,
-%D     subtitle=Literate \ConTeXt\ modules,
+%D     subtitle=Literate Programming in \ConTeXt,
 %D       author=Stephen Gaito,
 %D         date=\currentdate,
 %D    copyright=PerceptiSys Ltd (Stephen Gaito),
@@ -49,43 +49,44 @@ respective preambles provide:
 
 % begin info
 %
-% title   : JoyLoL CoAlgebra definitions
+% title   : Literate Programming in ConTeXt
 % comment : Provides structured document and code generation
 % status  : under development, mkiv only
 %
 % end info
 
-%M \usemodule[literate-programming]
+%M \usemodule[literate-progs]
 
 \usemodule[t-contests]
 
 \unprotect
 
-\ctxloadluafile{t-literate-programming}
-\ctxloadluafile{t-literate-programming-templates}
+\ctxloadluafile{t-literate-progs}
+\ctxloadluafile{t-literate-progs-templates}
 \stopMkIVCode
 
 \startLuaCode
--- A Lua file (the lua code associated with t-literate-modules.mkiv)
+-- A Lua file (the lua code associated with t-literate-progs.mkiv)
 
-if not modules then modules = { } end modules ['t-literate-modules'] = {
+if not modules then modules = { } end
+modules ['t-literate-progs'] = {
     version   = 1.000,
-    comment   = "Literate MkIV ConTeXt modules - lua",
+    comment   = "Literate Programming in ConTeXt - lua",
     author    = "PerceptiSys Ltd (Stephen Gaito)",
     copyright = "PerceptiSys Ltd (Stephen Gaito)",
     license   = "MIT License"
 }
 
-thirddata                 = thirddata                 or {}
-thirddata.literateModules = thirddata.literateModules or {}
+thirddata               = thirddata               or {}
+thirddata.literateProgs = thirddata.literateProgs or {}
 
-local litMods  = thirddata.literateModules
-litMods.code   = {}
-local code     = litMods.code
-code.mkiv      = {}
-code.lua       = {}
-code.templates = {}
-code.lakefile  = {}
+local litProgs  = thirddata.literateProgs
+litProgs.code   = {}
+local code      = litProgs.code
+code.mkiv       = {}
+code.lua        = {}
+code.templates  = {}
+code.lakefile   = {}
 
 local pp = require('pl/pretty')
 local table_insert = table.insert
@@ -93,27 +94,28 @@ local table_concat = table.concat
 \stopLuaCode
 
 \startLuaTemplate
--- A Lua file of t-literate-module templates
+-- A Lua file of t-literate-progs templates
 
-if not modules then modules = { } end modules ['t-literate-modules-templates'] = {
+if not modules then modules = { } end
+modules ['t-literate-progs-templates'] = {
     version   = 1.000,
-    comment   = "Literate MkIV ConTeXt modules - templates",
+    comment   = "Literate Programming in ConTeXt - templates",
     author    = "PerceptiSys Ltd (Stephen Gaito)",
     copyright = "PerceptiSys Ltd (Stephen Gaito)",
     license   = "MIT License"
 }
 
-thirddata                 = thirddata                 or {}
-thirddata.literateModules = thirddata.literateModules or {}
+thirddata               = thirddata               or {}
+thirddata.literateProgs = thirddata.literateProgs or {}
 
-local litMods          = thirddata.literateModules
-litMods.templates      = {}
-local templates        = litMods.templates
-templates.mkiv         = {}
-templates.lua          = {}
-templates.templates    = {}
-templates.lakefile     = {}
-templates.litModsTable = {}
+local litProgs          = thirddata.literateProgs
+litProgs.templates      = {}
+local templates         = litProgs.templates
+templates.mkiv          = {}
+templates.lua           = {}
+templates.templates     = {}
+templates.lakefile      = {}
+templates.litProgsTable = {}
 
 local table_insert = table.insert
 local table_concat = table.concat

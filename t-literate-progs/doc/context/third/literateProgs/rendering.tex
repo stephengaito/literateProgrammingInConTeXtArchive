@@ -1,4 +1,4 @@
-% A ConTeXt document [master document: literateProgramming.tex]
+% A ConTeXt document [master document: literateProgs.tex]
 
 \startchapter[title=The Lua Rendering Engine]
 
@@ -9,7 +9,7 @@
 --   https://john.nachtimwald.com/2014/08/06/using-lua-as-a-templating-engine/
 -- (via the minLua JoyLoL template engine)
 
-function litMods.renderNextChunk(prevChunk, renderedText, curTemplate)
+function litProgs.renderNextChunk(prevChunk, renderedText, curTemplate)
   local result = ""
   
   if prevChunk
@@ -40,10 +40,10 @@ function litMods.renderNextChunk(prevChunk, renderedText, curTemplate)
           -- consider using an PCall here....
           local luaFunc, errMessage = load(luaChunk)
           if luaFunc then
-            newChunk = luaFunc(litMods)
+            newChunk = luaFunc(litProgs)
           end
         end
-        result = litMods.renderNextChunk(newChunk, renderedText, curTemplate)
+        result = litProgs.renderNextChunk(newChunk, renderedText, curTemplate)
       end
     else -- there is no '{{' in the template
       table_insert(renderedText, curTemplate)
@@ -56,16 +56,16 @@ function litMods.renderNextChunk(prevChunk, renderedText, curTemplate)
   return result
 end
 
-function litMods.render(aTemplate)
-  return litMods.renderNextChunk("", { }, aTemplate)
+function litProgs.render(aTemplate)
+  return litProgs.renderNextChunk("", { }, aTemplate)
 end
 
 -- Now we need the code that captures and creates a given code/file type 
 
 local function renderFile(aFilePath, baseTemplate)
   local outFile = io.open(aFilePath, 'w')
-  --outFile:write(pp.write(litMods))
-  local renderedBaseTemplate = litMods.renderNextChunk("", {}, baseTemplate)
+  --outFile:write(pp.write(litProgs))
+  local renderedBaseTemplate = litProgss.renderNextChunk("", {}, baseTemplate)
   --outFile:write('\n--------------\n')
   outFile:write(renderedBaseTemplate)
   outFile:close()

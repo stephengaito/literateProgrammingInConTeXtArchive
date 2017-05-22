@@ -1,11 +1,11 @@
 -- A Lua Lakefile
 
 local docDir    =
-  't-literate-programming/doc/context/third/literateProgramming'
+  't-literate-progs/doc/context/third/literateProgs'
 local moduleDir =
-  't-literate-programming/tex/context/third/literateProgramming'
+  't-literate-progs/tex/context/third/literateProgs'
 local srcFiles = {
-  docDir..'/literateProgramming.tex',
+  docDir..'/literateProgs.tex',
   docDir..'/overview.tex',
   docDir..'/preamble.tex',
   docDir..'/rendering.tex',
@@ -20,12 +20,12 @@ local srcFiles = {
 }
 
 local contextDoc =
-  'cd '..docDir..' ; context literateProgramming.tex '
+  'cd '..docDir..' ; context literateProgs.tex '
 
 local moduleTargets = {
-  't-literate-programming.mkiv',
-  't-literate-programming.lua',
-  't-literate-programming-templates.lua'
+  't-literate-progs.mkiv',
+  't-literate-progs.lua',
+  't-literate-progs-templates.lua'
 }
 
 local buildTargets   = { }

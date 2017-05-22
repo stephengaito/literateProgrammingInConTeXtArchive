@@ -1,0 +1,58 @@
+% A ConTeXt document [master document: literateProgs.tex]
+
+\startchapter[title=Conclusion]
+
+\section[title=Finalizing code]
+
+We need to finalize each of the program files. We take this opportunity to 
+provide a \quote{pretty printed} version of the literate program code that 
+has been captured. This will greatly help in any required debugging of the 
+program creation code. 
+
+\startMkIVCode
+
+%D \section{Literate Programming Table}
+
+%D \subsection{Implementation: create file}
+
+\def\createLitProgsTableFile[#1]{
+  \directlua{thirddata.literateProgs.createLitProgsTableFile('#1')}
+}
+
+\protect \endinput
+
+\stopMkIVCode
+
+\startLuaCode
+
+function litProgs.dumpLitProgsTable()
+  return pp.write(litProgs)
+end
+
+function litProgs.createLitProgsTableFile(aFilePath)
+  renderFile(aFilePath, litProgs.templates.litProgsTable.file)
+end
+
+\stopLuaCode
+
+\startLuaTemplate
+
+templates.litProgsTable.file = [=[
+{{ return thirddata.literateProgs.dumpLitProgsTable() }}
+]=]
+
+\stopLuaTemplate
+
+\section[title=Creating module files]
+
+\createMkIVFile[../../../../../build/t-literate-progs.mkiv]
+
+\createLuaFile[../../../../../build/t-literate-progs.lua]
+
+\createTemplateFile[../../../../../build/t-literate-progs-templates.lua]
+
+\createLakefile[../../../../../build/lakefile]
+
+\createLitProgsTableFile[../../../../../build/t-literate-progs-table.lua]
+
+\stopchapter

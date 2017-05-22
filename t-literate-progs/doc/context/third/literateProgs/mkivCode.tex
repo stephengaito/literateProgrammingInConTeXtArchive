@@ -1,4 +1,4 @@
-% A ConTeXt document [master document: literateProgramming.tex]
+% A ConTeXt document [master document: literateProgs.tex]
 
 \startchapter[title=MkIV code]
 
@@ -86,7 +86,7 @@ We can now define the \type{\stopMkIVCode} macro using the
 \let\oldStopMkIVCode=\stopMkIVCode
 \def\stopMkIVCode{%
   \oldStopMkIVCode%
- \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
+ \directlua{thirddata.literateProgs.addMkIVCode('_typing_')}}
 
 \stopMkIVAltCode
 
@@ -100,14 +100,14 @@ Having defined the \type{\stopMkIVCode}, we can now define the
 \let\oldStopMkIVAltCode=\stopMkIVAltCode
 \def\stopMkIVAltCode{%
   \oldStopMkIVAltCode%
-  \directlua{thirddata.literateModules.addMkIVCode('_typing_')}}
+  \directlua{thirddata.literateProgs.addMkIVCode('_typing_')}}
 
 \stopMkIVCode
 
  Once the \type{MkIV} code has been captured and typeset, we need to 
 specify where we want to store it until we ultimately render it via 
 templates into the corresponding \type{MkIV} files. To do this we define 
-the \type{addMkIVCode} function in Lua, inside the \type{litMods} table. 
+the \type{addMkIVCode} function in Lua, inside the \type{litProgs} table. 
 The \type{addMkIVCode} function is invoked by the \type{\stopMkIVCode} 
 macro and takes the \ConTeXt\ buffer name, in this case always 
 \quote{_typing_}, from which to extract the last \quote{chunk} of 
@@ -115,7 +115,7 @@ macro and takes the \ConTeXt\ buffer name, in this case always
 and inserts it at the end of the \type{code.mkiv} array. 
 
 \startLuaCode
-function litMods.addMkIVCode(bufferName)
+function litProgs.addMkIVCode(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
   table_insert(code.mkiv, bufferContents)
 end
@@ -132,7 +132,7 @@ extension.
  %D \subsection{Implementation: createFile}
 
 \def\createMkIVFile[#1]{
-  \directlua{thirddata.literateModules.createMkIVFile('#1')}
+  \directlua{thirddata.literateProgs.createMkIVFile('#1')}
 }
 
 \stopMkIVCode
@@ -141,15 +141,15 @@ The \type{\createMkIVFile} macro in turn invokes the \type{createMkIVFile}
 Lua function. 
 
 \startLuaCode
-function litMods.createMkIVFile(aFilePath)
-  renderFile(aFilePath, litMods.templates.mkiv.file)
+function litProgs.createMkIVFile(aFilePath)
+  renderFile(aFilePath, litProgs.templates.mkiv.file)
 end
 \stopLuaCode
 
 \startLuaTemplate
 
 templates.mkiv.file = [=[
-{{ return table.concat(thirddata.literateModules.code.mkiv, "\n\n") }}
+{{ return table.concat(thirddata.literateProgs.code.mkiv, "\n\n") }}
 ]=]
 
 \stopLuaTemplate
