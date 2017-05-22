@@ -65,7 +65,7 @@ end
 local function renderFile(aFilePath, baseTemplate)
   local outFile = io.open(aFilePath, 'w')
   --outFile:write(pp.write(litProgs))
-  local renderedBaseTemplate = litProgss.renderNextChunk("", {}, baseTemplate)
+  local renderedBaseTemplate = litProgs.renderNextChunk("", {}, baseTemplate)
   --outFile:write('\n--------------\n')
   outFile:write(renderedBaseTemplate)
   outFile:close()
