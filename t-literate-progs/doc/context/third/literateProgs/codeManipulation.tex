@@ -23,21 +23,22 @@ provide the user with more appropriate error messages.
 The \type{\dotripleempty} command scans the token stream expecting a 
 command plus up to three \quote{[} \quote{]} delimited arguments. It then 
 sets one of the \type{\ifXXXargument} tests to true, depending upon how 
-many arguments it has found. The \quote{real} work gets done~ in~ either~ 
-the~ \type{\defineLitProgsSingle},~ \type{\defineLitProgsDouble}~ or 
+many arguments it has found. The \quote{real} work gets done in either the 
+\type{\defineLitProgsSingle}, \type{\defineLitProgsDouble} or 
 \type{\defineLitProgsTriple} commands, which explicitly expect either one, 
 two or three arguments respectively. The \type{\defineLitProgsZero} 
-command provides an appropriate error~ message,~ if~ the~ user~ has~ 
-provided~ no~ arguments.~ The \type{\defineLitProgsDirect} command simply 
-manages the choice of the appropriate \type{\defineLitProgsXXX} command. 
+command provides an appropriate error message, if the user has provided no 
+arguments. The \type{\defineLitProgsDirect} command simply manages the 
+choice of the appropriate \type{\defineLitProgsXXX} command. 
 
-Since~~~ we~~ are~~~ enhancing~~ the~~~ \type{typing}~~ environment~~~ using~~ lua~~~ 
-code,~~ the~~ \type{\defineLitProgsDouble} and \type{\defineLitProgsTriple} 
-commands make use of the \type{\fixStartLitProgs} and 
-\type{\fixStopLitProgs} commands to layer in our enhancements. These two 
-commands will be defined below. Similarly, we need to define a setup 
-command corresponding to our new code type. We do this using the 
-\type{defineLitProgsSetup} command, also to be defined below. 
+Since we are enhancing the \type{typing} environment using lua code, the 
+\type{\defineLitProgsSingle}, \type{\defineLitProgsDouble} and 
+\type{\defineLitProgsTriple} commands make use of the 
+\type{\fixStartLitProgs} and \type{\fixStopLitProgs} commands to layer in 
+our enhancements. These two commands will be defined below. Similarly, we 
+need to define a setup command corresponding to our new code type. We do 
+this using the \type{defineLitProgsSetup} command, also to be defined 
+below. 
 
 \startMkIVCode
 \unexpanded\def\defineLitProgs{%
@@ -60,21 +61,24 @@ command corresponding to our new code type. We do this using the
   \definetyping[#1][#2][#3]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
-  \defineLitProgsSetup{#1}
+  \defineLitProgsCreateFile{#1}
+  %\defineLitProgsSetup{#1}
 }
 
 \def\defineLitProgsDouble[#1][#2]{
   \definetyping[#1][#2]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
-  \defineLitProgsSetup{#1}
+  \defineLitProgsCreateFile{#1}
+  %\defineLitProgsSetup{#1}
 }
 
 \def\defineLitProgsSingle[#1]{
   \definetyping[#1]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
-  \defineLitProgsSetup{#1}
+  \defineLitProgsCreateFile{#1}
+  %\defineLitProgsSetup{#1}
 }
 
 \def\defineLitProgsZero{
@@ -112,37 +116,37 @@ use an explicit variable argument pattern similar to that used to define
 
 \startMkIVCode
 \def\fixStartLitProgs#1{%
-  \let\csname oldStart#1\endcsname=\csname start#1\endcsname%
-  \unexpanded\def\csname start#1\endcsname{%
-    \dosingleempty\csname start#1Direct\endcsname%
+  \letvalue{oldStart#1}=\getvalue{start#1}%
+  \setuvalue{start#1}{%
+    \dosingleempty\getvalue{start#1Direct}%
   }
-  \def\csname start#1Direct\endcsname{%
+  \setvalue{start#1Direct}{%
     \iffirstargument%
-      \expandafter\csname start#1Single\endcsname%
+      \getvalue{start#1Single}%
     \else
-      \expandafter\csname start#1Zero\endcsname%
+      \getvalue{start#1Zero}%
     \fi
   }
-  \def\csname start#1Zero\endcsname{%
-    \csname start#1Single\endcsname[default]%
+  \setvalue{start#1Zero}{%
+    \getvalue{start#1Single}[default]%
   }
-  \def\csname start#1Single\endcsname[#1]{%
+  \setvalue{start#1Single}[#1]{%
     \directlua{thirddata.literateProgs.setCodeStream('#1')}%
-    \csname oldStart#1\endcsname%
+    \getvalue{oldStart#1}%
   }
 }
 \stopMkIVCode
 
-Having defined fixed \type{\startXXX}, we have a much simpler task to do 
+Having defined \type{\fixStartLitProgs}, we have a much simpler task to do 
 more or less the same technique to fix the \type{\stopXXX} command. 
 However, in this case, things are simpler since the \type{\stopXXX} 
 command takes no arguments. 
 
 \startMkIVCode
-\def\fixStopLitProgs#1{
-  \let\csname oldStop#1\endcsname=\csname stop#1\endcsname
-  \def\csname stop#1\endcsname{
-    \csname oldStop#1\endcsname
+\def\fixStopLitProgs#1{%
+  \letvalue{oldStop#1}=\getvalue{stop#1}%
+  \setvalue{stop#1}{%
+    \getvalue{oldStop#1}%
     \directlua{
       thirddata.literateProgs.addCode(
         '#1',
@@ -172,21 +176,22 @@ command takes no arguments.
 %}
 %\stopMkIVCode
 
-Finally, we a \quote{general purpose} code file creation command, 
-\type{\createLitProgsFile}. This command takes three explicit arguments, 
-the name of the code, this is the same string as used to define this type 
-of code. The second argument is the code stream, again this is the same 
-string as used in any of the corresponding \type{\startXXX} commands. The 
-last argument is the name of the code file to be created. 
+Finally, we need a code file creation command for each code type, 
+\type{\createXXXFile}. This command takes two explicit arguments, the 
+first argument is the name of the code stream, this is the same string as 
+used in any of the corresponding \type{\startXXX} commands. The second 
+argument is the name of the code file to be created. 
 
 \startMkIVCode
-\def\createLitProgsFile{%
-  \directlua{
-    thirddata.literateProgs.createCodeFile(
-      \currentLitProgs,
-      \somethingElse,
-      '#1'
-    )
+\def\defineLitProgsCreateFile#1{%
+  \setvalue{create#1File}#2#3{%
+    \directlua{
+      thirddata.literateProgs.createCodeFile(
+        '#1',
+        '#2',
+        '#3'
+      )
+    }
   }
 }
 \stopMkIVCode
