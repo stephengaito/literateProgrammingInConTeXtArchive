@@ -48,6 +48,54 @@
 \ctxloadluafile{t-literate-progs}
 \ctxloadluafile{t-literate-progs-templates}
 
+\unexpanded\def\defineLitProgs{%
+  \dotripleempty\defineLitProgsDirect%
+}
+
+\unexpanded\def\defineLitProgsDirect{%
+  \ifthirdargument%
+    \defineLitProgsTriple%
+  \else\ifsecondargument%
+    \defineLitProgsDouble%
+  \else\iffirstargument%
+    \defineLitProgsSingle%
+  \else%
+    \defineLitProgsZero%
+  \fi\fi\fi%
+}
+
+\def\defineLitProgsTriple[#1][#2][#3]{
+  \definetyping[#1][#2][#3]
+  \fixStartLitProgs{#1}
+  \fixStopLitProgs{#1}
+  \defineLitProgsCreateFile{#1}
+  %\defineLitProgsSetup{#1}
+}
+
+\def\defineLitProgsDouble[#1][#2]{
+  \definetyping[#1][#2]
+  \fixStartLitProgs{#1}
+  \fixStopLitProgs{#1}
+  \defineLitProgsCreateFile{#1}
+  %\defineLitProgsSetup{#1}
+}
+
+\unexpanded\def\defineLitProgsSingle[#1]{
+  \definetyping[#1]
+  \fixStartLitProgs{#1}
+  \fixStopLitProgs{#1}
+  \defineLitProgsCreateFile{#1}
+  %\defineLitProgsSetup{#1}
+}
+
+\def\defineLitProgsZero{
+  \errmessage{
+    \string\\defineLitProgs
+    requires at least one argument,
+    you have provided none.
+  }
+}
+
 %D \section{MkIV code environment}
 
 %D \subsection{Implementation: start (MkIV)}

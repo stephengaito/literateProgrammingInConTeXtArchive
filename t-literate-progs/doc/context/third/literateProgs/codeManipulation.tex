@@ -7,6 +7,8 @@ versions of the \ConTeXt\ \type{typing} environment. When creating
 \quote{standard} \ConTeXt\ environments the two commands, 
 \type{\defineXXX} and \type{\setupXXX}, are critical to their overall use. 
 
+\startTestSuite[defineLitProgs]
+
 We begin by defining the \type{\defineLitProgs} command. This command is a 
 simple enhancement of the \type{\definetyping} command, so we, 
 essentially, define the \type{\defineLitProgs} command to call the 
@@ -38,7 +40,9 @@ Since we are enhancing the \type{typing} environment using lua code, the
 our enhancements. These two commands will be defined below. Similarly, we 
 need to define a setup command corresponding to our new code type. We do 
 this using the \type{defineLitProgsSetup} command, also to be defined 
-below. 
+below. Finally for each code type we would like a corresponding 
+\type{createXXXFile} macro to write the accumulated text for a given code 
+type out into a file. 
 
 \startMkIVCode
 \unexpanded\def\defineLitProgs{%
@@ -89,6 +93,32 @@ below.
   }
 }
 \stopMkIVCode
+
+\startTestCase[should define all associated macros]
+
+We assert that the \type{\defineLitProgs} macro actually defines all of 
+the required macros. 
+
+\startConTest
+\startMocking
+  \defTexMockOneArg{fixStartLitProgs}
+  \defTexMockOneArg{fixStopLitProgs}
+  \defTexMockOneArg{defineLitProgsCreateFile}
+  \defTexMockOneArg{defineLitProgsSetup}
+
+  \defineLitProgs[TestCode]
+%  \assertDefined{startTestCode}
+%  \assertDefined{stopTestCode}
+%  \assertMockExpanded{fixStartLitProgs}
+%  \assertMockExpanded{fixStopLitProgs}
+%  \assertMockExpanded{defineLitProgsCreateFile}
+%  %\assertMockExpanded{defineLitProgsSetup}
+\stopMocking
+\stopConTest
+
+\stopTestCase
+
+\stopTestSuite
 
 Having provided the \ConTeXt\ code required to deal with variable 
 arguments, we now need to provide the code required to \quote{fix} the 

@@ -86,13 +86,6 @@ deductive proof and inductive testing is much clearer. For the moment we
 will only provide \quote{inductive} tests of correctness for the above Lua 
 code. 
 
-\def\startTestSuite{\subsection}
-\def\stopTestSuite{\relax}
-\def\startTestCase{\subsubsection}
-\def\stopTestCase{\relax}
-\definetyping[LuaTest]
-\setuptyping[LuaTest][option=lua]
-
 \startTestSuite[title=renderNextChunk]
 
 At the moment, the critical complexity is contained in the 
