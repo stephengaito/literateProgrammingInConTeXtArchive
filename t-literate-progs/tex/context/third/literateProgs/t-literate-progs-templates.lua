@@ -24,8 +24,15 @@ templates.litProgsTable = {}
 local table_insert = table.insert
 local table_concat = table.concat
 
+function templates.concat(aTable)
+  return table_concat(aTable, '\n\n')
+end
+
+addTemplate {
+  'mkivFile',
+  { }}
 templates.mkiv.file = [=[
-{{ return table.concat(thirddata.literateProgs.code.mkiv, "\n\n") }}
+{{! concat(thirddata.literateProgs.code.mkiv, "\n\n") }}
 ]=]
 
 templates.lua.file = [=[
