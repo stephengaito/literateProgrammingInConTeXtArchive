@@ -108,14 +108,15 @@ this we provide arguments which have a simple previous chunk
 template (\type{curTemplate}). 
 
 \startLuaTest
-  local result = renderNextChunk("this is a simple text", { }, "")
+  local result = thirddata.literateProgs.renderNextChunk(
+    "this is a simple text", { }, ""
+  )
 \stopLuaTest
 
 The result of this invocation, should be a Lua string which consists 
 of the \type{preChunk}. 
 
 \startLuaTest
-  texio.write_nl(result)
   assert.isString(result)
   assert.isEqual("this is a simple text", result)
 \stopLuaTest
@@ -127,10 +128,14 @@ We next need to show that more complex collections of previously rendered
 text are handled correctly. 
 
 \startLuaTest
-  local result = renderNextChunk("this is a final text", {
-    "this is the first text",
-    "this is the second text"
-  }, "")
+  local result = thirddata.literateProgs.renderNextChunk(
+    "this is a final text",
+    {
+      "this is the first text",
+      "this is the second text"
+    },
+    ""
+  )
 \stopLuaTest
 
 The result should be the texts contained in the rendered text together 
@@ -144,7 +149,6 @@ white-space}.
     result
   )
 \stopLuaTest
-
 \stopTestCase
 
 \stopTestSuite
