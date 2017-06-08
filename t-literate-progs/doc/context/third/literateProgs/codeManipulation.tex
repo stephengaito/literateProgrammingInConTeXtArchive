@@ -94,10 +94,44 @@ type out into a file.
 }
 \stopMkIVCode
 
-\startTestCase[should define all associated macros]
+\startTestCase[should call all associated macros]
 
 We assert that the \type{\defineLitProgs} macro actually defines all of 
 the required macros. 
+
+\startConTest
+\startMocking
+  \defContextMock{defineLitProgsDirect}
+  \defineLitProgs[TestCode]
+  \assertMockExpanded{defineLitProgsDirect}{}
+\stopMocking
+\stopConTest
+
+\startConTest
+\startMocking
+\startTracingMockExpansions
+  \defContextMock{defineLitProgsTriple}
+  \meaning\defineLitProgsTriple
+  \defContextMock{defineLitProgsDouble}
+  \meaning\defineLitProgsDouble
+  \defContextMock{defineLitProgsSingle}
+  \meaning\defineLitProgsSingle
+  \defContextMock{defineLitProgsZero}
+  \meaning\defineLitProgsZero
+  \firstargumentfalse
+  \secondargumentfalse
+  \thirdargumentfalse
+  \assertNoFirstArgument{first}
+  \assertNoSecondArgument{first}
+  \assertNoThirdArgument{first}
+  \defineLitProgs[AFirstArg]
+  \assertFirstArgument{second}
+  \assertNoSecondArgument{second}
+  \assertNoThirdArgument{second}
+  \assertMockExpanded{defineLitProgsSingle}{}
+\stopTracingMockExpansions
+\stopMocking
+\stopConTest
 
 \startConTest
 \startMocking
@@ -107,13 +141,23 @@ the required macros.
   \defTexMockOneArg{defineLitProgsSetup}
 
   \defineLitProgs[TestCode]
-%  \assertDefined{startTestCode}
-%  \assertDefined{stopTestCode}
-%  \assertMockExpanded{fixStartLitProgs}
-%  \assertMockExpanded{fixStopLitProgs}
-%  \assertMockExpanded{defineLitProgsCreateFile}
-%  %\assertMockExpanded{defineLitProgsSetup}
+  \assertDefined{startTestCode}{}
+  \assertDefined{stopTestCode}{}
+  \assertMockExpanded{fixStartLitProgs}{}
+  \assertMockExpanded{fixStopLitProgs}{}
+  \assertMockExpanded{defineLitProgsCreateFile}{}
+  %\assertMockExpanded{defineLitProgsSetup}{}
 \stopMocking
+\stopConTest
+
+\stopTestCase
+
+\startTestCase[should define associated marcros]
+
+\startConTest
+%  \defineLitProgs[TestCode]
+  \assertDefined{startTestCode}{}
+  \assertDefined{stopTestCode}{}
 \stopConTest
 
 \stopTestCase

@@ -52,19 +52,19 @@
   \dotripleempty\defineLitProgsDirect%
 }
 
-\unexpanded\def\defineLitProgsDirect{%
+\setuevalue{defineLitProgsDirect}{%
   \ifthirdargument%
-    \defineLitProgsTriple%
+    \noexpand\defineLitProgsTriple%
   \else\ifsecondargument%
-    \defineLitProgsDouble%
+    \noexpand\defineLitProgsDouble%
   \else\iffirstargument%
-    \defineLitProgsSingle%
+    \noexpand\defineLitProgsSingle%
   \else%
-    \defineLitProgsZero%
+    \noexpand\defineLitProgsZero%
   \fi\fi\fi%
 }
 
-\def\defineLitProgsTriple[#1][#2][#3]{
+\unexpanded\def\defineLitProgsTriple[#1][#2][#3]{
   \definetyping[#1][#2][#3]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
@@ -72,7 +72,7 @@
   %\defineLitProgsSetup{#1}
 }
 
-\def\defineLitProgsDouble[#1][#2]{
+\unexpanded\def\defineLitProgsDouble[#1][#2][#3]{
   \definetyping[#1][#2]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
@@ -80,7 +80,7 @@
   %\defineLitProgsSetup{#1}
 }
 
-\unexpanded\def\defineLitProgsSingle[#1]{
+\unexpanded\def\defineLitProgsSingle[#1][#2][#3]{
   \definetyping[#1]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
@@ -88,7 +88,7 @@
   %\defineLitProgsSetup{#1}
 }
 
-\def\defineLitProgsZero{
+\unexpanded\def\defineLitProgsZero{
   \errmessage{
     \string\\defineLitProgs
     requires at least one argument,
