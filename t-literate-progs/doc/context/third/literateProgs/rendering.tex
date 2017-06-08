@@ -81,12 +81,12 @@ Science does provide tools which could be used to attempt to \emph{prove}
 the above Lua code correct these tools are not really integral to the Lua 
 language. Our primary aim in creating this cycle of tools is to develop 
 the JoyLoL language in which these tools of \emph{deductive} proof are 
-integral, to the language. In the JoyLoL language, the distinction between 
+integral to the language. In the JoyLoL language, the distinction between 
 deductive proof and inductive testing is much clearer. For the moment we 
 will only provide \quote{inductive} tests of correctness for the above Lua 
 code. 
 
-\startTestSuite[title=renderNextChunk]
+\startTestSuite[renderNextChunk]
 
 At the moment, the critical complexity is contained in the 
 \type{renderNextChunk} function, so we will focus upon testing this 
@@ -98,7 +98,7 @@ make a number of simple assertions about that invocation’s returned value.
 If all of the assertions are true, we consider the \type{renderNextChunk} 
 function \quote{inductively} correct. 
 
-\startTestCase[title=should stop]
+\startTestCase[should stop]
 
 The \type{renderNextChunk} function is recursive, so in our first test 
 case, it is important to test that this recursion \emph{does} stop. To do 
@@ -115,12 +115,13 @@ The result of this invocation, should be a Lua string which consists
 of the \type{preChunk}. 
 
 \startLuaTest
-  assert_string(result)
-  assert_equal("this is a simple text", result)
+  texio.write_nl(result)
+  assert.isString(result)
+  assert.isEqual("this is a simple text", result)
 \stopLuaTest
 \stopTestCase
 
-\startTestCase[title=should combine previously rendered text]
+\startTestCase[should combine previously rendered text]
 
 We next need to show that more complex collections of previously rendered 
 text are handled correctly. 
@@ -137,8 +138,8 @@ with the \type{prevChunck} all concatenated \emph{with no additional
 white-space}. 
 
 \startLuaTest
-  assert_string(result)
-  assert_equal(
+  assert.isString(result)
+  assert.isEqual(
     "this is the first textthis is the second textthis is a final text",
     result
   )
