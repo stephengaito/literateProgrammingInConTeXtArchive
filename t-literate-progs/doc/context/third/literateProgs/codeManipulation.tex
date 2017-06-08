@@ -49,19 +49,19 @@ type out into a file.
   \dotripleempty\defineLitProgsDirect%
 }
 
-\def\defineLitProgsDirect{%
+\unexpanded\def\defineLitProgsDirect{%
   \ifthirdargument%
-    \expandafter\defineLitProgsTriple%
+    \noexpand\defineLitProgsTriple%
   \else\ifsecondargument%
-    \expandafter\defineLitProgsDouble%
+    \noexpand\defineLitProgsDouble%
   \else\iffirstargument%
-    \expandafter\defineLitProgsSingle%
+    \noexpand\defineLitProgsSingle%
   \else%
-    \expandafter\defineLitProgsZero%
+    \noexpand\defineLitProgsZero%
   \fi\fi\fi%
 }
 
-\def\defineLitProgsTriple[#1][#2][#3]{
+\unexpanded\def\defineLitProgsTriple[#1][#2][#3]{
   \definetyping[#1][#2][#3]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
@@ -69,7 +69,7 @@ type out into a file.
   %\defineLitProgsSetup{#1}
 }
 
-\def\defineLitProgsDouble[#1][#2]{
+\unexpanded\def\defineLitProgsDouble[#1][#2][#3]{
   \definetyping[#1][#2]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
@@ -77,7 +77,7 @@ type out into a file.
   %\defineLitProgsSetup{#1}
 }
 
-\def\defineLitProgsSingle[#1]{
+\unexpanded\def\defineLitProgsSingle[#1][#2][#3]{
   \definetyping[#1]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
@@ -85,7 +85,7 @@ type out into a file.
   %\defineLitProgsSetup{#1}
 }
 
-\def\defineLitProgsZero{
+\unexpanded\def\defineLitProgsZero[#1][#2][#3]{
   \errmessage{
     \string\\defineLitProgs
     requires at least one argument,
@@ -257,15 +257,18 @@ used in any of the corresponding \type{\startXXX} commands. The second
 argument is the name of the code file to be created. 
 
 \startMkIVCode
+\def\callCreateCodeFile#1#2#3{%
+  \directlua{
+    thirddata.literateProgs.createCodeFile(
+      '#1',
+      '#2',
+      '#3'
+    )
+  }
+}
 \def\defineLitProgsCreateFile#1{%
-  \setvalue{create#1File}#2#3{%
-    \directlua{
-      thirddata.literateProgs.createCodeFile(
-        '#1',
-        '#2',
-        '#3'
-      )
-    }
+  \setevalue{create#1File}{%
+    \noexpand\callCreateCodeFile #1
   }
 }
 \stopMkIVCode
@@ -277,7 +280,7 @@ collection of lua functions and code fragments respectively.
 
 \startLuaCode
 function litProgs.setCodeStream(aCodeStream)
-  code.curCodeStream = aCodeStream  
+  code.curCodeStream = aCodeStream
 end
 
 function litProgs.addCode(aCodeType, bufferName)

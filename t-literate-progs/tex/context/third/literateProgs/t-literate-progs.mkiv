@@ -52,7 +52,7 @@
   \dotripleempty\defineLitProgsDirect%
 }
 
-\setuevalue{defineLitProgsDirect}{%
+\unexpanded\def\defineLitProgsDirect{%
   \ifthirdargument%
     \noexpand\defineLitProgsTriple%
   \else\ifsecondargument%
@@ -88,11 +88,60 @@
   %\defineLitProgsSetup{#1}
 }
 
-\unexpanded\def\defineLitProgsZero{
+\unexpanded\def\defineLitProgsZero[#1][#2][#3]{
   \errmessage{
     \string\\defineLitProgs
     requires at least one argument,
     you have provided none.
+  }
+}
+
+\def\fixStartLitProgs#1{%
+  \letvalue{oldStart#1}=\getvalue{start#1}%
+  \setuvalue{start#1}{%
+    \dosingleempty\getvalue{start#1Direct}%
+  }
+  \setvalue{start#1Direct}{%
+    \iffirstargument%
+      \getvalue{start#1Single}%
+    \else
+      \getvalue{start#1Zero}%
+    \fi
+  }
+  \setvalue{start#1Zero}{%
+    \getvalue{start#1Single}[default]%
+  }
+  \setvalue{start#1Single}[#1]{%
+    \directlua{thirddata.literateProgs.setCodeStream('#1')}%
+    \getvalue{oldStart#1}%
+  }
+}
+
+\def\fixStopLitProgs#1{%
+  \letvalue{oldStop#1}=\getvalue{stop#1}%
+  \setvalue{stop#1}{%
+    \getvalue{oldStop#1}%
+    \directlua{
+      thirddata.literateProgs.addCode(
+        '#1',
+        '_typing_'
+      )
+    }
+  }
+}
+
+\def\callCreateCodeFile#1#2#3{%
+  \directlua{
+    thirddata.literateProgs.createCodeFile(
+      '#1',
+      '#2',
+      '#3'
+    )
+  }
+}
+\def\defineLitProgsCreateFile#1{%
+  \setevalue{create#1File}{%
+    \noexpand\callCreateCodeFile #1
   }
 }
 

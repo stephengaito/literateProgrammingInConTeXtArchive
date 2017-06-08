@@ -91,6 +91,29 @@ local function renderFile(aFilePath, baseTemplate)
   outFile:close()
 end
 
+function litProgs.setCodeStream(aCodeStream)
+  code.curCodeStream = aCodeStream
+end
+
+function litProgs.addCode(aCodeType, bufferName)
+  local bufferContents  =
+    buffers.getcontent(bufferName):gsub("\13", "\n")
+  code[aCodeType]       = code[aCodeType] or { }
+  local codeType        = code[aCodeType]
+  local aCodeStream     = code.curCodeStream or 'default'
+  codeType[aCodeStream] = codeType[aCodeStream] or { }
+  local codeStream      = codeType[aCodeStream]
+  table_insert(codeStream, bufferContents)
+end
+
+function litProgs.createCodeFile(aCodeType,
+                                 aCodeStream,
+                                 aFilePath)
+  -- here be dragons! -- how do we pass in cType and cSubType
+  renderFile(aFilePath, litProgs.templates.lua.file)
+  -- here be dragons!
+end
+
 function litProgs.addMkIVCode(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
   table_insert(code.mkiv, bufferContents)
