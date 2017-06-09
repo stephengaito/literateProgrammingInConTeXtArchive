@@ -32,7 +32,7 @@
 
 function litProgs.addLuaCode(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  table_insert(code.lua, bufferContents)
+  tInsert(code.lua, bufferContents)
 end
 
 function litProgs.createLuaFile(aFilePath)

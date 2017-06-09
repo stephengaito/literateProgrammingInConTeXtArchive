@@ -21,8 +21,41 @@ code.templates  = {}
 code.lakefile   = {}
 
 local pp = require('pl/pretty')
-local table_insert = table.insert
-local table_concat = table.concat
+local tInsert = table.insert
+local tConcat = table.concat
+
+function litProgs.parseTemplate(aTemplateStr)
+  local theTemplate = { }
+
+  if type(aTemplateStr) == 'string' then
+    -- we only do anything if we have been given
+    -- an explicit string 
+    local position = 1
+    while aTemplateStr:find('{{', position) do
+    
+      local textChunk = aTemplateStr:match('^.*{{', position)
+      if textChunk then 
+        local textChunkLen = #textChunk
+        textChunk = textChunk:sub(1, textChunkLen-2)
+        if 0 < #textChunk then tInsert(theTemplate, textChunk) end
+        position = position + textChunkLen
+      end
+      
+      local luaChunk = aTemplateStr:match('^.+}}', position)
+      if luaChunk then
+        local luaChunkLen = #luaChunk
+        luaChunk = luaChunk:sub(1, luaChunkLen-2)
+        if 0 < #luaChunk then tInsert(theTemplate, luaChunk) end
+        position = position + luaChunkLen
+      end
+    end
+    
+    if position < #aTemplateStr then
+      tInsert(theTemplate, aTemplateStr:sub(position))
+    end
+  end
+  return theTemplate
+end
 
 -- We need a simple Lua based template engine
 -- Our template engine has been inspired by:
@@ -35,7 +68,7 @@ function litProgs.renderNextChunk(prevChunk, renderedText, curTemplate)
   if prevChunk
     and type(prevChunk) == 'string'
     and 0 < #prevChunk then
-    table_insert(renderedText, prevChunk)
+    tInsert(renderedText, prevChunk)
   end
  
   if type(curTemplate) == 'string' and (0 < #curTemplate) then
@@ -45,7 +78,7 @@ function litProgs.renderNextChunk(prevChunk, renderedText, curTemplate)
       if textChunk then
         local textChunkLen = #textChunk
         textChunk = textChunk:sub(1, textChunkLen-2)
-        if 0 < #textChunk then table_insert(renderedText, textChunk) end
+        if 0 < #textChunk then tInsert(renderedText, textChunk) end
         position = position + textChunkLen
       end
  
@@ -66,12 +99,12 @@ function litProgs.renderNextChunk(prevChunk, renderedText, curTemplate)
         result = litProgs.renderNextChunk(newChunk, renderedText, curTemplate)
       end
     else -- there is no '{{' in the template
-      table_insert(renderedText, curTemplate)
-      result = table_concat(renderedText)
+      tInsert(renderedText, curTemplate)
+      result = tConcat(renderedText)
     end
   else
     -- nothing to do...
-    result = table_concat(renderedText)
+    result = tConcat(renderedText)
   end
   return result
 end
@@ -103,7 +136,7 @@ function litProgs.addCode(aCodeType, bufferName)
   local aCodeStream     = code.curCodeStream or 'default'
   codeType[aCodeStream] = codeType[aCodeStream] or { }
   local codeStream      = codeType[aCodeStream]
-  table_insert(codeStream, bufferContents)
+  tInsert(codeStream, bufferContents)
 end
 
 function litProgs.createCodeFile(aCodeType,
@@ -116,7 +149,7 @@ end
 
 function litProgs.addMkIVCode(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  table_insert(code.mkiv, bufferContents)
+  tInsert(code.mkiv, bufferContents)
 end
 
 function litProgs.createMkIVFile(aFilePath)
@@ -125,7 +158,7 @@ end
 
 function litProgs.addLuaCode(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  table_insert(code.lua, bufferContents)
+  tInsert(code.lua, bufferContents)
 end
 
 function litProgs.createLuaFile(aFilePath)
@@ -134,7 +167,7 @@ end
 
 function litProgs.addLuaTemplate(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  table_insert(code.templates, bufferContents)
+  tInsert(code.templates, bufferContents)
 end
 
 function litProgs.createLuaTemplateFile(aFilePath)
@@ -143,7 +176,7 @@ end
 
 function litProgs.addLakefile(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  table_insert(code.lakefile, bufferContents)
+  tInsert(code.lakefile, bufferContents)
 end
 
 function litProgs.createLakefile(aFilePath)

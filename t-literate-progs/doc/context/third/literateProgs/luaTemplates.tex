@@ -32,7 +32,7 @@
 
 function litProgs.addLuaTemplate(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  table_insert(code.templates, bufferContents)
+  tInsert(code.templates, bufferContents)
 end
 
 function litProgs.createLuaTemplateFile(aFilePath)

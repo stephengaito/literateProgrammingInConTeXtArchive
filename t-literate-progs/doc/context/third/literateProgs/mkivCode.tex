@@ -117,7 +117,7 @@ and inserts it at the end of the \type{code.mkiv} array.
 \startLuaCode
 function litProgs.addMkIVCode(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  table_insert(code.mkiv, bufferContents)
+  tInsert(code.mkiv, bufferContents)
 end
 \stopLuaCode
 

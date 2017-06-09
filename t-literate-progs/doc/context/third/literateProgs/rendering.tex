@@ -2,6 +2,140 @@
 
 \startchapter[title=The Lua Rendering Engine]
 
+We follow Terance Parr's advice, \cite{parr2004templateMVC}, to ensure 
+there is a clear separation between Model and View when rendering 
+templates. In his view, the rendering process is a form of 
+\quote{unparsing} or, alternatively, language generation. Using Parr's 
+\quote{push} semantics, a template is defined to be a litteral string with 
+embedded pairs of \quote{\{\{}, \quote{\}\}} delimited \quote{holes} or 
+attribute actions, where each attribute action must not have side-effects 
+on the data model. 
+
+Our template engine will support two semantic actions: simple attribute 
+reference and mapping a named template against a list of attributes. To do 
+this we will have three forms of attribute actions: 
+
+\startitemize
+\item {\bf reference}: \type{{{= <attribute-list> }}} 
+
+\item {\bf application}: \type{{{! <attribute-list> }}}
+
+\item {\bf mapping}: \type{{{|<separator>| <attribute-list> }}}
+
+\stopitemize
+
+Note that attribute application is simply a convenient form of attribute 
+mapping. Note as well that while attribute mapping is a form of \type{for} 
+\type{in} looping, it, and attribute application, can be used to replace 
+any need for explicit \type{if}, \type{elseif}, \type{else}, \type{endif} 
+structures. 
+
+In each case, the \type{<attribute-list>} is a comma separated list of 
+attribute names or indirect references. An indirect attribute reference is 
+an attribute name enclosed in \quote{\[} \quote{\]} pairs. An attribute 
+\emph{reference} expects one attribute name or indirect reference, namely 
+the attribute whose value will be placed into the template \quote{hole} at 
+that point. An attribute \emph{application} expects a list of one or more 
+attributes, the first of which denotes the template to which the rest of 
+the attributes will be applied to. An attribute \emph{mapping} again 
+expects a list of two or more attributes. The first attribute refers to 
+the attribute or attribute array whose individual items, in the case of an 
+attribute array, are applied to the template identified by the second 
+attribute. All subsequent attributes are used as arguments applied to the 
+template. 
+
+To render a template we will use a strategy of explicitly parsing all 
+templates into a Lua structure which our rendering engine, below, can 
+efficiently interpret.
+
+\startTestSuite[parseTemplate]
+
+The \type{parseTemplate} method takes a string template and parses it into 
+a Lua array of alternating string literals and attribute actions. This 
+array will be walked over by the \type{renderer} rendering engine to 
+product the final result of rendering the template. 
+
+\startLuaCode
+function litProgs.parseTemplate(aTemplateStr)
+  local theTemplate = { }
+
+  if type(aTemplateStr) == 'string' then
+    -- we only do anything if we have been given
+    -- an explicit string 
+    local position = 1
+    while aTemplateStr:find('{{', position) do
+    
+      local textChunk = aTemplateStr:match('^.*{{', position)
+      if textChunk then 
+        local textChunkLen = #textChunk
+        textChunk = textChunk:sub(1, textChunkLen-2)
+        if 0 < #textChunk then tInsert(theTemplate, textChunk) end
+        position = position + textChunkLen
+      end
+      
+      local luaChunk = curTemplate:match('^.+}}', position)
+      if luaChunk then
+        local luaChunkLen = #luaChunk
+        luaChunk = luaChunk:sub(1, luaChunkLen-2)
+        if 0 < #luaChunk then tInsert(theTemplate, luaChunk) end
+        position = position + luaChunkLen
+      end
+    end
+    
+    if position < #aTemplateStr then
+      tInsert(theTemplate, aTemplateStr:sub(position))
+    end
+  end
+  return theTemplate
+end
+\stopLuaCode
+
+\startTestCase[should parse simple templates]
+
+\startLuaTest
+local parseTemplate = thirddata.literateProgs.parseTemplate
+local aTemplate = parseTemplate('This is a test')
+assert.isTable(aTemplate)
+assert.length(aTemplate, 1)
+assert.isString(aTemplate[1])
+assert.matches(aTemplate[1], 'This is a test')
+--
+aTemplate = parseTemplate(
+'This is a test{{here is an action}}This is another test'
+)
+assert.isTable(aTemplate)
+assert.length(aTemplate, 3)
+assert.isString(aTemplate[1])
+assert.matches(aTemplate[1], 'This is a test')
+assert.isString(aTemplate[2])
+assert.matches(aTemplate[2], 'here is an action')
+assert.isString(aTemplate[3])
+assert.matches(aTemplate[3], 'This is another test')
+\stopLuaTest
+\stopTestCase
+
+\stopTestSuite
+
+The \type{addTemplate} method is used by any template files to manage the 
+process of parsing a template into a structure located in the \ConTeXt\ 
+\type{thirddata.templates} structure. The \type{addTemplate} method can be 
+used as a Lua based DSL for managing templates. 
+
+\startLuaCode
+function litProgs.addTemplate()
+
+end
+\stopLuaCode
+
+\startLuaCode
+function litProgs.renderer()
+
+end
+\stopLuaCode
+
+What follows is our previous attempt at rendering a template. This will be 
+phased out once the new type of template rendering is fully functional. 
+
 \startLuaCode
 
 -- We need a simple Lua based template engine
@@ -15,7 +149,7 @@ function litProgs.renderNextChunk(prevChunk, renderedText, curTemplate)
   if prevChunk
     and type(prevChunk) == 'string'
     and 0 < #prevChunk then
-    table_insert(renderedText, prevChunk)
+    tInsert(renderedText, prevChunk)
   end
   
   if type(curTemplate) == 'string' and (0 < #curTemplate) then
@@ -25,7 +159,7 @@ function litProgs.renderNextChunk(prevChunk, renderedText, curTemplate)
       if textChunk then 
         local textChunkLen = #textChunk
         textChunk = textChunk:sub(1, textChunkLen-2)
-        if 0 < #textChunk then table_insert(renderedText, textChunk) end
+        if 0 < #textChunk then tInsert(renderedText, textChunk) end
         position = position + textChunkLen
       end
       
@@ -46,12 +180,12 @@ function litProgs.renderNextChunk(prevChunk, renderedText, curTemplate)
         result = litProgs.renderNextChunk(newChunk, renderedText, curTemplate)
       end
     else -- there is no '{{' in the template
-      table_insert(renderedText, curTemplate)
-      result = table_concat(renderedText)
+      tInsert(renderedText, curTemplate)
+      result = tConcat(renderedText)
     end
   else
     -- nothing to do...
-    result = table_concat(renderedText)
+    result = tConcat(renderedText)
   end
   return result
 end

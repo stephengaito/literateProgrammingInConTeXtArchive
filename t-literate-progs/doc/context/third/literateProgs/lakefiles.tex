@@ -34,7 +34,7 @@ drive the creation of the various files required by any given
 
 function litProgs.addLakefile(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  table_insert(code.lakefile, bufferContents)
+  tInsert(code.lakefile, bufferContents)
 end
 
 function litProgs.createLakefile(aFilePath)

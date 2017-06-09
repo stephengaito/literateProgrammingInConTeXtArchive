@@ -28,9 +28,9 @@ function templates.concat(aTable)
   return table_concat(aTable, '\n\n')
 end
 
-addTemplate {
-  'mkivFile',
-  { }}
+--addTemplate {
+--  'mkivFile',
+--  { }}
 templates.mkiv.file = [=[
 {{! concat(thirddata.literateProgs.code.mkiv, "\n\n") }}
 ]=]

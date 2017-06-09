@@ -291,7 +291,7 @@ function litProgs.addCode(aCodeType, bufferName)
   local aCodeStream     = code.curCodeStream or 'default'
   codeType[aCodeStream] = codeType[aCodeStream] or { }
   local codeStream      = codeType[aCodeStream]
-  table_insert(codeStream, bufferContents)
+  tInsert(codeStream, bufferContents)
 end
 
 function litProgs.createCodeFile(aCodeType,
