@@ -23,6 +23,18 @@ code.lakefile   = {}
 local pp = require('pl/pretty')
 local tInsert = table.insert
 local tConcat = table.concat
+local sFmt    = string.format
+local sMatch  = string.match
+local toStr   = tostring
+
+local function reportTemplateError(aTemplateStr, errMessage)
+  texio.write_nl('---------------------------')
+  texio.write_nl(errMessage)
+  texio.write_nl("Template:")
+  texio.write_nl(aTemplateStr)
+  texio.write_nl("Ignoring this attribute action")
+  texio.write_nl('---------------------------')
+end
 
 function litProgs.parseTemplate(aTemplateStr)
   local theTemplate = { }
@@ -31,23 +43,60 @@ function litProgs.parseTemplate(aTemplateStr)
     -- we only do anything if we have been given
     -- an explicit string 
     local position = 1
-    while aTemplateStr:find('{{', position) do
+    while aTemplateStr:find('{{', position, true) do
     
-      local textChunk = aTemplateStr:match('^.*{{', position)
-      if textChunk then 
-        local textChunkLen = #textChunk
-        textChunk = textChunk:sub(1, textChunkLen-2)
-        if 0 < #textChunk then tInsert(theTemplate, textChunk) end
-        position = position + textChunkLen
+      local endText, startChunk = aTemplateStr:find('{{', position, true)
+      if position < endText then 
+        local textChunk = aTemplateStr:sub(position, endText-1)
+        if textChunk and 0 < #textChunk then
+          tInsert(theTemplate, textChunk)
+        end
       end
+      position = startChunk + 1
       
-      local luaChunk = aTemplateStr:match('^.+}}', position)
-      if luaChunk then
-        local luaChunkLen = #luaChunk
-        luaChunk = luaChunk:sub(1, luaChunkLen-2)
-        if 0 < #luaChunk then tInsert(theTemplate, luaChunk) end
-        position = position + luaChunkLen
+      local endChunk, startText = aTemplateStr:find('}}', position, true)
+      if position < endChunk then
+        local luaChunk = aTemplateStr:sub(position, endChunk-1)
+        if luaChunk and 0 < #luaChunk then
+          local actionType = luaChunk:sub(1,1)
+          local luaChunk = luaChunk:sub(2)
+          local arguments = { }
+          for anArg in luaChunk:gmatch('[^,]+') do
+            tInsert(arguments, anArg:match("^%s*(.-)%s*$"))
+          end
+          if actionType == '=' then
+            if 0 < #arguments then
+              tInsert(theTemplate, { 'reference', arguments[1] })
+            else
+              reportTemplateError(aTemplateStr,
+                "No attribute specified"
+              )
+            end
+          elseif actionType == '!' then
+            if 0 < #arguments then
+              tInsert(theTemplate, { 'application', arguments })
+            else
+              reportTemplateError(aTemplateStr,
+                "No template specified"
+              )
+            end
+          elseif actionType == '|' then
+            if 2 < #arguments then
+              tInsert(theTemplate, { 'mapping', arguments })
+            else
+              reportTemplateError(aTemplateStr,
+                "No attribute, separator or template specified"
+              )
+            end
+          else
+            reportTemplateError(aTemplateStr,
+              sFmt("Unknown template attribute action [%s]",
+                actionType)
+            )
+          end
+        end
       end
+      position = startText + 1
     end
     
     if position < #aTemplateStr then

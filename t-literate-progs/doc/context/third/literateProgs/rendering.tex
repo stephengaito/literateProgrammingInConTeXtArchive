@@ -20,7 +20,7 @@ this we will have three forms of attribute actions:
 
 \item {\bf application}: \type{{{! <attribute-list> }}}
 
-\item {\bf mapping}: \type{{{|<separator>| <attribute-list> }}}
+\item {\bf mapping}: \type{{{| <attribute-list> }}}
 
 \stopitemize
 
@@ -77,7 +77,10 @@ function litProgs.parseTemplate(aTemplateStr)
       if luaChunk then
         local luaChunkLen = #luaChunk
         luaChunk = luaChunk:sub(1, luaChunkLen-2)
-        if 0 < #luaChunk then tInsert(theTemplate, luaChunk) end
+        if 0 < #luaChunk then
+          texio.write_nl('['..luaChunk:sub(1,1)..']')
+          tInsert(theTemplate, luaChunk)
+        end
         position = position + luaChunkLen
       end
     end
@@ -101,17 +104,69 @@ assert.isString(aTemplate[1])
 assert.matches(aTemplate[1], 'This is a test')
 --
 aTemplate = parseTemplate(
-'This is a test{{here is an action}}This is another test'
+  'This is a test{{=  anAttribute  }}This is another test'
 )
 assert.isTable(aTemplate)
 assert.length(aTemplate, 3)
 assert.isString(aTemplate[1])
 assert.matches(aTemplate[1], 'This is a test')
-assert.isString(aTemplate[2])
-assert.matches(aTemplate[2], 'here is an action')
+assert.isTable(aTemplate[2])
+assert.length(aTemplate[2], 2)
+assert.matches(aTemplate[2][1], 'reference')
+assert.matches(aTemplate[2][2], 'anAttribute')
 assert.isString(aTemplate[3])
 assert.matches(aTemplate[3], 'This is another test')
+--
+aTemplate = parseTemplate(
+  '{{| aList, aSeparator, aTemplate, anArgument}}'
+)
+assert.isTable(aTemplate)
+assert.length(aTemplate,1)
+assert.isTable(aTemplate[1])
+assert.length(aTemplate[1], 2)
+assert.matches(aTemplate[1][1], 'mapping')
+assert.isTable(aTemplate[1][2])
+assert.length(aTemplate[1][2], 4)
+assert.matches(aTemplate[1][2][1], 'aList')
+assert.matches(aTemplate[1][2][2], 'aSeparator')
+assert.matches(aTemplate[1][2][3], 'aTemplate')
+assert.matches(aTemplate[1][2][4], 'anArgument')
+--
+aTemplate = parseTemplate(
+[=[
+This is a test
+but this {{= anAttribute }} is a reference
+while this {{! aTemplate, anAttribute }} is an application
+and this {{| aList, aSeparator, aTemplate, anArgument }}
+is a mapping
+]=])
+assert.isTable(aTemplate)
+showValue(aTemplate)
+assert.length(aTemplate,7)
+assert.matches(aTemplate[1], 'This is a test\nbut this ')
+assert.isTable(aTemplate[2])
+assert.length(aTemplate[2], 2)
+assert.matches(aTemplate[2][1], 'reference')
+assert.matches(aTemplate[2][2], 'anAttribute')
+assert.matches(aTemplate[3], ' is a reference\nwhile this ')
+assert.isTable(aTemplate[4])
+assert.matches(aTemplate[4][1], 'application')
+assert.isTable(aTemplate[4][2])
+assert.length(aTemplate[4][2], 2)
+assert.matches(aTemplate[4][2][1], 'aTemplate')
+assert.matches(aTemplate[4][2][2], 'anAttribute')
+assert.matches(aTemplate[5], ' is an application\nand this ')
+assert.isTable(aTemplate[6])
+assert.matches(aTemplate[6][1], 'mapping')
+assert.isTable(aTemplate[6][2])
+assert.length(aTemplate[6][2], 4)
+assert.matches(aTemplate[6][2][1], 'aList')
+assert.matches(aTemplate[6][2][2], 'aSeparator')
+assert.matches(aTemplate[6][2][3], 'aTemplate')
+assert.matches(aTemplate[6][2][4], 'anArgument')
+assert.matches(aTemplate[7], '\nis a mapping\n')
 \stopLuaTest
+\showLuaTest
 \stopTestCase
 
 \stopTestSuite
