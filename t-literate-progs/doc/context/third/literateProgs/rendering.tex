@@ -56,41 +56,86 @@ array will be walked over by the \type{renderer} rendering engine to
 product the final result of rendering the template. 
 
 \startLuaCode
-function litProgs.parseTemplate(aTemplateStr)
+local function reportTemplateError(aTemplateStr, errMessage)
+  texio.write_nl('---------------------------')
+  texio.write_nl(errMessage)
+  texio.write_nl("Template:")
+  texio.write_nl(aTemplateStr)
+  texio.write_nl("Ignoring this attribute action")
+  texio.write_nl('---------------------------')
+end
+
+local function parseTemplate(aTemplateStr)
   local theTemplate = { }
 
   if type(aTemplateStr) == 'string' then
     -- we only do anything if we have been given
-    -- an explicit string 
+    -- an explicit string
     local position = 1
-    while aTemplateStr:find('{{', position) do
-    
-      local textChunk = aTemplateStr:match('^.*{{', position)
-      if textChunk then 
-        local textChunkLen = #textChunk
-        textChunk = textChunk:sub(1, textChunkLen-2)
-        if 0 < #textChunk then tInsert(theTemplate, textChunk) end
-        position = position + textChunkLen
-      end
-      
-      local luaChunk = curTemplate:match('^.+}}', position)
-      if luaChunk then
-        local luaChunkLen = #luaChunk
-        luaChunk = luaChunk:sub(1, luaChunkLen-2)
-        if 0 < #luaChunk then
-          texio.write_nl('['..luaChunk:sub(1,1)..']')
-          tInsert(theTemplate, luaChunk)
+    while aTemplateStr:find('{{', position, true) do
+
+      local endText, startChunk = aTemplateStr:find('{{', position, true)
+      if position < endText then
+        local textChunk = aTemplateStr:sub(position, endText-1)
+        if textChunk and 0 < #textChunk then
+          tInsert(theTemplate, textChunk)
         end
-        position = position + luaChunkLen
       end
+      position = startChunk + 1
+
+      local endChunk, startText = aTemplateStr:find('}}', position, true)
+      if position < endChunk then
+        local luaChunk = aTemplateStr:sub(position, endChunk-1)
+        if luaChunk and 0 < #luaChunk then
+          local actionType = luaChunk:sub(1,1)
+          local luaChunk = luaChunk:sub(2)
+          local arguments = { }
+          for anArg in luaChunk:gmatch('[^,]+') do
+            tInsert(arguments, anArg:match("^%s*(.-)%s*$"))
+          end
+          if actionType == '=' then
+            if 0 < #arguments then
+              tInsert(theTemplate, { 'reference', arguments[1] })
+            else
+              reportTemplateError(aTemplateStr,
+                "No attribute specified"
+              )
+            end
+          elseif actionType == '!' then
+            if 0 < #arguments then
+              tInsert(theTemplate, { 'application', arguments })
+            else
+              reportTemplateError(aTemplateStr,
+                "No template specified"
+              )
+            end
+          elseif actionType == '|' then
+            if 2 < #arguments then
+              tInsert(theTemplate, { 'mapping', arguments })
+            else
+              reportTemplateError(aTemplateStr,
+                "No attribute, separator or template specified"
+              )
+            end
+          else
+            reportTemplateError(aTemplateStr,
+              sFmt("Unknown template attribute action [%s]",
+                actionType)
+            )
+          end
+        end
+      end
+      position = startText + 1
     end
-    
+
     if position < #aTemplateStr then
       tInsert(theTemplate, aTemplateStr:sub(position))
     end
   end
   return theTemplate
 end
+
+litProgs.parseTemplate = parseTemplate
 \stopLuaCode
 
 \startTestCase[should parse simple templates]
@@ -141,7 +186,6 @@ and this {{| aList, aSeparator, aTemplate, anArgument }}
 is a mapping
 ]=])
 assert.isTable(aTemplate)
-showValue(aTemplate)
 assert.length(aTemplate,7)
 assert.matches(aTemplate[1], 'This is a test\nbut this ')
 assert.isTable(aTemplate[2])
@@ -166,21 +210,140 @@ assert.matches(aTemplate[6][2][3], 'aTemplate')
 assert.matches(aTemplate[6][2][4], 'anArgument')
 assert.matches(aTemplate[7], '\nis a mapping\n')
 \stopLuaTest
-\showLuaTest
 \stopTestCase
 
 \stopTestSuite
+
+\startTestSuite[addTemplate]
 
 The \type{addTemplate} method is used by any template files to manage the 
 process of parsing a template into a structure located in the \ConTeXt\ 
 \type{thirddata.templates} structure. The \type{addTemplate} method can be 
 used as a Lua based DSL for managing templates. 
 
-\startLuaCode
-function litProgs.addTemplate()
+The \type{addTemplate} method expects three arguments, the 
+\type{templatePath}, an ordered collection of the internal names of the 
+formal arguments contained in \type{templateArgs}, and the 
+\type{templateStr}. 
 
+The \type{templatePath} must be a string containing a \quote{.} separated 
+list of lua identifiers. All templates are contained subtables of the 
+\type{thirddata.templates} table. The \quote{.} separated list of lua 
+identifiers provides a \quote{path} through these subtables to the 
+ultimate template. This provides a simple namespace mechanism to help 
+organize complex collection of templates. 
+
+\startLuaCode
+local function parseTemplatePath(templatePathStr)
+  if type(templatePathStr) ~= 'string' then
+    texio.write_nl(
+      sFmt("Expected [%s] to be a string.", tempaltePathStr)
+    )
+    texio.write_nl("Ignoring template.")
+    return nil
+  end
+  local templatePath = { }
+  for subTemplate in templatePathStr:gmatch('[^%.]+') do
+    tInsert(templatePath, subTemplate)
+  end
+  return templatePath
+end
+
+litProgs.parseTemplatePath = parseTemplatePath
+
+local function navigateToTemplateTable(templatePath)
+  thirddata.templates = thirddata.templates or { }
+  local curTable = thirddata.templates
+  for i, templateDir in ipairs(templatePath) do
+    curTable[templateDir] = curTable[templateDir] or { }
+    curTable = curTable[templateDir]
+  end
+  return curTable
+end
+
+litProgs.navigateToTemplateTable = navigateToTemplateTable
+
+function litProgs.addTemplate(templatePath, templateArgs, templateStr)
+  templatePath = parseTemplatePath(templatePath)
+  if not templatePath then return nil end
+  local templateTable    = navigateToTemplateTable(templatePath)
+  templateTable.args     = templateArgs
+  templateTable.template = parseTemplate(templateStr)
 end
 \stopLuaCode
+
+\startTestCase[parseTemplatePath should parse simple template paths]
+\startLuaTest
+local parseTemplatePath = thirddata.literateProgs.parseTemplatePath
+local templatePath = parseTemplatePath('test.subTest.subSubTest')
+assert.isTable(templatePath)
+assert.length(templatePath, 3)
+assert.matches(templatePath[1], 'test')
+assert.matches(templatePath[2], 'subTest')
+assert.matches(templatePath[3], 'subSubTest')
+\stopLuaTest
+\stopTestCase
+
+\startTestCase[navigateToTemplateTable should navigate to subtables]
+\startLuaTest
+local parseTemplatePath = thirddata.literateProgs.parseTemplatePath
+local templatePath = parseTemplatePath('test.subTest.subSubTest')
+local navigateToTemplateTable = thirddata.literateProgs.navigateToTemplateTable
+local curTable = navigateToTemplateTable(templatePath)
+assert.isTable(curTable)
+local templates = thirddata.templates
+assert.isNotNil(templates)
+assert.isTable(templates)
+--
+curtable = templates.test
+assert.isNotNil(curTable)
+assert.isTable(curTable)
+--
+curtable = curTable.subTest
+assert.isNotNil(curTable)
+assert.isTable(curTable)
+--
+curtable = curTable.subSubTest
+assert.isNotNil(curTable)
+assert.isTable(curTable)
+--
+templates.test = nil
+assert.isNil(templates.test)
+\stopLuaTest
+\stopTestCase
+
+\startTestCase[addTemplate should add a simple template]
+\startLuaTest
+local templates = thirddata.templates
+assert.isNil(templates.test)
+--
+local addTemplate = thirddata.literateProgs.addTemplate
+addTemplate('test.subTest.subSubTest',
+  { 'arg1', 'arg2'},
+  'This is a test template'
+)
+--
+assert.isNotNil(templates.test)
+assert.isNotNil(templates.test.subTest)
+assert.isNotNil(templates.test.subTest.subSubTest)
+local templateTable = templates.test.subTest.subSubTest
+assert.isTable(templateTable)
+assert.isNotNil(templateTable.args)
+assert.isTable(templateTable.args)
+assert.length(templateTable.args, 2)
+assert.matches(templateTable.args[1], 'arg1')
+assert.matches(templateTable.args[2], 'arg2')
+assert.isNotNil(templateTable.template)
+assert.isTable(templateTable.template)
+assert.length(templateTable.template, 1)
+assert.matches(templateTable.template[1], 'This is a test template')
+--
+templates.test = nil
+assert.isNil(templates.test)
+\stopLuaTest
+\stopTestCase
+
+\stopTestSuite
 
 \startLuaCode
 function litProgs.renderer()

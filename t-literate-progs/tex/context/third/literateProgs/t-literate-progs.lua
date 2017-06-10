@@ -36,24 +36,24 @@ local function reportTemplateError(aTemplateStr, errMessage)
   texio.write_nl('---------------------------')
 end
 
-function litProgs.parseTemplate(aTemplateStr)
+local function parseTemplate(aTemplateStr)
   local theTemplate = { }
 
   if type(aTemplateStr) == 'string' then
     -- we only do anything if we have been given
-    -- an explicit string 
+    -- an explicit string
     local position = 1
     while aTemplateStr:find('{{', position, true) do
-    
+
       local endText, startChunk = aTemplateStr:find('{{', position, true)
-      if position < endText then 
+      if position < endText then
         local textChunk = aTemplateStr:sub(position, endText-1)
         if textChunk and 0 < #textChunk then
           tInsert(theTemplate, textChunk)
         end
       end
       position = startChunk + 1
-      
+
       local endChunk, startText = aTemplateStr:find('}}', position, true)
       if position < endChunk then
         local luaChunk = aTemplateStr:sub(position, endChunk-1)
@@ -98,12 +98,51 @@ function litProgs.parseTemplate(aTemplateStr)
       end
       position = startText + 1
     end
-    
+
     if position < #aTemplateStr then
       tInsert(theTemplate, aTemplateStr:sub(position))
     end
   end
   return theTemplate
+end
+
+litProgs.parseTemplate = parseTemplate
+
+local function parseTemplatePath(templatePathStr)
+  if type(templatePathStr) ~= 'string' then
+    texio.write_nl(
+      sFmt("Expected [%s] to be a string.", tempaltePathStr)
+    )
+    texio.write_nl("Ignoring template.")
+    return nil
+  end
+  local templatePath = { }
+  for subTemplate in templatePathStr:gmatch('[^%.]+') do
+    tInsert(templatePath, subTemplate)
+  end
+  return templatePath
+end
+
+litProgs.parseTemplatePath = parseTemplatePath
+
+local function navigateToTemplateTable(templatePath)
+  thirddata.templates = thirddata.templates or { }
+  local curTable = thirddata.templates
+  for i, templateDir in ipairs(templatePath) do
+    curTable[templateDir] = curTable[templateDir] or { }
+    curTable = curTable[templateDir]
+  end
+  return curTable
+end
+
+litProgs.navigateToTemplateTable = navigateToTemplateTable
+
+function litProgs.addTemplate(templatePath, templateArgs, templateStr)
+  templatePath = parseTemplatePath(templatePath)
+  if not templatePath then return nil end
+  local templateTable    = navigateToTemplateTable(templatePath)
+  templateTable.args     = templateArgs
+  templateTable.template = parseTemplate(templateStr)
 end
 
 -- We need a simple Lua based template engine

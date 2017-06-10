@@ -88,9 +88,12 @@ code.lua        = {}
 code.templates  = {}
 code.lakefile   = {}
 
---local pp = require('pl/pretty')
+local pp = require('pl/pretty')
 local tInsert = table.insert
 local tConcat = table.concat
+local sFmt    = string.format
+local sMatch  = string.match
+local toStr   = tostring
 \stopLuaCode
 
 \startLuaTemplate
