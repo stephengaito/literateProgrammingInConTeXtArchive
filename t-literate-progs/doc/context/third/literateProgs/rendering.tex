@@ -346,8 +346,69 @@ assert.isNil(templates.test)
 \stopTestSuite
 
 \startLuaCode
-function litProgs.renderer()
+local function getReference(aReference, anEnv)
 
+end
+
+local function buildNewEnv(template, arguments, anEnv)
+
+end
+
+function litProgs.renderer(aTemplate, anEnv)
+  if type(aTemplate) == 'table' and 0 < #aTemplate then
+    local result = { }
+    for i, aChunk = ipairs(aTemplate) do
+      if type(aChunk) == 'string' then
+        -- a simple litteral string... add it
+        tInsert(result, aChunk)
+      elseif type(aChunk) == 'table' and 0 < #aChunk then
+        local actionType = aChunk[1]
+        local arguments  = aChunk[2]
+        if actionType == 'reference' then
+          if type(arguments) == 'string' then
+            local attrValue = getReference(arguments, anEnv)
+            if type(attrValue) == 'string' then
+              tInsert(result, attrValue)
+            end
+          end
+        elseif actionType == 'application' then
+          if type(arguments) == 'table' and 1 < #arguments then
+            local template = tRemove(arguments, 1)
+            if type(template) == 'string' then
+              template = getReference(template, thirddata.templates)
+              local newEnv = buildNewEnv(template, arguments, anEnv)
+              local templateValue = renderer(template, newEnv)
+              if type(templateValue) == 'string' then
+                tInsert(result, templateValue)
+              end
+            end
+          end
+        elseif actionType == 'mapping' then
+          if type(arguments) == 'table' and 2 < #arguments then
+            local attrList  = tRemove(arguments, 1)
+            local separator = tRemove(arguments, 1)
+            local template  = tRemove(arguments, 1)
+            if type(template) == 'string' and type(separator) == 'string' then
+              template = getReference(template, thirddata.templates)
+              if type(attrList) == 'string' then
+                attrList = { attrList }
+              end
+              if type(attrList) == 'table' and 0 < #attrList then
+                for i, anAttrRef = ipairs(attrList) do
+                  tInsert(arguments, anAttrRef)
+                  local newEnv = buildNewEnv(template, arguments, anEnv )
+                  tRemove(arguments, 1)
+                  local templateValue = renderer(template, newEnv)
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  else
+    return ""
+  end
 end
 \stopLuaCode
 
