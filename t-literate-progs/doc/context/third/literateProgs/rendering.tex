@@ -345,11 +345,46 @@ assert.isNil(templates.test)
 
 \stopTestSuite
 
+\startTestSuite[renderer]
+
+
 \startLuaCode
 local function getReference(aReference, anEnv)
+  if type(aReference) ~= 'string' then return nil end
+  local redirect = aReference:sub(1,1)
+  if redirect == '*' then
+    local newRef = aReference:sub(2)
+    local indirectRef = getReference(newRef, anEnv)
+    if indirectRef and type(indirectRef) == 'string' then
+      return getReference(indirectRef, anEnv)
+    else
+      return nil
+    end
+  end
 
+  return anEnv[aReference]
 end
 
+litProgs.getReference = getReference
+\stopLuaCode
+
+\startTestCase[getReference should get indirect references]
+
+\startLuaTest
+local getReference = thirddata.literateProgs.getReference
+local anEnv = { 
+  anAttr = 'anAttrValue',
+  attr   = 'anAttr'
+}
+assert.isNil(getReference(42))
+assert.matches(getReference('anAttr', anEnv), 'anAttrValue')
+assert.matches(getReference('attr',   anEnv), 'anAttr')
+assert.matches(getReference('*attr',  anEnv), 'anAttrValue')
+assert.isNil(  getReference('noAttr', anEnv))
+\stopLuaTest
+\stopTestCase
+
+\startLuaCode
 local function buildNewEnv(template, arguments, anEnv)
 
 end

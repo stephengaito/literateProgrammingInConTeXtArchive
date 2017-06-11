@@ -145,6 +145,24 @@ function litProgs.addTemplate(templatePath, templateArgs, templateStr)
   templateTable.template = parseTemplate(templateStr)
 end
 
+local function getReference(aReference, anEnv)
+  if type(aReference) ~= 'string' then return nil end
+  local redirect = aReference:sub(1,1)
+  if redirect == '*' then
+    local newRef = aReference:sub(2)
+    local indirectRef = getReference(newRef, anEnv)
+    if indirectRef and type(indirectRef) == 'string' then
+      return getReference(indirectRef, anEnv)
+    else
+      return nil
+    end
+  end
+
+  return anEnv[aReference]
+end
+
+litProgs.getReference = getReference
+
 -- We need a simple Lua based template engine
 -- Our template engine has been inspired by:
 --   https://john.nachtimwald.com/2014/08/06/using-lua-as-a-templating-engine/
