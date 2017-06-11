@@ -34,28 +34,7 @@ program creation code.
 }
 
 \protect \endinput
-
 \stopMkIVCode
-
-\startLuaCode
-
-function litProgs.dumpLitProgsTable()
-  return pp.write(litProgs)
-end
-
-function litProgs.createLitProgsTableFile(aFilePath)
-  renderFile(aFilePath, litProgs.templates.litProgsTable.file)
-end
-
-\stopLuaCode
-
-\startLuaTemplate
-
-templates.litProgsTable.file = [=[
-{{ return thirddata.literateProgs.dumpLitProgsTable() }}
-]=]
-
-\stopLuaTemplate
 
 \section[title=Creating module files]
 
@@ -66,7 +45,5 @@ templates.litProgsTable.file = [=[
 \createTemplateFile[../../../../../build/t-literate-progs-templates.lua]
 
 \createLakefile[../../../../../build/lakefile]
-
-\createLitProgsTableFile[../../../../../build/t-literate-progs-table.lua]
 
 \stopchapter

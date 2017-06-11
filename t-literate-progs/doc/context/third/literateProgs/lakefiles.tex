@@ -38,18 +38,10 @@ function litProgs.addLakefile(bufferName)
 end
 
 function litProgs.createLakefile(aFilePath)
-  renderFile(aFilePath, litProgs.templates.lakefile.file)
+  renderCodeFile(aFilePath, litProgs.code.lakefile)
 end
 
 \stopLuaCode
-
-\startLuaTemplate
-
-templates.lakefile.file = [=[
-{{ return table.concat(thirddata.literateProgs.code.lakefile, "\n\n") }}
-]=]
-
-\stopLuaTemplate
 
 \startLakefile
 -- A Lua Lakefile

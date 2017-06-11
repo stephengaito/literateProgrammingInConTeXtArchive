@@ -36,17 +36,9 @@ function litProgs.addLuaTemplate(bufferName)
 end
 
 function litProgs.createLuaTemplateFile(aFilePath)
-  renderFile(aFilePath, litProgs.templates.templates.file)
+  renderCodeFile(aFilePath, litProgs.code.templates)
 end
 
 \stopLuaCode
-
-\startLuaTemplate
-
-templates.templates.file = [=[
-{{ return table.concat(thirddata.literateProgs.code.templates, "\n\n") }}
-]=]
-
-\stopLuaTemplate
 
 \stopchapter

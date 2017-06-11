@@ -126,6 +126,7 @@ local function getReference(aReference, anEnv)
 end
 
 litProgs.getReference = getReference
+
 local function parseTemplatePath(templatePathStr, anEnv)
   if type(templatePathStr) ~= 'string' then
     texio.write_nl(
@@ -258,70 +259,9 @@ end
 
 litProgs.renderer = renderer
 
--- We need a simple Lua based template engine
--- Our template engine has been inspired by:
---   https://john.nachtimwald.com/2014/08/06/using-lua-as-a-templating-engine/
--- (via the minLua JoyLoL template engine)
-
-function litProgs.renderNextChunk(prevChunk, renderedText, curTemplate)
-  local result = ""
- 
-  if prevChunk
-    and type(prevChunk) == 'string'
-    and 0 < #prevChunk then
-    tInsert(renderedText, prevChunk)
-  end
- 
-  if type(curTemplate) == 'string' and (0 < #curTemplate) then
-    if curTemplate:find('{{') then
-      local position  = 1
-      local textChunk = curTemplate:match('^.*{{', position)
-      if textChunk then
-        local textChunkLen = #textChunk
-        textChunk = textChunk:sub(1, textChunkLen-2)
-        if 0 < #textChunk then tInsert(renderedText, textChunk) end
-        position = position + textChunkLen
-      end
- 
-      local luaChunk = curTemplate:match('^.+}}', position)
-      if luaChunk then
-        local luaChunkLen = #luaChunk
-        luaChunk = luaChunk:sub(1, luaChunkLen-2)
-        position = position + luaChunkLen
-        curTemplate = curTemplate:sub(position, #curTemplate)
-        local newChunk = ""
-        if not luaChunk:match('^%s*$') then
-          -- consider using an PCall here....
-          local luaFunc, errMessage = load(luaChunk)
-          if luaFunc then
-            newChunk = luaFunc(litProgs)
-          end
-        end
-        result = litProgs.renderNextChunk(newChunk, renderedText, curTemplate)
-      end
-    else -- there is no '{{' in the template
-      tInsert(renderedText, curTemplate)
-      result = tConcat(renderedText)
-    end
-  else
-    -- nothing to do...
-    result = tConcat(renderedText)
-  end
-  return result
-end
-
-function litProgs.render(aTemplate)
-  return litProgs.renderNextChunk("", { }, aTemplate)
-end
-
--- Now we need the code that captures and creates a given code/file type
-
-local function renderFile(aFilePath, baseTemplate)
+local function renderCodeFile(aFilePath, codeTable)
   local outFile = io.open(aFilePath, 'w')
-  --outFile:write(pp.write(litProgs))
-  local renderedBaseTemplate = litProgs.renderNextChunk("", {}, baseTemplate)
-  --outFile:write('\n--------------\n')
-  outFile:write(renderedBaseTemplate)
+  outFile:write(tConcat(codeTable, '\n\n'))
   outFile:close()
 end
 
@@ -354,7 +294,7 @@ function litProgs.addMkIVCode(bufferName)
 end
 
 function litProgs.createMkIVFile(aFilePath)
-  renderFile(aFilePath, litProgs.templates.mkiv.file)
+  renderCodeFile(aFilePath, litProgs.code.mkiv)
 end
 
 function litProgs.addLuaCode(bufferName)
@@ -363,7 +303,7 @@ function litProgs.addLuaCode(bufferName)
 end
 
 function litProgs.createLuaFile(aFilePath)
-  renderFile(aFilePath, litProgs.templates.lua.file)
+  renderCodeFile(aFilePath, litProgs.code.lua)
 end
 
 function litProgs.addLuaTemplate(bufferName)
@@ -372,7 +312,7 @@ function litProgs.addLuaTemplate(bufferName)
 end
 
 function litProgs.createLuaTemplateFile(aFilePath)
-  renderFile(aFilePath, litProgs.templates.templates.file)
+  renderCodeFile(aFilePath, litProgs.code.templates)
 end
 
 function litProgs.addLakefile(bufferName)
@@ -381,13 +321,5 @@ function litProgs.addLakefile(bufferName)
 end
 
 function litProgs.createLakefile(aFilePath)
-  renderFile(aFilePath, litProgs.templates.lakefile.file)
-end
-
-function litProgs.dumpLitProgsTable()
-  return pp.write(litProgs)
-end
-
-function litProgs.createLitProgsTableFile(aFilePath)
-  renderFile(aFilePath, litProgs.templates.litProgsTable.file)
+  renderCodeFile(aFilePath, litProgs.code.lakefile)
 end

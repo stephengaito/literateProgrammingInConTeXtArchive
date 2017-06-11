@@ -142,16 +142,8 @@ Lua function.
 
 \startLuaCode
 function litProgs.createMkIVFile(aFilePath)
-  renderFile(aFilePath, litProgs.templates.mkiv.file)
+  renderCodeFile(aFilePath, litProgs.code.mkiv)
 end
 \stopLuaCode
-
-\startLuaTemplate
-
-templates.mkiv.file = [=[
-{{ return table.concat(thirddata.literateProgs.code.mkiv, "\n\n") }}
-]=]
-
-\stopLuaTemplate
 
 \stopchapter
