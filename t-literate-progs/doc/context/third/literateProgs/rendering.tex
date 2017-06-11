@@ -128,7 +128,7 @@ local function parseTemplate(aTemplateStr)
       position = startText + 1
     end
 
-    if position < #aTemplateStr then
+    if position <= #aTemplateStr then
       tInsert(theTemplate, aTemplateStr:sub(position))
     end
   end
@@ -149,18 +149,18 @@ assert.isString(aTemplate[1])
 assert.matches(aTemplate[1], 'This is a test')
 --
 aTemplate = parseTemplate(
-  'This is a test{{=  anAttribute  }}This is another test'
+  'This is a test [{{=  anAttribute  }}]'
 )
 assert.isTable(aTemplate)
 assert.length(aTemplate, 3)
 assert.isString(aTemplate[1])
-assert.matches(aTemplate[1], 'This is a test')
+assert.matches(aTemplate[1], 'This is a test %[')
 assert.isTable(aTemplate[2])
 assert.length(aTemplate[2], 2)
 assert.matches(aTemplate[2][1], 'reference')
 assert.matches(aTemplate[2][2], 'anAttribute')
 assert.isString(aTemplate[3])
-assert.matches(aTemplate[3], 'This is another test')
+assert.matches(aTemplate[3], '%]')
 --
 aTemplate = parseTemplate(
   '{{| aList, aSeparator, aTemplate, anArgument}}'
@@ -384,13 +384,13 @@ assert.isNil(  getReference('noAttr', anEnv))
 
 \startLuaCode
 local function buildNewEnv(template, arguments, anEnv)
-  if type(template)    ~= 'table' or #template  < 1 or
-     type(template[1]) ~= 'table' or
-     type(arguments)   ~= 'table' or
-     type(anEnv)       ~= 'table' then
+  if type(template)      ~= 'table' or
+     type(template.args) ~= 'table' or
+     type(arguments)     ~= 'table' or
+     type(anEnv)         ~= 'table' then
     return { }
   end
-  local formalArgs = template[1]
+  local formalArgs = template.args
   local newEnv = { }
   for i, aFormalArg in ipairs(formalArgs) do
     newEnv[aFormalArg] = getReference(arguments[i], anEnv)
@@ -404,7 +404,10 @@ litProgs.buildNewEnv = buildNewEnv
 \startTestCase[buildNewEnv should map formal to actual arguments]
 \startLuaTest
 local buildNewEnv = thirddata.literateProgs.buildNewEnv
-local aTemplate = { { 'argA', 'argB', 'argC' }, 'aString' }
+local aTemplate = { 
+  args = { 'argA', 'argB', 'argC' }, 
+  template = 'aString'
+}
 local someArgs  = { 'attrA', 'attrB' }
 local anEnv     = {
   attrA = 'attrAValue',
@@ -431,29 +434,29 @@ assert.isTable(buildNewEnv( { { }}, { }, { }))
 \stopTestCase
 
 \startLuaCode
-function litProgs.renderer(aTemplate, anEnv)
-  if type(aTemplate) == 'table' and 0 < #aTemplate then
+local function renderer(aTemplate, anEnv)
+  if type(aTemplate) == 'table' and
+     type(aTemplate.template) == 'table' then
     local result = { }
-    for i, aChunk in ipairs(aTemplate) do
+    for i, aChunk in ipairs(aTemplate.template) do
       if type(aChunk) == 'string' then
         -- a simple litteral string... add it
         tInsert(result, aChunk)
-      elseif type(aChunk) == 'table' and 0 < #aChunk then
+      elseif type(aChunk) == 'table' and 2 <= #aChunk then
         local actionType = aChunk[1]
         local arguments  = aChunk[2]
         if actionType == 'reference' then
           if type(arguments) == 'string' then
             local attrValue = getReference(arguments, anEnv)
-            if type(attrValue) == 'string' then
-              tInsert(result, attrValue)
-            end
+            tInsert(result, toStr(attrValue))
           end
         elseif actionType == 'application' then
           if type(arguments) == 'table' and 1 < #arguments then
-            local template = tRemove(arguments, 1)
-            if type(template) == 'string' then
-              template = getReference(template, thirddata.templates)
-              local newEnv = buildNewEnv(template, arguments, anEnv)
+            local templatePath = tRemove(arguments, 1)
+            if type(templatePath) == 'string' then
+              templatePath   = parseTemplatePath(templatePath)
+              local template = navigateToTemplateTable(templatePath)
+              local newEnv   = buildNewEnv(template, arguments, anEnv)
               local templateValue = renderer(template, newEnv)
               if type(templateValue) == 'string' then
                 tInsert(result, templateValue)
@@ -461,21 +464,36 @@ function litProgs.renderer(aTemplate, anEnv)
             end
           end
         elseif actionType == 'mapping' then
-          if type(arguments) == 'table' and 2 < #arguments then
-            local attrList  = tRemove(arguments, 1)
-            local separator = tRemove(arguments, 1)
-            local template  = tRemove(arguments, 1)
-            if type(template) == 'string' and type(separator) == 'string' then
-              template = getReference(template, thirddata.templates)
-              if type(attrList) == 'string' then
+          if type(arguments) == 'table' and 4 <= #arguments then
+            local attrList     = tRemove(arguments, 1)
+            local separator    = tRemove(arguments, 1)
+            local templatePath = tRemove(arguments, 1)
+            local listArg      = tRemove(arguments, 1)
+            if type(attrList)     == 'string' and
+               type(separator)    == 'string' and
+               type(templatePath) == 'string' and
+               type(listArg)      == 'string' then
+              attrList       = getReference(attrList,  anEnv)
+              separator      = getReference(separator, anEnv)
+              templatePath   = parseTemplatePath(templatePath)
+              local template = navigateToTemplateTable(templatePath)
+              local newEnv   = buildNewEnv(template, arguments, anEnv )
+              if type(separator) ~= 'string' then
+                separator = ''
+              end
+              if type(attrList) ~= 'table' then
                 attrList = { attrList }
               end
               if type(attrList) == 'table' and 0 < #attrList then
-                for i, anAttrRef in ipairs(attrList) do
-                  tInsert(arguments, anAttrRef)
-                  local newEnv = buildNewEnv(template, arguments, anEnv )
-                  tRemove(arguments, 1)
+                for i, anAttrValue in ipairs(attrList) do
+                  newEnv[listArg] = anAttrValue
                   local templateValue = renderer(template, newEnv)
+                  if type(templateValue) == 'string' then
+                    tInsert(result, templateValue)
+                  end
+                  if i < #attrList then
+                    tInsert(result, separator)
+                  end
                 end
               end
             end
@@ -483,10 +501,13 @@ function litProgs.renderer(aTemplate, anEnv)
         end
       end
     end
+    return tConcat(result)
   else
     return ""
   end
 end
+
+litProgs.renderer = renderer
 \stopLuaCode
 
 \startTestCase[renderer should ...]
@@ -500,30 +521,29 @@ addTemplate(
 )
 assert.isTable(thirddata.templates.test)
 assert.isTable(thirddata.templates.test.templateA)
-showValue(thirddata.templates.test.templateA)
 addTemplate(
   'test.templateB',
   { 'anArg' },
 [=[
 This is a test {{= anArgA }}
 so is this {{! test.templateA, anArgB }}
-and this {{| argList, newLines, test.templateA }}
+and this {{| argList, newLines, test.templateA, anArg }}
 ]=]
 )
 assert.isTable(thirddata.templates.test.templateB)
-showValue(thirddata.templates.test.templateB)
 local anEnv = {
   argList = { 1, 2, 3 },
-  newLines = '\n',
+  newLines = ',\n',
   anArgA = 'argAValue',
   anArgB = 'argBValue'
 }
-showValue(anEnv)
 local templateB = thirddata.templates.test.templateB
 local result = renderer(templateB, anEnv)
-showValue(result)
+assert.matches(result, 'test argAValue\n')
+assert.matches(result, 'this anArg == %[argBValue%]\n')
+assert.matches(result, 'this anArg == %[1%],\n')
+assert.matches(result, 'anArg == %[3%]\n')
 \stopLuaTest
-\showLuaTest
 \stopTestCase
 
 \stopTestSuite

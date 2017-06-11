@@ -25,7 +25,7 @@ local table_insert = table.insert
 local table_concat = table.concat
 
 templates.mkiv.file = [=[
-{{return table.concat(thirddata.literateProgs.code.mkiv, "\n\n") }}
+{{ return table.concat(thirddata.literateProgs.code.mkiv, "\n\n") }}
 ]=]
 
 templates.lua.file = [=[

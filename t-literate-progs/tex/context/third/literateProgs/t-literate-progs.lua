@@ -100,7 +100,7 @@ local function parseTemplate(aTemplateStr)
       position = startText + 1
     end
 
-    if position < #aTemplateStr then
+    if position <= #aTemplateStr then
       tInsert(theTemplate, aTemplateStr:sub(position))
     end
   end
@@ -182,29 +182,28 @@ end
 litProgs.buildNewEnv = buildNewEnv
 
 local function renderer(aTemplate, anEnv)
-  if type(aTemplate) == 'table' and 
+  if type(aTemplate) == 'table' and
      type(aTemplate.template) == 'table' then
     local result = { }
     for i, aChunk in ipairs(aTemplate.template) do
       if type(aChunk) == 'string' then
         -- a simple litteral string... add it
         tInsert(result, aChunk)
-      elseif type(aChunk) == 'table' and 0 < #aChunk then
+      elseif type(aChunk) == 'table' and 2 <= #aChunk then
         local actionType = aChunk[1]
         local arguments  = aChunk[2]
         if actionType == 'reference' then
           if type(arguments) == 'string' then
             local attrValue = getReference(arguments, anEnv)
-            if type(attrValue) == 'string' then
-              tInsert(result, attrValue)
-            end
+            tInsert(result, toStr(attrValue))
           end
         elseif actionType == 'application' then
           if type(arguments) == 'table' and 1 < #arguments then
-            local template = tRemove(arguments, 1)
-            if type(template) == 'string' then
-              template = getReference(template, thirddata.templates)
-              local newEnv = buildNewEnv(template, arguments, anEnv)
+            local templatePath = tRemove(arguments, 1)
+            if type(templatePath) == 'string' then
+              templatePath   = parseTemplatePath(templatePath)
+              local template = navigateToTemplateTable(templatePath)
+              local newEnv   = buildNewEnv(template, arguments, anEnv)
               local templateValue = renderer(template, newEnv)
               if type(templateValue) == 'string' then
                 tInsert(result, templateValue)
@@ -212,21 +211,36 @@ local function renderer(aTemplate, anEnv)
             end
           end
         elseif actionType == 'mapping' then
-          if type(arguments) == 'table' and 2 < #arguments then
-            local attrList  = tRemove(arguments, 1)
-            local separator = tRemove(arguments, 1)
-            local template  = tRemove(arguments, 1)
-            if type(template) == 'string' and type(separator) == 'string' then
-              template = getReference(template, thirddata.templates)
-              if type(attrList) == 'string' then
+          if type(arguments) == 'table' and 4 <= #arguments then
+            local attrList     = tRemove(arguments, 1)
+            local separator    = tRemove(arguments, 1)
+            local templatePath = tRemove(arguments, 1)
+            local listArg      = tRemove(arguments, 1)
+            if type(attrList)     == 'string' and
+               type(separator)    == 'string' and
+               type(templatePath) == 'string' and
+               type(listArg)      == 'string' then
+              attrList       = getReference(attrList,  anEnv)
+              separator      = getReference(separator, anEnv)
+              templatePath   = parseTemplatePath(templatePath)
+              local template = navigateToTemplateTable(templatePath)
+              local newEnv   = buildNewEnv(template, arguments, anEnv )
+              if type(separator) ~= 'string' then
+                separator = ''
+              end
+              if type(attrList) ~= 'table' then
                 attrList = { attrList }
               end
               if type(attrList) == 'table' and 0 < #attrList then
-                for i, anAttrRef in ipairs(attrList) do
-                  tInsert(arguments, anAttrRef)
-                  local newEnv = buildNewEnv(template, arguments, anEnv )
-                  tRemove(arguments, 1)
+                for i, anAttrValue in ipairs(attrList) do
+                  newEnv[listArg] = anAttrValue
                   local templateValue = renderer(template, newEnv)
+                  if type(templateValue) == 'string' then
+                    tInsert(result, templateValue)
+                  end
+                  if i < #attrList then
+                    tInsert(result, separator)
+                  end
                 end
               end
             end
