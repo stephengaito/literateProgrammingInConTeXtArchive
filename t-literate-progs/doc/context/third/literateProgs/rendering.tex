@@ -234,13 +234,51 @@ ultimate template. This provides a simple namespace mechanism to help
 organize complex collection of templates. 
 
 \startLuaCode
-local function parseTemplatePath(templatePathStr)
+local function getReference(aReference, anEnv)
+  if type(aReference) ~= 'string' then return nil end
+  local redirect = aReference:sub(1,1)
+  if redirect == '*' then
+    local newRef = aReference:sub(2)
+    local indirectRef = getReference(newRef, anEnv)
+    if indirectRef and type(indirectRef) == 'string' then
+      return getReference(indirectRef, anEnv)
+    else
+      return nil
+    end
+  end
+
+  return anEnv[aReference]
+end
+
+litProgs.getReference = getReference
+\stopLuaCode
+
+\startTestCase[getReference should get indirect references]
+\startLuaTest
+local getReference = thirddata.literateProgs.getReference
+local anEnv = { 
+  anAttr = 'anAttrValue',
+  attr   = 'anAttr'
+}
+assert.isNil(getReference(42))
+assert.matches(getReference('anAttr', anEnv), 'anAttrValue')
+assert.matches(getReference('attr',   anEnv), 'anAttr')
+assert.matches(getReference('*attr',  anEnv), 'anAttrValue')
+assert.isNil(  getReference('noAttr', anEnv))
+\stopLuaTest
+\stopTestCase
+
+\startLuaCode
+local function parseTemplatePath(templatePathStr, anEnv)
   if type(templatePathStr) ~= 'string' then
     texio.write_nl(
       sFmt("Expected [%s] to be a string.", tempaltePathStr)
     )
     texio.write_nl("Ignoring template.")
     return nil
+  end
+  if templatePathStr:sub(1,1) == '*' then
+    templatePathStr = getReference(templatePathStr:sub(2), anEnv)
   end
   local templatePath = { }
   for subTemplate in templatePathStr:gmatch('[^%.]+') do
@@ -276,6 +314,22 @@ end
 \startLuaTest
 local parseTemplatePath = thirddata.literateProgs.parseTemplatePath
 local templatePath = parseTemplatePath('test.subTest.subSubTest')
+assert.isTable(templatePath)
+assert.length(templatePath, 3)
+assert.matches(templatePath[1], 'test')
+assert.matches(templatePath[2], 'subTest')
+assert.matches(templatePath[3], 'subSubTest')
+\stopLuaTest
+\stopTestCase
+
+\startTestCase[parseTemplatePath should parse indirect template references]
+
+\startLuaTest
+local parseTemplatePath = thirddata.literateProgs.parseTemplatePath
+local anEnv = {
+  indirectTemplatePath = 'test.subTest.subSubTest'
+}
+local templatePath = parseTemplatePath('*indirectTemplatePath', anEnv)
 assert.isTable(templatePath)
 assert.length(templatePath, 3)
 assert.matches(templatePath[1], 'test')
@@ -346,41 +400,6 @@ assert.isNil(templates.test)
 \stopTestSuite
 
 \startTestSuite[renderer]
-
-\startLuaCode
-local function getReference(aReference, anEnv)
-  if type(aReference) ~= 'string' then return nil end
-  local redirect = aReference:sub(1,1)
-  if redirect == '*' then
-    local newRef = aReference:sub(2)
-    local indirectRef = getReference(newRef, anEnv)
-    if indirectRef and type(indirectRef) == 'string' then
-      return getReference(indirectRef, anEnv)
-    else
-      return nil
-    end
-  end
-
-  return anEnv[aReference]
-end
-
-litProgs.getReference = getReference
-\stopLuaCode
-
-\startTestCase[getReference should get indirect references]
-\startLuaTest
-local getReference = thirddata.literateProgs.getReference
-local anEnv = { 
-  anAttr = 'anAttrValue',
-  attr   = 'anAttr'
-}
-assert.isNil(getReference(42))
-assert.matches(getReference('anAttr', anEnv), 'anAttrValue')
-assert.matches(getReference('attr',   anEnv), 'anAttr')
-assert.matches(getReference('*attr',  anEnv), 'anAttrValue')
-assert.isNil(  getReference('noAttr', anEnv))
-\stopLuaTest
-\stopTestCase
 
 \startLuaCode
 local function buildNewEnv(template, arguments, anEnv)
@@ -454,7 +473,7 @@ local function renderer(aTemplate, anEnv)
           if type(arguments) == 'table' and 1 < #arguments then
             local templatePath = tRemove(arguments, 1)
             if type(templatePath) == 'string' then
-              templatePath   = parseTemplatePath(templatePath)
+              templatePath   = parseTemplatePath(templatePath, anEnv)
               local template = navigateToTemplateTable(templatePath)
               local newEnv   = buildNewEnv(template, arguments, anEnv)
               local templateValue = renderer(template, newEnv)
@@ -475,7 +494,7 @@ local function renderer(aTemplate, anEnv)
                type(listArg)      == 'string' then
               attrList       = getReference(attrList,  anEnv)
               separator      = getReference(separator, anEnv)
-              templatePath   = parseTemplatePath(templatePath)
+              templatePath   = parseTemplatePath(templatePath, anEnv)
               local template = navigateToTemplateTable(templatePath)
               local newEnv   = buildNewEnv(template, arguments, anEnv )
               if type(separator) ~= 'string' then

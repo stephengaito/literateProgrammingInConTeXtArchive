@@ -109,13 +109,33 @@ end
 
 litProgs.parseTemplate = parseTemplate
 
-local function parseTemplatePath(templatePathStr)
+local function getReference(aReference, anEnv)
+  if type(aReference) ~= 'string' then return nil end
+  local redirect = aReference:sub(1,1)
+  if redirect == '*' then
+    local newRef = aReference:sub(2)
+    local indirectRef = getReference(newRef, anEnv)
+    if indirectRef and type(indirectRef) == 'string' then
+      return getReference(indirectRef, anEnv)
+    else
+      return nil
+    end
+  end
+
+  return anEnv[aReference]
+end
+
+litProgs.getReference = getReference
+local function parseTemplatePath(templatePathStr, anEnv)
   if type(templatePathStr) ~= 'string' then
     texio.write_nl(
       sFmt("Expected [%s] to be a string.", tempaltePathStr)
     )
     texio.write_nl("Ignoring template.")
     return nil
+  end
+  if templatePathStr:sub(1,1) == '*' then
+    templatePathStr = getReference(templatePathStr:sub(2), anEnv)
   end
   local templatePath = { }
   for subTemplate in templatePathStr:gmatch('[^%.]+') do
@@ -145,24 +165,6 @@ function litProgs.addTemplate(templatePath, templateArgs, templateStr)
   templateTable.args     = templateArgs
   templateTable.template = parseTemplate(templateStr)
 end
-
-local function getReference(aReference, anEnv)
-  if type(aReference) ~= 'string' then return nil end
-  local redirect = aReference:sub(1,1)
-  if redirect == '*' then
-    local newRef = aReference:sub(2)
-    local indirectRef = getReference(newRef, anEnv)
-    if indirectRef and type(indirectRef) == 'string' then
-      return getReference(indirectRef, anEnv)
-    else
-      return nil
-    end
-  end
-
-  return anEnv[aReference]
-end
-
-litProgs.getReference = getReference
 
 local function buildNewEnv(template, arguments, anEnv)
   if type(template)      ~= 'table' or
@@ -201,7 +203,7 @@ local function renderer(aTemplate, anEnv)
           if type(arguments) == 'table' and 1 < #arguments then
             local templatePath = tRemove(arguments, 1)
             if type(templatePath) == 'string' then
-              templatePath   = parseTemplatePath(templatePath)
+              templatePath   = parseTemplatePath(templatePath, anEnv)
               local template = navigateToTemplateTable(templatePath)
               local newEnv   = buildNewEnv(template, arguments, anEnv)
               local templateValue = renderer(template, newEnv)
@@ -222,7 +224,7 @@ local function renderer(aTemplate, anEnv)
                type(listArg)      == 'string' then
               attrList       = getReference(attrList,  anEnv)
               separator      = getReference(separator, anEnv)
-              templatePath   = parseTemplatePath(templatePath)
+              templatePath   = parseTemplatePath(templatePath, anEnv)
               local template = navigateToTemplateTable(templatePath)
               local newEnv   = buildNewEnv(template, arguments, anEnv )
               if type(separator) ~= 'string' then
