@@ -347,7 +347,6 @@ assert.isNil(templates.test)
 
 \startTestSuite[renderer]
 
-
 \startLuaCode
 local function getReference(aReference, anEnv)
   if type(aReference) ~= 'string' then return nil end
@@ -369,7 +368,6 @@ litProgs.getReference = getReference
 \stopLuaCode
 
 \startTestCase[getReference should get indirect references]
-
 \startLuaTest
 local getReference = thirddata.literateProgs.getReference
 local anEnv = { 
@@ -386,9 +384,53 @@ assert.isNil(  getReference('noAttr', anEnv))
 
 \startLuaCode
 local function buildNewEnv(template, arguments, anEnv)
-
+  if type(template)    ~= 'table' or #template  < 1 or
+     type(template[1]) ~= 'table' or
+     type(arguments)   ~= 'table' or
+     type(anEnv)       ~= 'table' then
+    return { }
+  end
+  local formalArgs = template[1]
+  local newEnv = { }
+  for i, aFormalArg in ipairs(formalArgs) do
+    newEnv[aFormalArg] = getReference(arguments[i], anEnv)
+  end
+  return newEnv
 end
 
+litProgs.buildNewEnv = buildNewEnv
+\stopLuaCode
+
+\startTestCase[buildNewEnv should map formal to actual arguments]
+\startLuaTest
+local buildNewEnv = thirddata.literateProgs.buildNewEnv
+local aTemplate = { { 'argA', 'argB', 'argC' }, 'aString' }
+local someArgs  = { 'attrA', 'attrB' }
+local anEnv     = {
+  attrA = 'attrAValue',
+  attrB = 'attrBValue',
+  attrC = 'attrCValue'
+}
+local newEnv = buildNewEnv(aTemplate, someArgs, anEnv)
+assert.isTable(newEnv)
+assert.matches(newEnv['argA'], 'attrAValue')
+assert.matches(newEnv['argB'], 'attrBValue')
+assert.isNil(  newEnv['argC'])
+\stopLuaTest
+\stopTestCase
+
+\startTestCase[buildNewEnv should fail correctly]
+\startLuaTest
+local buildNewEnv = thirddata.literateProgs.buildNewEnv
+assert.isTable(buildNewEnv('aString'))
+assert.isTable(buildNewEnv( { }, 'aString'))
+assert.isTable(buildNewEnv( { }, { }, 'aString'))
+assert.isTable(buildNewEnv( { }, { }, { }))
+assert.isTable(buildNewEnv( { { }}, { }, { }))
+\stopLuaTest
+\stopTestCase
+
+\startLuaCode
 function litProgs.renderer(aTemplate, anEnv)
   if type(aTemplate) == 'table' and 0 < #aTemplate then
     local result = { }

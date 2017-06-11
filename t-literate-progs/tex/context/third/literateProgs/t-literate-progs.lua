@@ -163,6 +163,23 @@ end
 
 litProgs.getReference = getReference
 
+local function buildNewEnv(template, arguments, anEnv)
+  if type(template)    ~= 'table' or #template  < 1 or
+     type(template[1]) ~= 'table' or
+     type(arguments)   ~= 'table' or
+     type(anEnv)       ~= 'table' then
+    return { }
+  end
+  local formalArgs = template[1]
+  local newEnv = { }
+  for i, aFormalArg in ipairs(formalArgs) do
+    newEnv[aFormalArg] = getReference(arguments[i], anEnv)
+  end
+  return newEnv
+end
+
+litProgs.buildNewEnv = buildNewEnv
+
 -- We need a simple Lua based template engine
 -- Our template engine has been inspired by:
 --   https://john.nachtimwald.com/2014/08/06/using-lua-as-a-templating-engine/
