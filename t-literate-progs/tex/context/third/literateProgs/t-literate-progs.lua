@@ -9,6 +9,12 @@ modules ['t-literate-progs'] = {
     license   = "MIT License"
 }
 
+local pp = require('pl/pretty')
+texio.write_nl('t-literate-progs.lua')
+texio.write_nl('-------------------------')
+texio.write_nl(pp.write(thirddata))
+texio.write_nl('-------------------------')
+
 thirddata               = thirddata               or {}
 thirddata.literateProgs = thirddata.literateProgs or {}
 
@@ -148,8 +154,8 @@ end
 litProgs.parseTemplatePath = parseTemplatePath
 
 local function navigateToTemplateTable(templatePath)
-  thirddata.templates = thirddata.templates or { }
-  local curTable = thirddata.templates
+  litProgs.templates = litProgs.templates or { }
+  local curTable = litProgs.templates
   for i, templateDir in ipairs(templatePath) do
     curTable[templateDir] = curTable[templateDir] or { }
     curTable = curTable[templateDir]
@@ -294,7 +300,7 @@ function litProgs.addMkIVCode(bufferName)
 end
 
 function litProgs.createMkIVFile(aFilePath)
-  renderCodeFile(aFilePath, litProgs.code.mkiv)
+  renderCodeFile(aFilePath, code.mkiv)
 end
 
 function litProgs.addLuaCode(bufferName)
@@ -303,7 +309,7 @@ function litProgs.addLuaCode(bufferName)
 end
 
 function litProgs.createLuaFile(aFilePath)
-  renderCodeFile(aFilePath, litProgs.code.lua)
+  renderCodeFile(aFilePath, code.lua)
 end
 
 function litProgs.addLuaTemplate(bufferName)
@@ -312,7 +318,7 @@ function litProgs.addLuaTemplate(bufferName)
 end
 
 function litProgs.createLuaTemplateFile(aFilePath)
-  renderCodeFile(aFilePath, litProgs.code.templates)
+  renderCodeFile(aFilePath, code.templates)
 end
 
 function litProgs.addLakefile(bufferName)
@@ -321,5 +327,5 @@ function litProgs.addLakefile(bufferName)
 end
 
 function litProgs.createLakefile(aFilePath)
-  renderCodeFile(aFilePath, litProgs.code.lakefile)
+  renderCodeFile(aFilePath, code.lakefile)
 end

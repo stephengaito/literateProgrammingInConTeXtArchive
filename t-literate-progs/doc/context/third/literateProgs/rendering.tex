@@ -48,6 +48,78 @@ To render a template we will use a strategy of explicitly parsing all
 templates into a Lua structure which our rendering engine, below, can 
 efficiently interpret.
 
+\startTestSuite[prettyPrint]
+
+\startLuaCode
+-- nil, boolean, number, string, function, userdata, thread, and table
+
+local function compareKeyValues(a, b)
+  return (a[1] < b[1])
+end
+
+local function prettyPrint(anObj, indent)
+  local result = ""
+  indent = indent or ""
+  if type(anObj) == 'nil' then
+    result = 'nil'
+  elseif type(anObj) == 'boolean' then
+    if anObj then result = 'true' else result = 'false' end
+  elseif type(anObj) == 'number' then
+    result = toStr(anObj)
+  elseif type(anObj) == 'string' then
+    result = '"'..anObj..'"'
+  elseif type(anObj) == 'function' then
+    result = toStr(anObj)
+  elseif type(anObj) == 'userdata' then
+    result = toStr(anObj)
+  elseif type(anObj) == 'thread' then
+    result = toStr(anObj)
+  elseif type(anObj) == 'table' then
+    local origIndent = indent
+    indent = indent..'  '
+    result = '{\n'
+    for i, aValue in ipairs(anObj) do
+      result = result..indent..prettyPrint(aValue, indent)..',\n'
+    end
+    local theKeyValues = { }
+    for aKey, aValue in pairs(anObj) do
+      if type(aKey) ~= 'number' or aKey < 1 or #anObj < aKey then
+        tInsert(theKeyValues,
+          { prettyPrint(aKey), aKey, prettyPrint(aValue, indent) })
+      end
+    end
+    tSort(theKeyValues, compareKeyValues)
+    for i, aKeyValue in ipairs(theKeyValues) do
+      result = result..indent..'['..aKeyValue[1]..'] = '..aKeyValue[3]..',\n'
+    end
+    result = result..origIndent..'}'
+  else
+    result = 'UNKNOWN TYPE: ['..toStr(anObj)..']'
+  end
+  return result
+end
+
+litProgs.prettyPrint = prettyPrint
+\stopLuaCode
+
+\startTestCase[test various examples]
+  
+\startLuaTest
+local pp = thirddata.contests.prettyPrint
+
+assert.isEqual(pp(42),         '42')
+assert.isEqual(pp('a string'), '"a string"')
+assert.isEqual(pp(true),       'true')
+assert.isEqual(pp(false),      'false')
+assert.isEqual(pp({ 1, 2, 3}), '{\n  1,\n  2,\n  3,\n}')
+
+assert.isEqual(pp({ x = 'x', y = 'y'}),
+  '{\n  ["x"] = "x",\n  ["y"] = "y",\n}')
+\stopLuaTest
+\stopTestCase
+
+\stopTestSuite
+
 \startTestSuite[parseTemplate]
 
 The \type{parseTemplate} method takes a string template and parses it into 
@@ -301,10 +373,11 @@ end
 
 litProgs.navigateToTemplateTable = navigateToTemplateTable
 
-function litProgs.addTemplate(templatePath, templateArgs, templateStr)
-  templatePath = parseTemplatePath(templatePath)
+function litProgs.addTemplate(templatePathStr, templateArgs, templateStr)
+  local templatePath = parseTemplatePath(templatePathStr)
   if not templatePath then return nil end
   local templateTable    = navigateToTemplateTable(templatePath)
+  templateTable.path     = templatePathStr
   templateTable.args     = templateArgs
   templateTable.template = parseTemplate(templateStr)
 end

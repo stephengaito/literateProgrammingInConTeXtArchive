@@ -25,3 +25,9 @@ local table_insert = table.insert
 local table_concat = table.concat
 
 local addTemplate = litProgs.addTemplate
+
+local pp = require('pl/pretty')
+texio.write_nl('t-literate-progs-templates.lua')
+texio.write_nl('-------------------------')
+texio.write_nl(pp.write(thirddata))
+texio.write_nl('-------------------------')
