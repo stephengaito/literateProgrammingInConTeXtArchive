@@ -434,7 +434,7 @@ assert.isTable(buildNewEnv( { { }}, { }, { }))
 function litProgs.renderer(aTemplate, anEnv)
   if type(aTemplate) == 'table' and 0 < #aTemplate then
     local result = { }
-    for i, aChunk = ipairs(aTemplate) do
+    for i, aChunk in ipairs(aTemplate) do
       if type(aChunk) == 'string' then
         -- a simple litteral string... add it
         tInsert(result, aChunk)
@@ -471,7 +471,7 @@ function litProgs.renderer(aTemplate, anEnv)
                 attrList = { attrList }
               end
               if type(attrList) == 'table' and 0 < #attrList then
-                for i, anAttrRef = ipairs(attrList) do
+                for i, anAttrRef in ipairs(attrList) do
                   tInsert(arguments, anAttrRef)
                   local newEnv = buildNewEnv(template, arguments, anEnv )
                   tRemove(arguments, 1)
@@ -488,6 +488,45 @@ function litProgs.renderer(aTemplate, anEnv)
   end
 end
 \stopLuaCode
+
+\startTestCase[renderer should ...]
+\startLuaTest
+local renderer    = thirddata.literateProgs.renderer
+local addTemplate = thirddata.literateProgs.addTemplate
+addTemplate( 
+  'test.templateA',
+  { 'anArg' },
+  'anArg == [{{= anArg}}]'
+)
+assert.isTable(thirddata.templates.test)
+assert.isTable(thirddata.templates.test.templateA)
+showValue(thirddata.templates.test.templateA)
+addTemplate(
+  'test.templateB',
+  { 'anArg' },
+[=[
+This is a test {{= anArgA }}
+so is this {{! test.templateA, anArgB }}
+and this {{| argList, newLines, test.templateA }}
+]=]
+)
+assert.isTable(thirddata.templates.test.templateB)
+showValue(thirddata.templates.test.templateB)
+local anEnv = {
+  argList = { 1, 2, 3 },
+  newLines = '\n',
+  anArgA = 'argAValue',
+  anArgB = 'argBValue'
+}
+showValue(anEnv)
+local templateB = thirddata.templates.test.templateB
+local result = renderer(templateB, anEnv)
+showValue(result)
+\stopLuaTest
+\showLuaTest
+\stopTestCase
+
+\stopTestSuite
 
 What follows is our previous attempt at rendering a template. This will be 
 phased out once the new type of template rendering is fully functional. 

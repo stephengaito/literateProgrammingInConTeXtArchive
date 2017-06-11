@@ -22,6 +22,7 @@ code.lakefile   = {}
 
 local pp = require('pl/pretty')
 local tInsert = table.insert
+local tRemove = table.remove
 local tConcat = table.concat
 local sFmt    = string.format
 local sMatch  = string.match
@@ -164,13 +165,13 @@ end
 litProgs.getReference = getReference
 
 local function buildNewEnv(template, arguments, anEnv)
-  if type(template)    ~= 'table' or #template  < 1 or
-     type(template[1]) ~= 'table' or
-     type(arguments)   ~= 'table' or
-     type(anEnv)       ~= 'table' then
+  if type(template)      ~= 'table' or
+     type(template.args) ~= 'table' or
+     type(arguments)     ~= 'table' or
+     type(anEnv)         ~= 'table' then
     return { }
   end
-  local formalArgs = template[1]
+  local formalArgs = template.args
   local newEnv = { }
   for i, aFormalArg in ipairs(formalArgs) do
     newEnv[aFormalArg] = getReference(arguments[i], anEnv)
@@ -179,6 +180,67 @@ local function buildNewEnv(template, arguments, anEnv)
 end
 
 litProgs.buildNewEnv = buildNewEnv
+
+local function renderer(aTemplate, anEnv)
+  if type(aTemplate) == 'table' and 
+     type(aTemplate.template) == 'table' then
+    local result = { }
+    for i, aChunk in ipairs(aTemplate.template) do
+      if type(aChunk) == 'string' then
+        -- a simple litteral string... add it
+        tInsert(result, aChunk)
+      elseif type(aChunk) == 'table' and 0 < #aChunk then
+        local actionType = aChunk[1]
+        local arguments  = aChunk[2]
+        if actionType == 'reference' then
+          if type(arguments) == 'string' then
+            local attrValue = getReference(arguments, anEnv)
+            if type(attrValue) == 'string' then
+              tInsert(result, attrValue)
+            end
+          end
+        elseif actionType == 'application' then
+          if type(arguments) == 'table' and 1 < #arguments then
+            local template = tRemove(arguments, 1)
+            if type(template) == 'string' then
+              template = getReference(template, thirddata.templates)
+              local newEnv = buildNewEnv(template, arguments, anEnv)
+              local templateValue = renderer(template, newEnv)
+              if type(templateValue) == 'string' then
+                tInsert(result, templateValue)
+              end
+            end
+          end
+        elseif actionType == 'mapping' then
+          if type(arguments) == 'table' and 2 < #arguments then
+            local attrList  = tRemove(arguments, 1)
+            local separator = tRemove(arguments, 1)
+            local template  = tRemove(arguments, 1)
+            if type(template) == 'string' and type(separator) == 'string' then
+              template = getReference(template, thirddata.templates)
+              if type(attrList) == 'string' then
+                attrList = { attrList }
+              end
+              if type(attrList) == 'table' and 0 < #attrList then
+                for i, anAttrRef in ipairs(attrList) do
+                  tInsert(arguments, anAttrRef)
+                  local newEnv = buildNewEnv(template, arguments, anEnv )
+                  tRemove(arguments, 1)
+                  local templateValue = renderer(template, newEnv)
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+    return tConcat(result)
+  else
+    return ""
+  end
+end
+
+litProgs.renderer = renderer
 
 -- We need a simple Lua based template engine
 -- Our template engine has been inspired by:
