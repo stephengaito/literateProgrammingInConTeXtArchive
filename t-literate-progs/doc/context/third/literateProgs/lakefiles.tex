@@ -7,27 +7,17 @@ drive the creation of the various files required by any given
 \type{t-literate-progs} managed \ConTeXt\ program. 
 
 \startMkIVCode
-
-%D \section{Lakefile environment}
-
-%D \subsection{Implementation: start}
-
 \definetyping[Lakefile]
 \setuptyping[Lakefile][option=lua]
-
-%D \subsection{Implementation: stop}
 
 \let\oldStopLakefile=\stopLakefile
 \def\stopLakefile{%
   \oldStopLakefile%
   \directlua{thirddata.literateProgs.addLakefile('_typing_')}}
 
-%D \subsection{Implementation: create file}
-
 \def\createLakefile[#1]{
   \directlua{thirddata.literateProgs.createLakefile('#1')}
 }
-
 \stopMkIVCode
 
 \startLuaCode

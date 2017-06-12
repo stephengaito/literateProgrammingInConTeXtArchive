@@ -1,6 +1,6 @@
 -- A Lua file
 
--- from file: preamble.tex starting line: 64
+-- from file: preamble.tex starting line: 63
 
 -- This is the lua code associated with t-literate-progs.mkiv
 
@@ -364,16 +364,26 @@ function litProgs.createCodeFile(aCodeType,
   -- here be dragons!
 end
 
--- from file: mkivCode.tex starting line: 117
+-- from file: mkivCode.tex starting line: 109
+
+function litProgs.markMkIVCodeOrigin()
+  tInsert(code.mkiv,
+    sFmt('%% from file: %s starting line: %s',
+      status.filename,
+      toStr(status.linenumber)
+    )
+  )
+end
 
 function litProgs.addMkIVCode(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
   tInsert(code.mkiv, bufferContents)
 end
 
--- from file: mkivCode.tex starting line: 143
+-- from file: mkivCode.tex starting line: 140
 
 function litProgs.createMkIVFile(aFilePath)
+  tInsert(code.mkiv, 1, '% A ConTeXt MkIV module')
   renderCodeFile(aFilePath, code.mkiv)
 end
 
@@ -419,7 +429,7 @@ function litProgs.createLuaTemplateFile(aFilePath)
   renderCodeFile(aFilePath, code.templates)
 end
 
--- from file: lakefiles.tex starting line: 33
+-- from file: lakefiles.tex starting line: 23
 
 function litProgs.addLakefile(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")

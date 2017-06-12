@@ -1,6 +1,6 @@
 -- A Lua template file
 
--- from file: preamble.tex starting line: 97
+-- from file: preamble.tex starting line: 96
 
 -- t-literate-progs templates
 
