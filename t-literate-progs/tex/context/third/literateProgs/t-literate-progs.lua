@@ -1,4 +1,8 @@
--- A Lua file (the lua code associated with t-literate-progs.mkiv)
+-- A Lua file
+
+-- from file: preamble.tex starting line: 64
+
+-- This is the lua code associated with t-literate-progs.mkiv
 
 if not modules then modules = { } end
 modules ['t-literate-progs'] = {
@@ -390,7 +394,7 @@ function litProgs.addLuaCode(bufferName)
 end
 
 function litProgs.createLuaFile(aFilePath)
-  tRemove(code.lua, 1)
+  tInsert(code.lua, 1, '-- A Lua file')
   renderCodeFile(aFilePath, code.lua)
 end
 

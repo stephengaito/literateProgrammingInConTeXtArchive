@@ -38,7 +38,7 @@ function litProgs.addLuaCode(bufferName)
 end
 
 function litProgs.createLuaFile(aFilePath)
-  tRemove(code.lua, 1)
+  tInsert(code.lua, 1, '-- A Lua file')
   renderCodeFile(aFilePath, code.lua)
 end
 \stopLuaCode
