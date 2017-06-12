@@ -258,7 +258,16 @@ litProgs.buildNewEnv = buildNewEnv
 
 -- from file: rendering.tex after line: 600
 
-local function renderer(aTemplate, anEnv)
+local function renderer(aTemplate, anEnv, tracingOn)
+  if tracingOn then
+    texio.write_nl('>>>>>RENDERER>>>>>>>>>')
+    texio.write_nl('Path: '..aTemplate.path)
+    texio.write_nl('Template:')
+    texio.write_nl(prettyPrint(aTemplate))
+    texio.write_nl('Environment:')
+    texio.write_nl(prettyPrint(anEnv))
+  end
+  local resultStr = ""
   if type(aTemplate) == 'table' and
      type(aTemplate.template) == 'table' then
     local result = { }
@@ -281,7 +290,7 @@ local function renderer(aTemplate, anEnv)
               templatePath   = parseTemplatePath(templatePath, anEnv)
               local template = navigateToTemplate(templatePath)
               local newEnv   = buildNewEnv(template, arguments, anEnv)
-              local templateValue = renderer(template, newEnv)
+              local templateValue = renderer(template, newEnv, tracingOn)
               if type(templateValue) == 'string' then
                 tInsert(result, templateValue)
               end
@@ -301,7 +310,7 @@ local function renderer(aTemplate, anEnv)
               separator      = getReference(separator, anEnv)
               templatePath   = parseTemplatePath(templatePath, anEnv)
               local template = navigateToTemplate(templatePath)
-              local newEnv   = buildNewEnv(template, arguments, anEnv )
+              local newEnv   = buildNewEnv(template, arguments, anEnv)
               if type(separator) ~= 'string' then
                 separator = ''
               end
@@ -311,7 +320,7 @@ local function renderer(aTemplate, anEnv)
               if type(attrList) == 'table' and 0 < #attrList then
                 for i, anAttrValue in ipairs(attrList) do
                   newEnv[listArg] = anAttrValue
-                  local templateValue = renderer(template, newEnv)
+                  local templateValue = renderer(template, newEnv, tracingOn)
                   if type(templateValue) == 'string' then
                     tInsert(result, templateValue)
                   end
@@ -325,15 +334,21 @@ local function renderer(aTemplate, anEnv)
         end
       end
     end
-    return tConcat(result)
-  else
-    return ""
+    resultStr = tConcat(result)
   end
+  if tracingOn then
+    texio.write_nl('---------------------------')
+    texio.write_nl('Path: '..aTemplate.path)
+    texio.write_nl("Result:")
+    texio.write_nl(resultStr)
+    texio.write_nl('<<<<<RENDERER<<<<<<<<<')
+  end
+  return resultStr
 end
 
 litProgs.renderer = renderer
 
--- from file: rendering.tex after line: 725
+-- from file: rendering.tex after line: 750
 
 local function renderCodeFile(aFilePath, codeTable)
   local outFile = io.open(aFilePath, 'w')
