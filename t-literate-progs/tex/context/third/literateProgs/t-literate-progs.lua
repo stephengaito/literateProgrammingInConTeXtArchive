@@ -30,6 +30,7 @@ local tInsert = table.insert
 local tRemove = table.remove
 local tConcat = table.concat
 local tSort   = table.sort
+local tUnpack = table.unpack
 local sFmt    = string.format
 local sMatch  = string.match
 local mFloor  = math.floor
@@ -199,7 +200,14 @@ local function parseTemplatePath(templatePathStr, anEnv)
     return nil
   end
   if templatePathStr:sub(1,1) == '*' then
-    templatePathStr = getReference(templatePathStr:sub(2), anEnv)
+    local newTemplatePathStr = getReference(templatePathStr:sub(2), anEnv)
+    if newTemplatePathStr then
+      templatePathStr = newTemplatePathStr
+    else
+      texio.write_nl("ERROR: indirect parseTemplatePath")
+      texio.write_nl("  could not dereference: ["..templatePathStr.."]")
+      return { }
+    end
   end
   local templatePath = { }
   for subTemplate in templatePathStr:gmatch('[^%.]+') do
@@ -240,6 +248,16 @@ litProgs.addTemplate = addTemplate
 -- from file: rendering.tex after line: 525
 
 local function buildNewEnv(template, arguments, anEnv)
+  if anEnv.tracingOn then
+    texio.write_nl('------buildNewEnv------')
+    texio.write_nl('Formal arguments;')
+    --texio.write_nl(prettyPrint(template.args))
+    texio.write_nl(prettyPrint(template))
+    texio.write_nl('Actual arguments:')
+    texio.write_nl(prettyPrint(arguments))
+    texio.write_nl('Old environment:')
+    texio.write_nl(prettyPrint(anEnv))
+  end
   if type(template)      ~= 'table' or
      type(template.args) ~= 'table' or
      type(arguments)     ~= 'table' or
@@ -248,8 +266,14 @@ local function buildNewEnv(template, arguments, anEnv)
   end
   local formalArgs = template.args
   local newEnv = { }
+  newEnv.tracingOn = anEnv.tracingOn
   for i, aFormalArg in ipairs(formalArgs) do
     newEnv[aFormalArg] = getReference(arguments[i], anEnv)
+  end
+  if anEnv.tracingOn then
+    texio.write_nl('New environment:')
+    texio.write_nl(prettyPrint(newEnv))
+    texio.write_nl('-----------------------')
   end
   return newEnv
 end
@@ -258,9 +282,9 @@ litProgs.buildNewEnv = buildNewEnv
 
 -- from file: rendering.tex after line: 600
 
-local function renderer(aTemplate, anEnv, tracingOn)
-  if tracingOn then
-    texio.write_nl('>>>>>RENDERER>>>>>>>>>')
+local function renderer(aTemplate, anEnv)
+  if anEnv.tracingOn then
+    texio.write_nl('>>>>>>RENDERER>>>>>>')
     texio.write_nl('Path: '..aTemplate.path)
     texio.write_nl('Template:')
     texio.write_nl(prettyPrint(aTemplate))
@@ -280,17 +304,27 @@ local function renderer(aTemplate, anEnv, tracingOn)
         local arguments  = aChunk[2]
         if actionType == 'reference' then
           if type(arguments) == 'string' then
+            if anEnv.tracingOn then
+              texio.write_nl('Reference action:')
+              texio.write_nl('argument: ['..arguments..']')
+            end
             local attrValue = getReference(arguments, anEnv)
             tInsert(result, toStr(attrValue))
           end
         elseif actionType == 'application' then
           if type(arguments) == 'table' and 1 < #arguments then
+            arguments = { tUnpack(arguments) }
             local templatePath = tRemove(arguments, 1)
             if type(templatePath) == 'string' then
+              if anEnv.tracingOn then
+                texio.write_nl('Application action:')
+                texio.write_nl('templatePath: ['..templatePath..']')
+                texio.write_nl('   arguments: ['..tConcat(arguments,', ')..']')
+              end
               templatePath   = parseTemplatePath(templatePath, anEnv)
               local template = navigateToTemplate(templatePath)
               local newEnv   = buildNewEnv(template, arguments, anEnv)
-              local templateValue = renderer(template, newEnv, tracingOn)
+              local templateValue = renderer(template, newEnv)
               if type(templateValue) == 'string' then
                 tInsert(result, templateValue)
               end
@@ -298,14 +332,23 @@ local function renderer(aTemplate, anEnv, tracingOn)
           end
         elseif actionType == 'mapping' then
           if type(arguments) == 'table' and 4 <= #arguments then
+            arguments = { tUnpack(arguments) }
             local attrList     = tRemove(arguments, 1)
             local separator    = tRemove(arguments, 1)
             local templatePath = tRemove(arguments, 1)
             local listArg      = tRemove(arguments, 1)
+            tInsert(arguments, 1, listArg)
             if type(attrList)     == 'string' and
                type(separator)    == 'string' and
                type(templatePath) == 'string' and
                type(listArg)      == 'string' then
+              if anEnv.tracingOn then
+                texio.write_nl('Mapping action:')
+                texio.write_nl('    attrList: ['..attrList..']')
+                texio.write_nl('   separator: ['..separator..']')
+                texio.write_nl('templatePath: ['..templatePath..']')
+                texio.write_nl('     listArg: ['..listArg..']')
+              end
               attrList       = getReference(attrList,  anEnv)
               separator      = getReference(separator, anEnv)
               templatePath   = parseTemplatePath(templatePath, anEnv)
@@ -319,8 +362,11 @@ local function renderer(aTemplate, anEnv, tracingOn)
               end
               if type(attrList) == 'table' and 0 < #attrList then
                 for i, anAttrValue in ipairs(attrList) do
+                  if anEnv.tracingOn then
+                    texio.write_nl('mapped arg: ['..toStr(anAttrValue)..']')
+                  end
                   newEnv[listArg] = anAttrValue
-                  local templateValue = renderer(template, newEnv, tracingOn)
+                  local templateValue = renderer(template, newEnv)
                   if type(templateValue) == 'string' then
                     tInsert(result, templateValue)
                   end
@@ -336,12 +382,12 @@ local function renderer(aTemplate, anEnv, tracingOn)
     end
     resultStr = tConcat(result)
   end
-  if tracingOn then
-    texio.write_nl('---------------------------')
+  if anEnv.tracingOn then
+    texio.write_nl('-------------------')
     texio.write_nl('Path: '..aTemplate.path)
     texio.write_nl("Result:")
     texio.write_nl(resultStr)
-    texio.write_nl('<<<<<RENDERER<<<<<<<<<')
+    texio.write_nl('<<<<<<RENDERER<<<<<<')
   end
   return resultStr
 end

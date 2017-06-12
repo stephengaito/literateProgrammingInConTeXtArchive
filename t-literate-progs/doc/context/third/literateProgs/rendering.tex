@@ -550,6 +550,7 @@ local function buildNewEnv(template, arguments, anEnv)
   end
   local formalArgs = template.args
   local newEnv = { }
+  newEnv.tracingOn = anEnv.tracingOn
   for i, aFormalArg in ipairs(formalArgs) do
     newEnv[aFormalArg] = getReference(arguments[i], anEnv)
   end
@@ -614,8 +615,8 @@ the template's formal arguments. The indicated separator will be placed
 \emph{between} each expansion. 
 
 \startLuaCode
-local function renderer(aTemplate, anEnv, tracingOn)
-  if tracingOn then
+local function renderer(aTemplate, anEnv)
+  if anEnv.tracingOn then
     texio.write_nl('>>>>>RENDERER>>>>>>>>>')
     texio.write_nl('Path: '..aTemplate.path)
     texio.write_nl('Template:')
@@ -646,7 +647,7 @@ local function renderer(aTemplate, anEnv, tracingOn)
               templatePath   = parseTemplatePath(templatePath, anEnv)
               local template = navigateToTemplate(templatePath)
               local newEnv   = buildNewEnv(template, arguments, anEnv)
-              local templateValue = renderer(template, newEnv, tracingOn)
+              local templateValue = renderer(template, newEnv)
               if type(templateValue) == 'string' then
                 tInsert(result, templateValue)
               end
@@ -676,7 +677,7 @@ local function renderer(aTemplate, anEnv, tracingOn)
               if type(attrList) == 'table' and 0 < #attrList then
                 for i, anAttrValue in ipairs(attrList) do
                   newEnv[listArg] = anAttrValue
-                  local templateValue = renderer(template, newEnv, tracingOn)
+                  local templateValue = renderer(template, newEnv)
                   if type(templateValue) == 'string' then
                     tInsert(result, templateValue)
                   end
@@ -692,7 +693,7 @@ local function renderer(aTemplate, anEnv, tracingOn)
     end
     resultStr = tConcat(result)
   end
-  if tracingOn then
+  if anEnv.tracingOn then
     texio.write_nl('---------------------------')
     texio.write_nl('Path: '..aTemplate.path)
     texio.write_nl("Result:")
@@ -728,19 +729,20 @@ and this {{| argList, newLines, test.templateA, anArg }}
 )
 assert.isTable(templates.test.templateB)
 local anEnv = {
-  argList = { 1, 2, 3 },
-  newLines = ',\n',
-  anArgA = 'argAValue',
-  anArgB = 'argBValue'
+  --tracingOn = true,
+  argList   = { 1, 2, 3 },
+  newLines  = ',\n',
+  anArgA    = 'argAValue',
+  anArgB    = 'argBValue'
 }
 local templateB = templates.test.templateB
---local result = renderer(templateB, anEnv, true)
 local result = renderer(templateB, anEnv)
 assert.matches(result, 'test argAValue\n')
 assert.matches(result, 'this anArg == %[argBValue%]\n')
 assert.matches(result, 'this anArg == %[1%],\n')
 assert.matches(result, 'anArg == %[3%]\n')
 \stopLuaTest
+\showLuaTest
 \stopTestCase
 \stopTestSuite
 
