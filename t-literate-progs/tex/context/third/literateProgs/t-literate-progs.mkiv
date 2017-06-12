@@ -176,6 +176,12 @@
 \definetyping[LuaCode]
 \setuptyping[LuaCode][option=lua]
 
+\let\oldStartLuaCode=\startLuaCode
+\def\startLuaCode{%
+  \directlua{thirddata.literateProgs.markLuaCodeOrigin()}%
+  \oldStartLuaCode%
+}
+
 \let\oldStopLuaCode=\stopLuaCode
 \def\stopLuaCode{%
   \oldStopLuaCode%

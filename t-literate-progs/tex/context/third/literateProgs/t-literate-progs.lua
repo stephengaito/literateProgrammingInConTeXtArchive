@@ -29,6 +29,8 @@ local sFmt    = string.format
 local sMatch  = string.match
 local toStr   = tostring
 
+-- from file: rendering.tex starting line: 80
+
 local function compareKeyValues(a, b)
   return (a[1] < b[1])
 end
@@ -76,6 +78,8 @@ local function prettyPrint(anObj, indent)
 end
 
 litProgs.prettyPrint = prettyPrint
+
+-- from file: rendering.tex starting line: 154
 
 local function reportTemplateError(aTemplateStr, errMessage)
   texio.write_nl('---------------------------')
@@ -158,6 +162,8 @@ end
 
 litProgs.parseTemplate = parseTemplate
 
+-- from file: rendering.tex starting line: 322
+
 local function getReference(aReference, anEnv)
   if type(aReference) ~= 'string' then return nil end
   local redirect = aReference:sub(1,1)
@@ -175,6 +181,8 @@ local function getReference(aReference, anEnv)
 end
 
 litProgs.getReference = getReference
+
+-- from file: rendering.tex starting line: 366
 
 local function parseTemplatePath(templatePathStr, anEnv)
   if type(templatePathStr) ~= 'string' then
@@ -196,6 +204,8 @@ end
 
 litProgs.parseTemplatePath = parseTemplatePath
 
+-- from file: rendering.tex starting line: 424
+
 local function navigateToTemplate(templatePath)
   litProgs.templates = litProgs.templates or { }
   local curTable = litProgs.templates
@@ -208,6 +218,8 @@ end
 
 litProgs.navigateToTemplate = navigateToTemplate
 
+-- from file: rendering.tex starting line: 486
+
 local function addTemplate(templatePathStr, templateArgs, templateStr)
   local templatePath = parseTemplatePath(templatePathStr)
   if not templatePath then return nil end
@@ -218,6 +230,8 @@ local function addTemplate(templatePathStr, templateArgs, templateStr)
 end
 
 litProgs.addTemplate = addTemplate
+
+-- from file: rendering.tex starting line: 543
 
 local function buildNewEnv(template, arguments, anEnv)
   if type(template)      ~= 'table' or
@@ -235,6 +249,8 @@ local function buildNewEnv(template, arguments, anEnv)
 end
 
 litProgs.buildNewEnv = buildNewEnv
+
+-- from file: rendering.tex starting line: 616
 
 local function renderer(aTemplate, anEnv)
   if type(aTemplate) == 'table' and
@@ -311,11 +327,15 @@ end
 
 litProgs.renderer = renderer
 
+-- from file: rendering.tex starting line: 734
+
 local function renderCodeFile(aFilePath, codeTable)
   local outFile = io.open(aFilePath, 'w')
   outFile:write(tConcat(codeTable, '\n\n'))
   outFile:close()
 end
+
+-- from file: codeManipulation.tex starting line: 281
 
 function litProgs.setCodeStream(aCodeStream)
   code.curCodeStream = aCodeStream
@@ -340,13 +360,28 @@ function litProgs.createCodeFile(aCodeType,
   -- here be dragons!
 end
 
+-- from file: mkivCode.tex starting line: 117
+
 function litProgs.addMkIVCode(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
   tInsert(code.mkiv, bufferContents)
 end
 
+-- from file: mkivCode.tex starting line: 143
+
 function litProgs.createMkIVFile(aFilePath)
   renderCodeFile(aFilePath, code.mkiv)
+end
+
+-- from file: luaCode.tex starting line: 25
+
+function litProgs.markLuaCodeOrigin()
+  tInsert(code.lua,
+    sFmt('-- from file: %s starting line: %s',
+      status.filename,
+      toStr(status.linenumber)
+    )
+  )
 end
 
 function litProgs.addLuaCode(bufferName)
@@ -355,8 +390,11 @@ function litProgs.addLuaCode(bufferName)
 end
 
 function litProgs.createLuaFile(aFilePath)
+  tRemove(code.lua, 1)
   renderCodeFile(aFilePath, code.lua)
 end
+
+-- from file: luaTemplates.tex starting line: 31
 
 function litProgs.addLuaTemplate(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
@@ -366,6 +404,8 @@ end
 function litProgs.createLuaTemplateFile(aFilePath)
   renderCodeFile(aFilePath, code.templates)
 end
+
+-- from file: lakefiles.tex starting line: 33
 
 function litProgs.addLakefile(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")

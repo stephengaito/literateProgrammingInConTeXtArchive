@@ -6,6 +6,12 @@
 \definetyping[LuaCode]
 \setuptyping[LuaCode][option=lua]
 
+\let\oldStartLuaCode=\startLuaCode
+\def\startLuaCode{%
+  \directlua{thirddata.literateProgs.markLuaCodeOrigin()}%
+  \oldStartLuaCode%
+}
+
 \let\oldStopLuaCode=\stopLuaCode
 \def\stopLuaCode{%
   \oldStopLuaCode%
@@ -17,12 +23,22 @@
 \stopMkIVCode
 
 \startLuaCode
+function litProgs.markLuaCodeOrigin()
+  tInsert(code.lua,
+    sFmt('-- from file: %s starting line: %s',
+      status.filename,
+      toStr(status.linenumber)
+    )
+  )
+end
+
 function litProgs.addLuaCode(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
   tInsert(code.lua, bufferContents)
 end
 
 function litProgs.createLuaFile(aFilePath)
+  tRemove(code.lua, 1)
   renderCodeFile(aFilePath, code.lua)
 end
 \stopLuaCode
