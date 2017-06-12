@@ -75,13 +75,14 @@ modules ['t-literate-progs'] = {
 thirddata               = thirddata               or {}
 thirddata.literateProgs = thirddata.literateProgs or {}
 
-local litProgs  = thirddata.literateProgs
-litProgs.code   = {}
-local code      = litProgs.code
-code.mkiv       = {}
-code.lua        = {}
-code.templates  = {}
-code.lakefile   = {}
+local litProgs   = thirddata.literateProgs
+litProgs.code    = {}
+local code       = litProgs.code
+code.mkiv        = {}
+code.lua         = {}
+code.templates   = {}
+code.lakefile    = {}
+code.lineModulus = 25
 
 local pp = require('pl/pretty')
 local tInsert = table.insert
@@ -90,6 +91,7 @@ local tConcat = table.concat
 local tSort   = table.sort
 local sFmt    = string.format
 local sMatch  = string.match
+local mFloor  = math.floor
 local toStr   = tostring
 \stopLuaCode
 

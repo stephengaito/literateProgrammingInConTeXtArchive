@@ -109,9 +109,13 @@ and inserts it at the end of the \type{code.mkiv} array.
 \startLuaCode
 function litProgs.markMkIVCodeOrigin()
   tInsert(code.mkiv,
-    sFmt('%% from file: %s starting line: %s',
+    sFmt('%% from file: %s after line: %s',
       status.filename,
-      toStr(status.linenumber)
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
     )
   )
 end

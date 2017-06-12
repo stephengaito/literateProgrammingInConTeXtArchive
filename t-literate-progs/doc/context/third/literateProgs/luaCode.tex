@@ -25,9 +25,13 @@
 \startLuaCode
 function litProgs.markLuaCodeOrigin()
   tInsert(code.lua,
-    sFmt('-- from file: %s starting line: %s',
+    sFmt('-- from file: %s after line: %s',
       status.filename,
-      toStr(status.linenumber)
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
     )
   )
 end

@@ -1,6 +1,6 @@
 -- A Lua file
 
--- from file: preamble.tex starting line: 63
+-- from file: preamble.tex after line: 50
 
 -- This is the lua code associated with t-literate-progs.mkiv
 
@@ -16,13 +16,14 @@ modules ['t-literate-progs'] = {
 thirddata               = thirddata               or {}
 thirddata.literateProgs = thirddata.literateProgs or {}
 
-local litProgs  = thirddata.literateProgs
-litProgs.code   = {}
-local code      = litProgs.code
-code.mkiv       = {}
-code.lua        = {}
-code.templates  = {}
-code.lakefile   = {}
+local litProgs   = thirddata.literateProgs
+litProgs.code    = {}
+local code       = litProgs.code
+code.mkiv        = {}
+code.lua         = {}
+code.templates   = {}
+code.lakefile    = {}
+code.lineModulus = 25
 
 local pp = require('pl/pretty')
 local tInsert = table.insert
@@ -31,9 +32,10 @@ local tConcat = table.concat
 local tSort   = table.sort
 local sFmt    = string.format
 local sMatch  = string.match
+local mFloor  = math.floor
 local toStr   = tostring
 
--- from file: rendering.tex starting line: 80
+-- from file: rendering.tex after line: 75
 
 local function compareKeyValues(a, b)
   return (a[1] < b[1])
@@ -83,7 +85,7 @@ end
 
 litProgs.prettyPrint = prettyPrint
 
--- from file: rendering.tex starting line: 154
+-- from file: rendering.tex after line: 150
 
 local function reportTemplateError(aTemplateStr, errMessage)
   texio.write_nl('---------------------------')
@@ -166,7 +168,7 @@ end
 
 litProgs.parseTemplate = parseTemplate
 
--- from file: rendering.tex starting line: 322
+-- from file: rendering.tex after line: 300
 
 local function getReference(aReference, anEnv)
   if type(aReference) ~= 'string' then return nil end
@@ -186,7 +188,7 @@ end
 
 litProgs.getReference = getReference
 
--- from file: rendering.tex starting line: 366
+-- from file: rendering.tex after line: 350
 
 local function parseTemplatePath(templatePathStr, anEnv)
   if type(templatePathStr) ~= 'string' then
@@ -208,7 +210,7 @@ end
 
 litProgs.parseTemplatePath = parseTemplatePath
 
--- from file: rendering.tex starting line: 424
+-- from file: rendering.tex after line: 400
 
 local function navigateToTemplate(templatePath)
   litProgs.templates = litProgs.templates or { }
@@ -222,7 +224,7 @@ end
 
 litProgs.navigateToTemplate = navigateToTemplate
 
--- from file: rendering.tex starting line: 486
+-- from file: rendering.tex after line: 475
 
 local function addTemplate(templatePathStr, templateArgs, templateStr)
   local templatePath = parseTemplatePath(templatePathStr)
@@ -235,7 +237,7 @@ end
 
 litProgs.addTemplate = addTemplate
 
--- from file: rendering.tex starting line: 543
+-- from file: rendering.tex after line: 525
 
 local function buildNewEnv(template, arguments, anEnv)
   if type(template)      ~= 'table' or
@@ -254,7 +256,7 @@ end
 
 litProgs.buildNewEnv = buildNewEnv
 
--- from file: rendering.tex starting line: 616
+-- from file: rendering.tex after line: 600
 
 local function renderer(aTemplate, anEnv)
   if type(aTemplate) == 'table' and
@@ -331,7 +333,7 @@ end
 
 litProgs.renderer = renderer
 
--- from file: rendering.tex starting line: 734
+-- from file: rendering.tex after line: 725
 
 local function renderCodeFile(aFilePath, codeTable)
   local outFile = io.open(aFilePath, 'w')
@@ -339,7 +341,7 @@ local function renderCodeFile(aFilePath, codeTable)
   outFile:close()
 end
 
--- from file: codeManipulation.tex starting line: 281
+-- from file: codeManipulation.tex after line: 275
 
 function litProgs.setCodeStream(aCodeStream)
   code.curCodeStream = aCodeStream
@@ -364,13 +366,17 @@ function litProgs.createCodeFile(aCodeType,
   -- here be dragons!
 end
 
--- from file: mkivCode.tex starting line: 109
+-- from file: mkivCode.tex after line: 100
 
 function litProgs.markMkIVCodeOrigin()
   tInsert(code.mkiv,
-    sFmt('%% from file: %s starting line: %s',
+    sFmt('%% from file: %s after line: %s',
       status.filename,
-      toStr(status.linenumber)
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
     )
   )
 end
@@ -380,20 +386,24 @@ function litProgs.addMkIVCode(bufferName)
   tInsert(code.mkiv, bufferContents)
 end
 
--- from file: mkivCode.tex starting line: 140
+-- from file: mkivCode.tex after line: 125
 
 function litProgs.createMkIVFile(aFilePath)
   tInsert(code.mkiv, 1, '% A ConTeXt MkIV module')
   renderCodeFile(aFilePath, code.mkiv)
 end
 
--- from file: luaCode.tex starting line: 25
+-- from file: luaCode.tex after line: 25
 
 function litProgs.markLuaCodeOrigin()
   tInsert(code.lua,
-    sFmt('-- from file: %s starting line: %s',
+    sFmt('-- from file: %s after line: %s',
       status.filename,
-      toStr(status.linenumber)
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
     )
   )
 end
@@ -408,13 +418,17 @@ function litProgs.createLuaFile(aFilePath)
   renderCodeFile(aFilePath, code.lua)
 end
 
--- from file: luaTemplates.tex starting line: 25
+-- from file: luaTemplates.tex after line: 25
 
 function litProgs.markLuaTemplateOrigin()
   tInsert(code.templates,
-    sFmt('-- from file: %s starting line: %s',
+    sFmt('-- from file: %s after line: %s',
       status.filename,
-      toStr(status.linenumber)
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
     )
   )
 end
@@ -429,7 +443,7 @@ function litProgs.createLuaTemplateFile(aFilePath)
   renderCodeFile(aFilePath, code.templates)
 end
 
--- from file: lakefiles.tex starting line: 23
+-- from file: lakefiles.tex after line: 0
 
 function litProgs.addLakefile(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")

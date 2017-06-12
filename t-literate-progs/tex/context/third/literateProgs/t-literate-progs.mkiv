@@ -1,6 +1,6 @@
 % A ConTeXt MkIV module
 
-% from file: preamble.tex starting line: 16
+% from file: preamble.tex after line: 0
 
 %D \module
 %D   [     file=t-literate-progs,
@@ -47,7 +47,7 @@
 \ctxloadluafile{t-literate-progs}
 \ctxloadluafile{t-literate-progs-templates}
 
-% from file: codeManipulation.tex starting line: 47
+% from file: codeManipulation.tex after line: 25
 
 \unexpanded\def\defineLitProgs{%
   \dotripleempty\defineLitProgsDirect%
@@ -97,7 +97,7 @@
   }
 }
 
-% from file: codeManipulation.tex starting line: 191
+% from file: codeManipulation.tex after line: 175
 
 \def\fixStartLitProgs#1{%
   \letvalue{oldStart#1}=\getvalue{start#1}%
@@ -120,7 +120,7 @@
   }
 }
 
-% from file: codeManipulation.tex starting line: 219
+% from file: codeManipulation.tex after line: 200
 
 \def\fixStopLitProgs#1{%
   \letvalue{oldStop#1}=\getvalue{stop#1}%
@@ -135,7 +135,7 @@
   }
 }
 
-% from file: codeManipulation.tex starting line: 259
+% from file: codeManipulation.tex after line: 250
 
 \def\callCreateCodeFile#1#2#3{%
   \directlua{
@@ -152,7 +152,7 @@
   }
 }
 
-% from file: mkivCode.tex starting line: 25
+% from file: mkivCode.tex after line: 25
 
 \definetyping[MkIVCode]
 \setuptyping[MkIVCode][option=tex]
@@ -163,7 +163,7 @@
   \oldStartMkIVCode%
 }
 
-% from file: mkivCode.tex starting line: 66
+% from file: mkivCode.tex after line: 50
 
 \definetyping[MkIVAltCode]
 \setuptyping[MkIVAltCode][option=tex]
@@ -174,7 +174,7 @@
   \oldStartMkIVAltCode%
 }
 
-% from file: mkivCode.tex starting line: 80
+% from file: mkivCode.tex after line: 75
 
 \let\oldStopMkIVCode=\stopMkIVCode
 \def\stopMkIVCode{%
@@ -182,7 +182,7 @@
  \directlua{thirddata.literateProgs.addMkIVCode('_typing_')}
 }
 
-% from file: mkivCode.tex starting line: 91
+% from file: mkivCode.tex after line: 75
 
 \let\oldStopMkIVAltCode=\stopMkIVAltCode
 \def\stopMkIVAltCode{%
@@ -190,13 +190,13 @@
   \directlua{thirddata.literateProgs.addMkIVCode('_typing_')}
 }
 
-% from file: mkivCode.tex starting line: 131
+% from file: mkivCode.tex after line: 125
 
 \def\createMkIVFile[#1]{
   \directlua{thirddata.literateProgs.createMkIVFile('#1')}
 }
 
-% from file: luaCode.tex starting line: 5
+% from file: luaCode.tex after line: 0
 
 \definetyping[LuaCode]
 \setuptyping[LuaCode][option=lua]
@@ -216,7 +216,7 @@
   \directlua{thirddata.literateProgs.createLuaFile('#1')}
 }
 
-% from file: luaTemplates.tex starting line: 5
+% from file: luaTemplates.tex after line: 0
 
 \definetyping[LuaTemplate]
 \setuptyping[Template][option=lua]
@@ -236,7 +236,7 @@
   \directlua{thirddata.literateProgs.createLuaTemplateFile('#1')}
 }
 
-% from file: lakefiles.tex starting line: 9
+% from file: lakefiles.tex after line: 0
 
 \definetyping[Lakefile]
 \setuptyping[Lakefile][option=lua]
@@ -250,7 +250,7 @@
   \directlua{thirddata.literateProgs.createLakefile('#1')}
 }
 
-% from file: conclusion.tex starting line: 26
+% from file: conclusion.tex after line: 25
 
 \def\createLitProgsTableFile[#1]{
   \directlua{thirddata.literateProgs.createLitProgsTableFile('#1')}
