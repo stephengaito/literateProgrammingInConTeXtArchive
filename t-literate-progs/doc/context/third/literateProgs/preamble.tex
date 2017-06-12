@@ -55,8 +55,6 @@ respective preambles provide:
 %
 % end info
 
-%M \usemodule[literate-progs]
-
 \unprotect
 
 \ctxloadluafile{t-literate-progs}
@@ -74,12 +72,6 @@ modules ['t-literate-progs'] = {
     copyright = "PerceptiSys Ltd (Stephen Gaito)",
     license   = "MIT License"
 }
-
-local pp = require('pl/pretty')
-texio.write_nl('t-literate-progs.lua')
-texio.write_nl('-------------------------')
-texio.write_nl(pp.write(thirddata))
-texio.write_nl('-------------------------')
 
 thirddata               = thirddata               or {}
 thirddata.literateProgs = thirddata.literateProgs or {}
@@ -130,12 +122,6 @@ local table_insert = table.insert
 local table_concat = table.concat
 
 local addTemplate = litProgs.addTemplate
-
-local pp = require('pl/pretty')
-texio.write_nl('t-literate-progs-templates.lua')
-texio.write_nl('-------------------------')
-texio.write_nl(pp.write(thirddata))
-texio.write_nl('-------------------------')
 \stopLuaTemplate
 
 \stopchapter

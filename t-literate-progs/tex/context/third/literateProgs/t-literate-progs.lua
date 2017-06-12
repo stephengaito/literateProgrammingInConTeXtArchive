@@ -9,12 +9,6 @@ modules ['t-literate-progs'] = {
     license   = "MIT License"
 }
 
-local pp = require('pl/pretty')
-texio.write_nl('t-literate-progs.lua')
-texio.write_nl('-------------------------')
-texio.write_nl(pp.write(thirddata))
-texio.write_nl('-------------------------')
-
 thirddata               = thirddata               or {}
 thirddata.literateProgs = thirddata.literateProgs or {}
 
