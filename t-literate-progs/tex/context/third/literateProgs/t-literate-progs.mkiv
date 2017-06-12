@@ -173,23 +173,13 @@
   \directlua{thirddata.literateProgs.createMkIVFile('#1')}
 }
 
-%D \section{Lua code environment}
-
-%D \subsection{Examples}
-
-%D \subsection{Implementation: start}
-
 \definetyping[LuaCode]
 \setuptyping[LuaCode][option=lua]
-
-%D \subsection{Implementation: stop}
 
 \let\oldStopLuaCode=\stopLuaCode
 \def\stopLuaCode{%
   \oldStopLuaCode%
   \directlua{thirddata.literateProgs.addLuaCode('_typing_')}}
-
-%D \subsection{Implementation: create file}
 
 \def\createLuaFile[#1]{
   \directlua{thirddata.literateProgs.createLuaFile('#1')}

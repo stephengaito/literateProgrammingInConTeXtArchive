@@ -3,33 +3,20 @@
 \startchapter[title=Lua code]
 
 \startMkIVCode
-
-%D \section{Lua code environment}
-
-%D \subsection{Examples}
-
-%D \subsection{Implementation: start}
-
 \definetyping[LuaCode]
 \setuptyping[LuaCode][option=lua]
-
-%D \subsection{Implementation: stop}
 
 \let\oldStopLuaCode=\stopLuaCode
 \def\stopLuaCode{%
   \oldStopLuaCode%
   \directlua{thirddata.literateProgs.addLuaCode('_typing_')}}
 
-%D \subsection{Implementation: create file}
-
 \def\createLuaFile[#1]{
   \directlua{thirddata.literateProgs.createLuaFile('#1')}
 }
-
 \stopMkIVCode
 
 \startLuaCode
-
 function litProgs.addLuaCode(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
   tInsert(code.lua, bufferContents)
@@ -38,7 +25,6 @@ end
 function litProgs.createLuaFile(aFilePath)
   renderCodeFile(aFilePath, code.lua)
 end
-
 \stopLuaCode
 
 \stopchapter
