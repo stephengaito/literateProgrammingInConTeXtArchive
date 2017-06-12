@@ -57,8 +57,6 @@ respective preambles provide:
 
 %M \usemodule[literate-progs]
 
-\usemodule[t-contests]
-
 \unprotect
 
 \ctxloadluafile{t-literate-progs}
@@ -77,6 +75,12 @@ modules ['t-literate-progs'] = {
     license   = "MIT License"
 }
 
+local pp = require('pl/pretty')
+texio.write_nl('t-literate-progs.lua')
+texio.write_nl('-------------------------')
+texio.write_nl(pp.write(thirddata))
+texio.write_nl('-------------------------')
+
 thirddata               = thirddata               or {}
 thirddata.literateProgs = thirddata.literateProgs or {}
 
@@ -92,6 +96,7 @@ local pp = require('pl/pretty')
 local tInsert = table.insert
 local tRemove = table.remove
 local tConcat = table.concat
+local tSort   = table.sort
 local sFmt    = string.format
 local sMatch  = string.match
 local toStr   = tostring
@@ -125,6 +130,12 @@ local table_insert = table.insert
 local table_concat = table.concat
 
 local addTemplate = litProgs.addTemplate
+
+local pp = require('pl/pretty')
+texio.write_nl('t-literate-progs-templates.lua')
+texio.write_nl('-------------------------')
+texio.write_nl(pp.write(thirddata))
+texio.write_nl('-------------------------')
 \stopLuaTemplate
 
 \stopchapter

@@ -1,19 +1,19 @@
 % A ConTeXt document [master document: literateProgs.tex]
 
-\startchapter[title=The Lua Rendering Engine]
+\startchapter[title=A Lua Rendering Engine]
 
 We follow Terance Parr's advice, \cite{parr2004templateMVC}, to ensure 
 there is a clear separation between Model and View when rendering 
 templates. In his view, the rendering process is a form of 
 \quote{unparsing} or, alternatively, language generation. Using Parr's 
-\quote{push} semantics, a template is defined to be a litteral string with 
+\quote{push} semantics, a template is defined to be a literal string with 
 embedded pairs of \quote{\{\{}, \quote{\}\}} delimited \quote{holes} or 
-attribute actions, where each attribute action must not have side-effects 
+expansion actions, where each expansion action must not have side-effects 
 on the data model. 
 
 Our template engine will support two semantic actions: simple attribute 
-reference and mapping a named template against a list of attributes. To do 
-this we will have three forms of attribute actions: 
+reference and mapping a named template against a list of attribute values. 
+To do this we will have three forms of expansion actions: 
 
 \startitemize
 \item {\bf reference}: \type{{{= <attribute-list> }}} 
@@ -27,22 +27,35 @@ this we will have three forms of attribute actions:
 Note that attribute application is simply a convenient form of attribute 
 mapping. Note as well that while attribute mapping is a form of \type{for} 
 \type{in} looping, it, and attribute application, can be used to replace 
-any need for explicit \type{if}, \type{elseif}, \type{else}, \type{endif} 
-structures. 
+any need for explicit \type{if}, \type{elseif}, \type{else}, \type{end} 
+structures. In all cases, if an attribute value is a Lua \type{nil}, there 
+will be no template expansion. 
 
 In each case, the \type{<attribute-list>} is a comma separated list of 
 attribute names or indirect references. An indirect attribute reference is 
-an attribute name enclosed in \quote{\[} \quote{\]} pairs. An attribute 
-\emph{reference} expects one attribute name or indirect reference, namely 
-the attribute whose value will be placed into the template \quote{hole} at 
-that point. An attribute \emph{application} expects a list of one or more 
-attributes, the first of which denotes the template to which the rest of 
-the attributes will be applied to. An attribute \emph{mapping} again 
-expects a list of two or more attributes. The first attribute refers to 
-the attribute or attribute array whose individual items, in the case of an 
-attribute array, are applied to the template identified by the second 
-attribute. All subsequent attributes are used as arguments applied to the 
-template. 
+an attribute name prefixed by a \quote{C}-style \quote{*} dereference 
+operator.
+
+An attribute \emph{\bf reference} expects one attribute name or indirect 
+reference, namely the attribute whose value, converted to a string using 
+the lua \type{tostring} method, will be placed into the template 
+\quote{hole} at that point. 
+
+An attribute \emph{\bf application} expects a list of one or more attributes, 
+the first of which denotes the template to which the rest of the 
+attributes will be applied to.
+
+An attribute \emph{\bf mapping} again expects a list of four or more 
+attributes. The \emph{first attribute} refers to the attribute list which 
+can be either a single value or an array of values whose individual items, 
+in the case of an attribute array, are applied to the template identified 
+by the third attribute. The \emph{second attribute} is the separator 
+placed between subsequent expansions of the mapped template applied to 
+each item of the attribute list. The \emph{third attribute} is a reference 
+to a previously defined \quote{mapped template}. The \emph{fourth 
+attribute} is the \quote{name}, internal to the mapped template given to 
+each value of the attribute list. All \emph{subsequent attributes} are 
+used as arguments applied to the mapped template. 
 
 To render a template we will use a strategy of explicitly parsing all 
 templates into a Lua structure which our rendering engine, below, can 
@@ -50,9 +63,21 @@ efficiently interpret.
 
 \startTestSuite[prettyPrint]
 
-\startLuaCode
--- nil, boolean, number, string, function, userdata, thread, and table
+While logically not required for our template engine, logistically, in 
+order to \quote{debug} our templates, we need a way of \quote{tracing} the 
+expansion of our templates. Of prime importance in the tracing of any 
+template expansion is the ability to understand both the template and the 
+environment used by that template at each recursive call. To do this, we 
+start by providing a simple \quote{pretty print} method to provide a human 
+readable rendition of an internal Lua data structure. 
 
+Lua has the following list of value types: nil, boolean, number, string, 
+function, userdata, thread, and table. Our pretty print method is a simple 
+Lua \type{if}, \type{then}, \type{elseif}, and \type{else} structure. 
+Tables are recursively pretty printed to provide a human readable way of 
+understanding their internal structure. 
+
+\startLuaCode
 local function compareKeyValues(a, b)
   return (a[1] < b[1])
 end
@@ -103,9 +128,9 @@ litProgs.prettyPrint = prettyPrint
 \stopLuaCode
 
 \startTestCase[test various examples]
-  
+
 \startLuaTest
-local pp = thirddata.contests.prettyPrint
+local pp = thirddata.literateProgs.prettyPrint
 
 assert.isEqual(pp(42),         '42')
 assert.isEqual(pp('a string'), '"a string"')
@@ -117,7 +142,6 @@ assert.isEqual(pp({ x = 'x', y = 'y'}),
   '{\n  ["x"] = "x",\n  ["y"] = "y",\n}')
 \stopLuaTest
 \stopTestCase
-
 \stopTestSuite
 
 \startTestSuite[parseTemplate]
@@ -286,24 +310,14 @@ assert.matches(aTemplate[7], '\nis a mapping\n')
 
 \stopTestSuite
 
-\startTestSuite[addTemplate]
+\startTestSuite[getReference]
 
-The \type{addTemplate} method is used by any template files to manage the 
-process of parsing a template into a structure located in the \ConTeXt\ 
-\type{thirddata.templates} structure. The \type{addTemplate} method can be 
-used as a Lua based DSL for managing templates. 
-
-The \type{addTemplate} method expects three arguments, the 
-\type{templatePath}, an ordered collection of the internal names of the 
-formal arguments contained in \type{templateArgs}, and the 
-\type{templateStr}. 
-
-The \type{templatePath} must be a string containing a \quote{.} separated 
-list of lua identifiers. All templates are contained subtables of the 
-\type{thirddata.templates} table. The \quote{.} separated list of lua 
-identifiers provides a \quote{path} through these subtables to the 
-ultimate template. This provides a simple namespace mechanism to help 
-organize complex collection of templates. 
+The \type{getReference} method takes a given reference and looks it up in 
+a given environment. Most importantly, the \type{getReference} method 
+manages the recursive lookup of indirect references by stripping each 
+successive \quote{C}-style \quote{*} dereference prefix operator and 
+recursively calling the \type{getReference} method on the resulting 
+reference. 
 
 \startLuaCode
 local function getReference(aReference, anEnv)
@@ -339,6 +353,15 @@ assert.matches(getReference('*attr',  anEnv), 'anAttrValue')
 assert.isNil(  getReference('noAttr', anEnv))
 \stopLuaTest
 \stopTestCase
+\stopTestSuite
+
+\startTestSuite[parseTemplatePath]
+
+To make it easy for humans to communicate, the \type{parseTemplatePath} 
+method takes a simple \quote{.} separated list of Lua identifiers and 
+parses it into a Lua ordered array of the individual Lua identifiers. This 
+provides a simple namespace mechanism for organizing complex collections 
+of templates. 
 
 \startLuaCode
 local function parseTemplatePath(templatePathStr, anEnv)
@@ -360,27 +383,6 @@ local function parseTemplatePath(templatePathStr, anEnv)
 end
 
 litProgs.parseTemplatePath = parseTemplatePath
-
-local function navigateToTemplateTable(templatePath)
-  thirddata.templates = thirddata.templates or { }
-  local curTable = thirddata.templates
-  for i, templateDir in ipairs(templatePath) do
-    curTable[templateDir] = curTable[templateDir] or { }
-    curTable = curTable[templateDir]
-  end
-  return curTable
-end
-
-litProgs.navigateToTemplateTable = navigateToTemplateTable
-
-function litProgs.addTemplate(templatePathStr, templateArgs, templateStr)
-  local templatePath = parseTemplatePath(templatePathStr)
-  if not templatePath then return nil end
-  local templateTable    = navigateToTemplateTable(templatePath)
-  templateTable.path     = templatePathStr
-  templateTable.args     = templateArgs
-  templateTable.template = parseTemplate(templateStr)
-end
 \stopLuaCode
 
 \startTestCase[parseTemplatePath should parse simple template paths]
@@ -410,13 +412,35 @@ assert.matches(templatePath[2], 'subTest')
 assert.matches(templatePath[3], 'subSubTest')
 \stopLuaTest
 \stopTestCase
+\stopTestSuite
 
-\startTestCase[navigateToTemplateTable should navigate to subtables]
+\startTestSuite[navigateToTemplate]
+
+The \type{navigateToTemplate} method takes a Lua ordered array of 
+identifiers indicating a \quote{path} through the 
+\type{thirddata.literateProgs.templates} table and returns the indicated 
+template if it exists. 
+
+\startLuaCode
+local function navigateToTemplate(templatePath)
+  litProgs.templates = litProgs.templates or { }
+  local curTable = litProgs.templates
+  for i, templateDir in ipairs(templatePath) do
+    curTable[templateDir] = curTable[templateDir] or { }
+    curTable = curTable[templateDir]
+  end
+  return curTable
+end
+
+litProgs.navigateToTemplate = navigateToTemplate
+\stopLuaCode
+
+\startTestCase[navigateToTemplate should navigate to subtables]
 \startLuaTest
 local parseTemplatePath = thirddata.literateProgs.parseTemplatePath
 local templatePath = parseTemplatePath('test.subTest.subSubTest')
-local navigateToTemplateTable = thirddata.literateProgs.navigateToTemplateTable
-local curTable = navigateToTemplateTable(templatePath)
+local navigateToTemplate = thirddata.literateProgs.navigateToTemplate
+local curTable = navigateToTemplate(templatePath)
 assert.isTable(curTable)
 local templates = thirddata.templates
 assert.isNotNil(templates)
@@ -438,10 +462,44 @@ templates.test = nil
 assert.isNil(templates.test)
 \stopLuaTest
 \stopTestCase
+\stopTestSuite
+
+\startTestSuite[addTemplate]
+
+The \type{addTemplate} method is used by any template file to manage the 
+process of parsing a template into a structure located in the \ConTeXt\ 
+\type{thirddata.literateProgs.templates} structure. The \type{addTemplate} 
+method can be used as a Lua based DSL for managing templates. 
+
+The \type{addTemplate} method expects three arguments, the 
+\type{templatePath}, an ordered collection of the internal names of the 
+formal arguments contained in \type{templateArgs}, and the 
+\type{templateStr}. 
+
+The \type{templatePath} must be a string containing a \quote{.} separated 
+list of Lua identifiers. All templates are subtables of the 
+\type{thirddata.literateProgs.templates} table. The \quote{.} separated 
+list of lua identifiers provides a \quote{path} through these subtables to 
+the ultimate template. This provides a simple namespace mechanism to help 
+organize complex collections of templates. 
+
+\startLuaCode
+local function addTemplate(templatePathStr, templateArgs, templateStr)
+  local templatePath = parseTemplatePath(templatePathStr)
+  if not templatePath then return nil end
+  local templateTable    = navigateToTemplate(templatePath)
+  templateTable.path     = templatePathStr
+  templateTable.args     = templateArgs
+  templateTable.template = parseTemplate(templateStr)
+end
+
+litProgs.addTemplate = addTemplate
+\stopLuaCode
 
 \startTestCase[addTemplate should add a simple template]
 \startLuaTest
-local templates = thirddata.templates
+local templates = thirddata.literateProgs.templates
+templates.test = nil -- This should not be needed ;-(
 assert.isNil(templates.test)
 --
 local addTemplate = thirddata.literateProgs.addTemplate
@@ -469,10 +527,18 @@ templates.test = nil
 assert.isNil(templates.test)
 \stopLuaTest
 \stopTestCase
-
 \stopTestSuite
 
-\startTestSuite[renderer]
+\startTestSuite[buildNewEnv]
+
+On each template \quote{mapping} and \quote{application} action, the 
+\type{renderer} rendering engine, defined below, recursively calls itself 
+using the indicated template and an attribute \emph{environment}. The 
+\type{buildNewEnv} method takes a template's formal arguments, a 
+collection of actual arguments and an existing environment. It produces an 
+new environment by mapping the values of actual arguments to their 
+corresponding formal arguments. The correspondence is defined by the 
+strict order of the formal and actual arguments. 
 
 \startLuaCode
 local function buildNewEnv(template, arguments, anEnv)
@@ -524,6 +590,28 @@ assert.isTable(buildNewEnv( { }, { }, { }))
 assert.isTable(buildNewEnv( { { }}, { }, { }))
 \stopLuaTest
 \stopTestCase
+\stopTestSuite
+
+\startTestSuite[renderer]
+
+Finally the \type{renderer} rendering engine is a \quote{template} 
+interpreter. It walks over the template body interpreting each literal or 
+action in turn. Any \emph{literal} is simply added as is to the result 
+table. Any \emph{action} encountered is \quote{expanded} into a string and 
+then added to the result table.
+
+The expansion of a \emph{reference action} is simply the result of the Lua 
+\type{tostring} method applied to the value returned by the 
+\type{getReference} method defined above. 
+
+An \emph{application action} is the result of recursively expanding the 
+given template in the environment obtained by mapping the existing 
+arguments to the template's formal arguments. 
+
+A \emph{mapping action} is the result of repeatedly expanding the given 
+template in the environment obtained by mapping the existing arguments to 
+the template's formal arguments. The indicated separator will be placed 
+\emph{between} each expansion. 
 
 \startLuaCode
 local function renderer(aTemplate, anEnv)
@@ -547,7 +635,7 @@ local function renderer(aTemplate, anEnv)
             local templatePath = tRemove(arguments, 1)
             if type(templatePath) == 'string' then
               templatePath   = parseTemplatePath(templatePath, anEnv)
-              local template = navigateToTemplateTable(templatePath)
+              local template = navigateToTemplate(templatePath)
               local newEnv   = buildNewEnv(template, arguments, anEnv)
               local templateValue = renderer(template, newEnv)
               if type(templateValue) == 'string' then
@@ -568,7 +656,7 @@ local function renderer(aTemplate, anEnv)
               attrList       = getReference(attrList,  anEnv)
               separator      = getReference(separator, anEnv)
               templatePath   = parseTemplatePath(templatePath, anEnv)
-              local template = navigateToTemplateTable(templatePath)
+              local template = navigateToTemplate(templatePath)
               local newEnv   = buildNewEnv(template, arguments, anEnv )
               if type(separator) ~= 'string' then
                 separator = ''
@@ -604,6 +692,7 @@ litProgs.renderer = renderer
 
 \startTestCase[renderer should ...]
 \startLuaTest
+local templates   = thirddata.literateProgs.templates
 local renderer    = thirddata.literateProgs.renderer
 local addTemplate = thirddata.literateProgs.addTemplate
 addTemplate( 
@@ -611,8 +700,8 @@ addTemplate(
   { 'anArg' },
   'anArg == [{{= anArg}}]'
 )
-assert.isTable(thirddata.templates.test)
-assert.isTable(thirddata.templates.test.templateA)
+assert.isTable(templates.test)
+assert.isTable(templates.test.templateA)
 addTemplate(
   'test.templateB',
   { 'anArg' },
@@ -622,14 +711,14 @@ so is this {{! test.templateA, anArgB }}
 and this {{| argList, newLines, test.templateA, anArg }}
 ]=]
 )
-assert.isTable(thirddata.templates.test.templateB)
+assert.isTable(templates.test.templateB)
 local anEnv = {
   argList = { 1, 2, 3 },
   newLines = ',\n',
   anArgA = 'argAValue',
   anArgB = 'argBValue'
 }
-local templateB = thirddata.templates.test.templateB
+local templateB = templates.test.templateB
 local result = renderer(templateB, anEnv)
 assert.matches(result, 'test argAValue\n')
 assert.matches(result, 'this anArg == %[argBValue%]\n')
@@ -637,8 +726,10 @@ assert.matches(result, 'this anArg == %[1%],\n')
 assert.matches(result, 'anArg == %[3%]\n')
 \stopLuaTest
 \stopTestCase
-
 \stopTestSuite
+
+Lastly we define a simple \type{renderCodeFile} method to write out a 
+given code table into the contents of the given file. 
 
 \startLuaCode
 local function renderCodeFile(aFilePath, codeTable)

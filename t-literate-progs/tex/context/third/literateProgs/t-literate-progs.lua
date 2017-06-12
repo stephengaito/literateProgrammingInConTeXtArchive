@@ -30,9 +30,58 @@ local pp = require('pl/pretty')
 local tInsert = table.insert
 local tRemove = table.remove
 local tConcat = table.concat
+local tSort   = table.sort
 local sFmt    = string.format
 local sMatch  = string.match
 local toStr   = tostring
+
+local function compareKeyValues(a, b)
+  return (a[1] < b[1])
+end
+
+local function prettyPrint(anObj, indent)
+  local result = ""
+  indent = indent or ""
+  if type(anObj) == 'nil' then
+    result = 'nil'
+  elseif type(anObj) == 'boolean' then
+    if anObj then result = 'true' else result = 'false' end
+  elseif type(anObj) == 'number' then
+    result = toStr(anObj)
+  elseif type(anObj) == 'string' then
+    result = '"'..anObj..'"'
+  elseif type(anObj) == 'function' then
+    result = toStr(anObj)
+  elseif type(anObj) == 'userdata' then
+    result = toStr(anObj)
+  elseif type(anObj) == 'thread' then
+    result = toStr(anObj)
+  elseif type(anObj) == 'table' then
+    local origIndent = indent
+    indent = indent..'  '
+    result = '{\n'
+    for i, aValue in ipairs(anObj) do
+      result = result..indent..prettyPrint(aValue, indent)..',\n'
+    end
+    local theKeyValues = { }
+    for aKey, aValue in pairs(anObj) do
+      if type(aKey) ~= 'number' or aKey < 1 or #anObj < aKey then
+        tInsert(theKeyValues,
+          { prettyPrint(aKey), aKey, prettyPrint(aValue, indent) })
+      end
+    end
+    tSort(theKeyValues, compareKeyValues)
+    for i, aKeyValue in ipairs(theKeyValues) do
+      result = result..indent..'['..aKeyValue[1]..'] = '..aKeyValue[3]..',\n'
+    end
+    result = result..origIndent..'}'
+  else
+    result = 'UNKNOWN TYPE: ['..toStr(anObj)..']'
+  end
+  return result
+end
+
+litProgs.prettyPrint = prettyPrint
 
 local function reportTemplateError(aTemplateStr, errMessage)
   texio.write_nl('---------------------------')
@@ -153,7 +202,7 @@ end
 
 litProgs.parseTemplatePath = parseTemplatePath
 
-local function navigateToTemplateTable(templatePath)
+local function navigateToTemplate(templatePath)
   litProgs.templates = litProgs.templates or { }
   local curTable = litProgs.templates
   for i, templateDir in ipairs(templatePath) do
@@ -163,15 +212,18 @@ local function navigateToTemplateTable(templatePath)
   return curTable
 end
 
-litProgs.navigateToTemplateTable = navigateToTemplateTable
+litProgs.navigateToTemplate = navigateToTemplate
 
-function litProgs.addTemplate(templatePath, templateArgs, templateStr)
-  templatePath = parseTemplatePath(templatePath)
+local function addTemplate(templatePathStr, templateArgs, templateStr)
+  local templatePath = parseTemplatePath(templatePathStr)
   if not templatePath then return nil end
-  local templateTable    = navigateToTemplateTable(templatePath)
+  local templateTable    = navigateToTemplate(templatePath)
+  templateTable.path     = templatePathStr
   templateTable.args     = templateArgs
   templateTable.template = parseTemplate(templateStr)
 end
+
+litProgs.addTemplate = addTemplate
 
 local function buildNewEnv(template, arguments, anEnv)
   if type(template)      ~= 'table' or
@@ -211,7 +263,7 @@ local function renderer(aTemplate, anEnv)
             local templatePath = tRemove(arguments, 1)
             if type(templatePath) == 'string' then
               templatePath   = parseTemplatePath(templatePath, anEnv)
-              local template = navigateToTemplateTable(templatePath)
+              local template = navigateToTemplate(templatePath)
               local newEnv   = buildNewEnv(template, arguments, anEnv)
               local templateValue = renderer(template, newEnv)
               if type(templateValue) == 'string' then
@@ -232,7 +284,7 @@ local function renderer(aTemplate, anEnv)
               attrList       = getReference(attrList,  anEnv)
               separator      = getReference(separator, anEnv)
               templatePath   = parseTemplatePath(templatePath, anEnv)
-              local template = navigateToTemplateTable(templatePath)
+              local template = navigateToTemplate(templatePath)
               local newEnv   = buildNewEnv(template, arguments, anEnv )
               if type(separator) ~= 'string' then
                 separator = ''
