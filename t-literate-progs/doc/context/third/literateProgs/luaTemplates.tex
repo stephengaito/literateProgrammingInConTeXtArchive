@@ -3,32 +3,34 @@
 \startchapter[title=Lua Templates]
 
 \startMkIVCode
-
-%D \section{Template environment}
-
-%D \subsection{Examples}
-
-%D \subsection{Implementation: start}
-
 \definetyping[LuaTemplate]
 \setuptyping[Template][option=lua]
 
-%D \subsection{Implementation: stop}
+\let\oldStartLuaTemplate=\startLuaTemplate
+\def\startLuaTemplate{%
+  \directlua{thirddata.literateProgs.markLuaTemplateOrigin()}%
+  \oldStartLuaTemplate%
+}
 
 \let\oldStopLuaTemplate=\stopLuaTemplate
 \def\stopLuaTemplate{%
   \oldStopLuaTemplate%
   \directlua{thirddata.literateProgs.addLuaTemplate('_typing_')}}
 
-%D \subsection{Implementation: create file}
-
 \def\createTemplateFile[#1]{
   \directlua{thirddata.literateProgs.createLuaTemplateFile('#1')}
 }
-
 \stopMkIVCode
 
 \startLuaCode
+function litProgs.markLuaTemplateOrigin()
+  tInsert(code.templates,
+    sFmt('-- from file: %s starting line: %s',
+      status.filename,
+      toStr(status.linenumber)
+    )
+  )
+end
 
 function litProgs.addLuaTemplate(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
@@ -36,9 +38,9 @@ function litProgs.addLuaTemplate(bufferName)
 end
 
 function litProgs.createLuaTemplateFile(aFilePath)
+  tInsert(code.templates, 1, '-- A Lua template file')
   renderCodeFile(aFilePath, code.templates)
 end
-
 \stopLuaCode
 
 \stopchapter

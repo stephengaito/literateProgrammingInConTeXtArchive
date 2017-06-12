@@ -191,23 +191,19 @@
   \directlua{thirddata.literateProgs.createLuaFile('#1')}
 }
 
-%D \section{Template environment}
-
-%D \subsection{Examples}
-
-%D \subsection{Implementation: start}
-
 \definetyping[LuaTemplate]
 \setuptyping[Template][option=lua]
 
-%D \subsection{Implementation: stop}
+\let\oldStartLuaTemplate=\startLuaTemplate
+\def\startLuaTemplate{%
+  \directlua{thirddata.literateProgs.markLuaTemplateOrigin()}%
+  \oldStartLuaTemplate%
+}
 
 \let\oldStopLuaTemplate=\stopLuaTemplate
 \def\stopLuaTemplate{%
   \oldStopLuaTemplate%
   \directlua{thirddata.literateProgs.addLuaTemplate('_typing_')}}
-
-%D \subsection{Implementation: create file}
 
 \def\createTemplateFile[#1]{
   \directlua{thirddata.literateProgs.createLuaTemplateFile('#1')}

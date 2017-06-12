@@ -1,4 +1,8 @@
--- A Lua file of t-literate-progs templates
+-- A Lua template file
+
+-- from file: preamble.tex starting line: 97
+
+-- t-literate-progs templates
 
 if not modules then modules = { } end
 modules ['t-literate-progs-templates'] = {

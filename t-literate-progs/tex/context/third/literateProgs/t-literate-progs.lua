@@ -398,7 +398,16 @@ function litProgs.createLuaFile(aFilePath)
   renderCodeFile(aFilePath, code.lua)
 end
 
--- from file: luaTemplates.tex starting line: 31
+-- from file: luaTemplates.tex starting line: 25
+
+function litProgs.markLuaTemplateOrigin()
+  tInsert(code.templates,
+    sFmt('-- from file: %s starting line: %s',
+      status.filename,
+      toStr(status.linenumber)
+    )
+  )
+end
 
 function litProgs.addLuaTemplate(bufferName)
   local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
@@ -406,6 +415,7 @@ function litProgs.addLuaTemplate(bufferName)
 end
 
 function litProgs.createLuaTemplateFile(aFilePath)
+  tInsert(code.templates, 1, '-- A Lua template file')
   renderCodeFile(aFilePath, code.templates)
 end
 
