@@ -218,7 +218,7 @@ end
 
 litProgs.parseTemplatePath = parseTemplatePath
 
--- from file: rendering.tex after line: 400
+-- from file: rendering.tex after line: 425
 
 local function navigateToTemplate(templatePath)
   litProgs.templates = litProgs.templates or { }
@@ -245,10 +245,10 @@ end
 
 litProgs.addTemplate = addTemplate
 
--- from file: rendering.tex after line: 525
+-- from file: rendering.tex after line: 550
 
 local function buildNewEnv(template, arguments, anEnv)
-  if anEnv.tracingOn then
+  if anEnv and anEnv.tracingOn then
     texio.write_nl('------buildNewEnv------')
     texio.write_nl('Formal arguments;')
     --texio.write_nl(prettyPrint(template.args))
@@ -280,7 +280,7 @@ end
 
 litProgs.buildNewEnv = buildNewEnv
 
--- from file: rendering.tex after line: 600
+-- from file: rendering.tex after line: 625
 
 local function renderer(aTemplate, anEnv)
   if anEnv.tracingOn then
@@ -394,7 +394,19 @@ end
 
 litProgs.renderer = renderer
 
--- from file: rendering.tex after line: 750
+-- from file: rendering.tex after line: 800
+
+local function splitString(aString)
+  local theSplitStr = { }
+  for aLine in aString:gmatch('([^\n\r]+)[\n\r]*') do
+    tInsert(theSplitStr, aLine)
+  end
+  return theSplitStr
+end
+
+litProgs.splitString = splitString
+
+-- from file: rendering.tex after line: 825
 
 local function renderCodeFile(aFilePath, codeTable)
   local outFile = io.open(aFilePath, 'w')
