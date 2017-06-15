@@ -47,7 +47,7 @@
 \ctxloadluafile{t-literate-progs}
 \ctxloadluafile{t-literate-progs-templates}
 
-% from file: codeManipulation.tex after line: 25
+% from file: codeManipulation.tex after line: 0
 
 \unexpanded\def\defineLitProgs{%
   \dotripleempty\defineLitProgsDirect%
@@ -97,7 +97,7 @@
   }
 }
 
-% from file: codeManipulation.tex after line: 175
+% from file: codeManipulation.tex after line: 150
 
 \def\fixStartLitProgs#1{%
   \letvalue{oldStart#1}=\getvalue{start#1}%
@@ -152,7 +152,7 @@
   }
 }
 
-% from file: mkivCode.tex after line: 25
+% from file: mkivCode.tex after line: 0
 
 \definetyping[MkIVCode]
 \setuptyping[MkIVCode][option=tex]
@@ -174,7 +174,7 @@
   \oldStartMkIVAltCode%
 }
 
-% from file: mkivCode.tex after line: 75
+% from file: mkivCode.tex after line: 50
 
 \let\oldStopMkIVCode=\stopMkIVCode
 \def\stopMkIVCode{%
@@ -182,7 +182,7 @@
  \directlua{thirddata.literateProgs.addMkIVCode('_typing_')}
 }
 
-% from file: mkivCode.tex after line: 75
+% from file: mkivCode.tex after line: 50
 
 \let\oldStopMkIVAltCode=\stopMkIVAltCode
 \def\stopMkIVAltCode{%
@@ -190,7 +190,7 @@
   \directlua{thirddata.literateProgs.addMkIVCode('_typing_')}
 }
 
-% from file: mkivCode.tex after line: 125
+% from file: mkivCode.tex after line: 100
 
 \def\createMkIVFile[#1]{
   \directlua{thirddata.literateProgs.createMkIVFile('#1')}
@@ -250,7 +250,7 @@
   \directlua{thirddata.literateProgs.createLakefile('#1')}
 }
 
-% from file: conclusion.tex after line: 25
+% from file: conclusion.tex after line: 0
 
 \def\createLitProgsTableFile[#1]{
   \directlua{thirddata.literateProgs.createLitProgsTableFile('#1')}

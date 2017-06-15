@@ -23,7 +23,7 @@ code.mkiv        = {}
 code.lua         = {}
 code.templates   = {}
 code.lakefile    = {}
-code.lineModulus = 25
+code.lineModulus = 50
 
 local pp = require('pl/pretty')
 local tInsert = table.insert
@@ -36,7 +36,7 @@ local sMatch  = string.match
 local mFloor  = math.floor
 local toStr   = tostring
 
--- from file: rendering.tex after line: 75
+-- from file: rendering.tex after line: 50
 
 local function compareKeyValues(a, b)
   return (a[1] < b[1])
@@ -218,7 +218,7 @@ end
 
 litProgs.parseTemplatePath = parseTemplatePath
 
--- from file: rendering.tex after line: 425
+-- from file: rendering.tex after line: 400
 
 local function navigateToTemplate(templatePath)
   litProgs.templates = litProgs.templates or { }
@@ -232,7 +232,7 @@ end
 
 litProgs.navigateToTemplate = navigateToTemplate
 
--- from file: rendering.tex after line: 475
+-- from file: rendering.tex after line: 450
 
 local function addTemplate(templatePathStr, templateArgs, templateStr)
   local templatePath = parseTemplatePath(templatePathStr)
@@ -280,7 +280,7 @@ end
 
 litProgs.buildNewEnv = buildNewEnv
 
--- from file: rendering.tex after line: 625
+-- from file: rendering.tex after line: 600
 
 local function renderer(aTemplate, anEnv)
   if anEnv.tracingOn then
@@ -406,7 +406,7 @@ end
 
 litProgs.splitString = splitString
 
--- from file: rendering.tex after line: 825
+-- from file: rendering.tex after line: 800
 
 local function renderCodeFile(aFilePath, codeTable)
   local outFile = io.open(aFilePath, 'w')
@@ -414,7 +414,7 @@ local function renderCodeFile(aFilePath, codeTable)
   outFile:close()
 end
 
--- from file: codeManipulation.tex after line: 275
+-- from file: codeManipulation.tex after line: 250
 
 function litProgs.setCodeStream(aCodeStream)
   code.curCodeStream = aCodeStream
@@ -459,14 +459,14 @@ function litProgs.addMkIVCode(bufferName)
   tInsert(code.mkiv, bufferContents)
 end
 
--- from file: mkivCode.tex after line: 125
+-- from file: mkivCode.tex after line: 100
 
 function litProgs.createMkIVFile(aFilePath)
   tInsert(code.mkiv, 1, '% A ConTeXt MkIV module')
   renderCodeFile(aFilePath, code.mkiv)
 end
 
--- from file: luaCode.tex after line: 25
+-- from file: luaCode.tex after line: 0
 
 function litProgs.markLuaCodeOrigin()
   tInsert(code.lua,
@@ -491,7 +491,7 @@ function litProgs.createLuaFile(aFilePath)
   renderCodeFile(aFilePath, code.lua)
 end
 
--- from file: luaTemplates.tex after line: 25
+-- from file: luaTemplates.tex after line: 0
 
 function litProgs.markLuaTemplateOrigin()
   tInsert(code.templates,
