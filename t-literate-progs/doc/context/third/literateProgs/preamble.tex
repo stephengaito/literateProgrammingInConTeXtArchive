@@ -14,7 +14,7 @@ respective preambles provide:
 \stopitemize
 
 %\defineLitProgs[MkIVCode][option=context]
-%\defineLitProgs[LuaCode][option=lua]
+\defineLitProgs[LuaCode][option=lua]
 \defineLitProgs[LuaTemplate][option=lua]
 
 \startMkIVCode
@@ -65,6 +65,8 @@ respective preambles provide:
 \stopMkIVCode
 
 \startLuaCode
+-- A Lua file
+
 -- This is the lua code associated with t-literate-progs.mkiv
 
 if not modules then modules = { } end
@@ -100,9 +102,35 @@ local mFloor  = math.floor
 local toStr   = tostring
 \stopLuaCode
 
+\startLuaCode
+local function markLuaCodeOrigin()
+  code['LuaCode']      = code['LuaCode'] or { }
+  local codeType       = code['LuaCode']
+  local codeStream     = codeType.curCodeStream or 'default'
+  codeType[codeStream] = codeType[codeStream] or { }
+  codeStream           = codeType[codeStream]
+  tInsert(codeStream,
+    sFmt('-- from file: %s after line: %s',
+      status.filename,
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
+    )
+  )
+end
+
+litProgs.markLuaCodeOrigin = markLuaCodeOrigin
+\stopLuaCode
+
+\setLitProgsOriginMarker[LuaCode][markLuaCodeOrigin]
+
 \section{Lua templates}
 
 \startLuaTemplate
+-- A Lua template file
+
 -- t-literate-progs templates
 
 if not modules then modules = { } end
@@ -134,8 +162,8 @@ local addTemplate = litProgs.addTemplate
 
 \startLuaCode
 local function markLuaTemplateOrigin()
-  code['LuaTemplates'] = code['LuaTemplate'] or { }
-  local codeType       = code['LuaTemplates']
+  code['LuaTemplate']  = code['LuaTemplate'] or { }
+  local codeType       = code['LuaTemplate']
   local codeStream     = codeType.curCodeStream or 'default'
   codeType[codeStream] = codeType[codeStream] or { }
   codeStream           = codeType[codeStream]

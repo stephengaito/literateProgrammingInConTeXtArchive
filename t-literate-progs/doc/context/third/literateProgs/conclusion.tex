@@ -31,13 +31,19 @@ program creation code.
 
 \createMkIVFile[../../../../../build/t-literate-progs.mkiv]
 
-\createLuaFile[../../../../../build/t-literate-progs.lua]
+\createLuaCodeFile%
+  {default}%
+  {../../../../../build/t-literate-progs.lua}%
+  {}
 
 \createLuaTemplateFile%
   {default}%
   {../../../../../build/t-literate-progs-templates.lua}%
-  {-- A Lua template file}
+  {}
 
-\createLakefileFile{default}{../../../../../build/lakefile}{}
+\createLakefileFile%
+  {default}%
+  {../../../../../build/lakefile}%
+  {}
 
 \stopchapter

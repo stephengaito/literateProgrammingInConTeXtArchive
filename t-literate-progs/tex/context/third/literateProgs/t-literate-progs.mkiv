@@ -168,26 +168,6 @@
   \directlua{thirddata.literateProgs.createMkIVFile('#1')}
 }
 
-% from file: luaCode.tex after line: 0
-
-\definetyping[LuaCode]
-\setuptyping[LuaCode][option=lua]
-
-\let\oldStartLuaCode=\startLuaCode
-\def\startLuaCode{%
-  \directlua{thirddata.literateProgs.markLuaCodeOrigin()}%
-  \oldStartLuaCode%
-}
-
-\let\oldStopLuaCode=\stopLuaCode
-\def\stopLuaCode{%
-  \oldStopLuaCode%
-  \directlua{thirddata.literateProgs.addLuaCode('_typing_')}}
-
-\def\createLuaFile[#1]{
-  \directlua{thirddata.literateProgs.createLuaFile('#1')}
-}
-
 % from file: conclusion.tex after line: 0
 
 \protect \endinput

@@ -2,49 +2,5 @@
 
 \startchapter[title=Lua code]
 
-\startMkIVCode
-\definetyping[LuaCode]
-\setuptyping[LuaCode][option=lua]
-
-\let\oldStartLuaCode=\startLuaCode
-\def\startLuaCode{%
-  \directlua{thirddata.literateProgs.markLuaCodeOrigin()}%
-  \oldStartLuaCode%
-}
-
-\let\oldStopLuaCode=\stopLuaCode
-\def\stopLuaCode{%
-  \oldStopLuaCode%
-  \directlua{thirddata.literateProgs.addLuaCode('_typing_')}}
-
-\def\createLuaFile[#1]{
-  \directlua{thirddata.literateProgs.createLuaFile('#1')}
-}
-\stopMkIVCode
-
-\startLuaCode
-function litProgs.markLuaCodeOrigin()
-  tInsert(code.lua,
-    sFmt('-- from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
-    )
-  )
-end
-
-function litProgs.addLuaCode(bufferName)
-  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  tInsert(code.lua, bufferContents)
-end
-
-function litProgs.createLuaFile(aFilePath)
-  tInsert(code.lua, 1, '-- A Lua file')
-  renderCodeFile(aFilePath, code.lua)
-end
-\stopLuaCode
 
 \stopchapter

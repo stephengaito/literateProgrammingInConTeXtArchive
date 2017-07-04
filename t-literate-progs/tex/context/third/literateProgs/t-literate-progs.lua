@@ -1,7 +1,5 @@
 -- A Lua file
 
--- from file: preamble.tex after line: 50
-
 -- This is the lua code associated with t-literate-progs.mkiv
 
 if not modules then modules = { } end
@@ -36,11 +34,31 @@ local sMatch  = string.match
 local mFloor  = math.floor
 local toStr   = tostring
 
--- from file: preamble.tex after line: 100
+local function markLuaCodeOrigin()
+  code['LuaCode']      = code['LuaCode'] or { }
+  local codeType       = code['LuaCode']
+  local codeStream     = codeType.curCodeStream or 'default'
+  codeType[codeStream] = codeType[codeStream] or { }
+  codeStream           = codeType[codeStream]
+  tInsert(codeStream,
+    sFmt('-- from file: %s after line: %s',
+      status.filename,
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
+    )
+  )
+end
+
+litProgs.markLuaCodeOrigin = markLuaCodeOrigin
+
+-- from file: preamble.tex after line: 150
 
 local function markLuaTemplateOrigin()
-  code['LuaTemplates'] = code['LuaTemplate'] or { }
-  local codeType       = code['LuaTemplates']
+  code['LuaTemplate']  = code['LuaTemplate'] or { }
+  local codeType       = code['LuaTemplate']
   local codeStream     = codeType.curCodeStream or 'default'
   codeType[codeStream] = codeType[codeStream] or { }
   codeStream           = codeType[codeStream]
@@ -544,29 +562,4 @@ end
 function litProgs.createMkIVFile(aFilePath)
   tInsert(code.mkiv, 1, '% A ConTeXt MkIV module')
   renderCodeFile(aFilePath, code.mkiv)
-end
-
--- from file: luaCode.tex after line: 0
-
-function litProgs.markLuaCodeOrigin()
-  tInsert(code.lua,
-    sFmt('-- from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
-    )
-  )
-end
-
-function litProgs.addLuaCode(bufferName)
-  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  tInsert(code.lua, bufferContents)
-end
-
-function litProgs.createLuaFile(aFilePath)
-  tInsert(code.lua, 1, '-- A Lua file')
-  renderCodeFile(aFilePath, code.lua)
 end
