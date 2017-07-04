@@ -44,24 +44,26 @@ below. Finally for each code type we would like a corresponding
 \type{createXXXFile} macro to write the accumulated text for a given code 
 type out into a file. 
 
+% see: http://wiki.contextgarden.net/Commands_with_optional_arguments
+
 \startMkIVCode
 \unexpanded\def\defineLitProgs{%
-  \dotripleempty\defineLitProgsDirect%
+  \dotripleempty\doDefineLitProgs%
 }
 
-\unexpanded\def\defineLitProgsDirect{%
+\unexpanded\def\doDefineLitProgs[#1][#2][#3]{%
   \ifthirdargument%
-    \noexpand\defineLitProgsTriple%
+    \doDefineLitProgsTriple{#1}{#2}{#3}%
   \else\ifsecondargument%
-    \noexpand\defineLitProgsDouble%
+    \doDefineLitProgsDouble{#1}{#2}%
   \else\iffirstargument%
-    \noexpand\defineLitProgsSingle%
+    \doDefineLitProgsSingle{#1}%
   \else%
-    \noexpand\defineLitProgsZero%
+    \doDefineLitProgsZero%
   \fi\fi\fi%
 }
 
-\unexpanded\def\defineLitProgsTriple[#1][#2][#3]{
+\unexpanded\def\doDefineLitProgsTriple#1#2#3{
   \definetyping[#1][#2][#3]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
@@ -69,7 +71,7 @@ type out into a file.
   %\defineLitProgsSetup{#1}
 }
 
-\unexpanded\def\defineLitProgsDouble[#1][#2][#3]{
+\unexpanded\def\doDefineLitProgsDouble#1#2{
   \definetyping[#1][#2]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
@@ -77,7 +79,7 @@ type out into a file.
   %\defineLitProgsSetup{#1}
 }
 
-\unexpanded\def\defineLitProgsSingle[#1][#2][#3]{
+\unexpanded\def\doDefineLitProgsSingle#1{
   \definetyping[#1]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
@@ -85,7 +87,7 @@ type out into a file.
   %\defineLitProgsSetup{#1}
 }
 
-\unexpanded\def\defineLitProgsZero[#1][#2][#3]{
+\unexpanded\def\doDefineLitProgsZero{
   \errmessage{
     \string\\defineLitProgs
     requires at least one argument,
@@ -100,24 +102,20 @@ We assert that the \type{\defineLitProgs} macro actually defines all of
 the required macros. 
 
 \startConTest
-\startMocking
-  \defContextMock{defineLitProgsDirect}
+\begingroup
+  \mockContextMacro{doDefineLitProgs}{3}
   \defineLitProgs[TestCode]
-  \assertMockExpanded{defineLitProgsDirect}{}
-\stopMocking
+  \assertMacroExpanded{doDefineLitProgs}{}
+\endgroup
 \stopConTest
 
 \startConTest
-\startMocking
-\startTracingMockExpansions
-  \defContextMock{defineLitProgsTriple}
-  \meaning\defineLitProgsTriple
-  \defContextMock{defineLitProgsDouble}
-  \meaning\defineLitProgsDouble
-  \defContextMock{defineLitProgsSingle}
-  \meaning\defineLitProgsSingle
-  \defContextMock{defineLitProgsZero}
-  \meaning\defineLitProgsZero
+\begingroup
+  \traceContextMacro{doDefineLitProgs}{3}
+  \mockTexMacro{doDefineLitProgsTriple}{3}
+  \mockTexMacro{doDefineLitProgsDouble}{2}
+  \mockTexMacro{doDefineLitProgsSingle}{1}
+  \mockTexMacro{doDefineLitProgsZero}{0}
   \firstargumentfalse
   \secondargumentfalse
   \thirdargumentfalse
@@ -128,26 +126,25 @@ the required macros.
   \assertFirstArgument{second}
   \assertNoSecondArgument{second}
   \assertNoThirdArgument{second}
-  \assertMockExpanded{defineLitProgsSingle}{}
-\stopTracingMockExpansions
-\stopMocking
+  \assertMacroExpanded{doDefineLitProgsSingle}{}
+\endgroup
 \stopConTest
 
 \startConTest
-\startMocking
-  \defTexMockOneArg{fixStartLitProgs}
-  \defTexMockOneArg{fixStopLitProgs}
-  \defTexMockOneArg{defineLitProgsCreateFile}
-  \defTexMockOneArg{defineLitProgsSetup}
+\begingroup
+  \mockTexMacro{fixStartLitProgs}{1}
+  \mockTexMacro{fixStopLitProgs}{1}
+  \mockTexMacro{defineLitProgsCreateFile}{1}
+  %\mockTexMacro{defineLitProgsSetup}{1}
 
   \defineLitProgs[TestCode]
   \assertDefined{startTestCode}{}
   \assertDefined{stopTestCode}{}
-  \assertMockExpanded{fixStartLitProgs}{}
-  \assertMockExpanded{fixStopLitProgs}{}
-  \assertMockExpanded{defineLitProgsCreateFile}{}
-  %\assertMockExpanded{defineLitProgsSetup}{}
-\stopMocking
+  \assertMacroExpanded{fixStartLitProgs}{}
+  \assertMacroExpanded{fixStopLitProgs}{}
+  \assertMacroExpanded{defineLitProgsCreateFile}{}
+  %\assertMacroExpanded{defineLitProgsSetup}{}
+\endgroup
 \stopConTest
 
 \stopTestCase
@@ -155,9 +152,11 @@ the required macros.
 \startTestCase[should define associated marcros]
 
 \startConTest
-%  \defineLitProgs[TestCode]
+\begingroup
+  \defineLitProgs[TestCode]
   \assertDefined{startTestCode}{}
   \assertDefined{stopTestCode}{}
+\endgroup
 \stopConTest
 
 \stopTestCase

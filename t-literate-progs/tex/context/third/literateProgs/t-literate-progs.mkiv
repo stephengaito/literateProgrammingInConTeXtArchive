@@ -50,22 +50,22 @@
 % from file: codeManipulation.tex after line: 0
 
 \unexpanded\def\defineLitProgs{%
-  \dotripleempty\defineLitProgsDirect%
+  \dotripleempty\doDefineLitProgs%
 }
 
-\unexpanded\def\defineLitProgsDirect{%
+\unexpanded\def\doDefineLitProgs[#1][#2][#3]{%
   \ifthirdargument%
-    \noexpand\defineLitProgsTriple%
+    \doDefineLitProgsTriple{#1}{#2}{#3}%
   \else\ifsecondargument%
-    \noexpand\defineLitProgsDouble%
+    \doDefineLitProgsDouble{#1}{#2}%
   \else\iffirstargument%
-    \noexpand\defineLitProgsSingle%
+    \doDefineLitProgsSingle{#1}%
   \else%
-    \noexpand\defineLitProgsZero%
+    \doDefineLitProgsZero%
   \fi\fi\fi%
 }
 
-\unexpanded\def\defineLitProgsTriple[#1][#2][#3]{
+\unexpanded\def\doDefineLitProgsTriple#1#2#3{
   \definetyping[#1][#2][#3]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
@@ -73,7 +73,7 @@
   %\defineLitProgsSetup{#1}
 }
 
-\unexpanded\def\defineLitProgsDouble[#1][#2][#3]{
+\unexpanded\def\doDefineLitProgsDouble#1#2{
   \definetyping[#1][#2]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
@@ -81,7 +81,7 @@
   %\defineLitProgsSetup{#1}
 }
 
-\unexpanded\def\defineLitProgsSingle[#1][#2][#3]{
+\unexpanded\def\doDefineLitProgsSingle#1{
   \definetyping[#1]
   \fixStartLitProgs{#1}
   \fixStopLitProgs{#1}
@@ -89,7 +89,7 @@
   %\defineLitProgsSetup{#1}
 }
 
-\unexpanded\def\defineLitProgsZero[#1][#2][#3]{
+\unexpanded\def\doDefineLitProgsZero{
   \errmessage{
     \string\\defineLitProgs
     requires at least one argument,
