@@ -24,10 +24,6 @@ has been captured. This will greatly help in any required debugging of the
 program creation code. 
 
 \startMkIVCode
-\def\createLitProgsTableFile[#1]{
-  \directlua{thirddata.literateProgs.createLitProgsTableFile('#1')}
-}
-
 \protect \endinput
 \stopMkIVCode
 
@@ -37,8 +33,11 @@ program creation code.
 
 \createLuaFile[../../../../../build/t-literate-progs.lua]
 
-\createTemplateFile[../../../../../build/t-literate-progs-templates.lua]
+\createLuaTemplateFile%
+  {default}%
+  {../../../../../build/t-literate-progs-templates.lua}%
+  {-- A Lua template file}
 
-\createLakefile[../../../../../build/lakefile]
+\createLakefileFile{default}{../../../../../build/lakefile}{}
 
 \stopchapter

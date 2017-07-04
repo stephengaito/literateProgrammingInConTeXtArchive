@@ -36,6 +36,28 @@ local sMatch  = string.match
 local mFloor  = math.floor
 local toStr   = tostring
 
+-- from file: preamble.tex after line: 100
+
+local function markLuaTemplateOrigin()
+  code['LuaTemplates'] = code['LuaTemplate'] or { }
+  local codeType       = code['LuaTemplates']
+  local codeStream     = codeType.curCodeStream or 'default'
+  codeType[codeStream] = codeType[codeStream] or { }
+  codeStream           = codeType[codeStream]
+  tInsert(codeStream,
+    sFmt('-- from file: %s after line: %s',
+      status.filename,
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
+    )
+  )
+end
+
+litProgs.markLuaTemplateOrigin = markLuaTemplateOrigin
+
 -- from file: rendering.tex after line: 50
 
 local function compareKeyValues(a, b)
@@ -433,29 +455,68 @@ litProgs.createFixLitProgs = createFixLitProgs
 
 -- from file: codeManipulation.tex after line: 300
 
-function litProgs.setCodeStream(aCodeStream)
-  code.curCodeStream = aCodeStream
+local function setOriginMarker(aCodeType, aCodeStream, anOriginMarker)
+  if type(litProgs[anOriginMarker]) == 'function' then
+    code[aCodeType] = code[aCodeType] or { }
+    local codeType  = code[aCodeType]
+    if aCodeStream then
+      codeType[aCodeStream] = codeType[aCodeStream] or { }
+      local codeStream = codeType[aCodeStream]
+      codeStream['markOrigin'] = litProgs[anOriginMarker]
+    else
+      codeType['markOrigin'] = litProgs[anOriginMarker]
+    end
+  end
 end
 
-function litProgs.addCode(aCodeType, bufferName)
+litProgs.setOriginMarker = setOriginMarker
+
+local function setCodeStream(aCodeType, aCodeStream)
+  code[aCodeType]        = code[aCodeType] or { }
+  local codeType         = code[aCodeType]
+  codeType.curCodeStream = aCodeStream
+  codeType[aCodeStream]  = codeType[aCodeStream] or { }
+  local codeStream       = codeType[aCodeStream]
+  if type(codeStream['markOrigin']) == 'function' then
+    codeStream['markOrigin'](codeStream, aCodeType, aCodeStream)
+  elseif type(codeType['markOrigin']) == 'function' then
+    codeType['markOrigin'](codeStream, aCodeType, aCodeStream)
+  end
+end
+
+litProgs.setCodeStream = setCodeStream
+
+local function addCode(aCodeType, bufferName)
   local bufferContents  =
     buffers.getcontent(bufferName):gsub("\13", "\n")
   code[aCodeType]       = code[aCodeType] or { }
   local codeType        = code[aCodeType]
-  local aCodeStream     = code.curCodeStream or 'default'
+  local aCodeStream     = codeType.curCodeStream or 'default'
   codeType[aCodeStream] = codeType[aCodeStream] or { }
   local codeStream      = codeType[aCodeStream]
   tInsert(codeStream, bufferContents)
 end
 
--- from file: codeManipulation.tex after line: 350
+litProgs.addCode = addCode
+
+-- from file: codeManipulation.tex after line: 450
 
 function litProgs.createCodeFile(aCodeType,
                                  aCodeStream,
-                                 aFilePath)
-  -- here be dragons! -- how do we pass in cType and cSubType
-  renderFile(aFilePath, litProgs.templates.lua.file)
-  -- here be dragons!
+                                 aFilePath,
+                                 aFileHeader)
+  local theCode = code[aCodeType]
+  if #aCodeStream < 1 then aCodeStream = 'default' end
+  if theCode then theCode = theCode[aCodeStream] end
+  if theCode and 0 < #aFilePath then
+    local outFile = io.open(aFilePath, 'w')
+    if 0 < #aFileHeader then
+      outFile:write(aFileHeader)
+      outFile:write('\n\n')
+    end
+    outFile:write(tConcat(theCode, '\n\n'))
+    outFile:close()
+  end
 end
 
 -- from file: mkivCode.tex after line: 100
@@ -508,40 +569,4 @@ end
 function litProgs.createLuaFile(aFilePath)
   tInsert(code.lua, 1, '-- A Lua file')
   renderCodeFile(aFilePath, code.lua)
-end
-
--- from file: luaTemplates.tex after line: 0
-
-function litProgs.markLuaTemplateOrigin()
-  tInsert(code.templates,
-    sFmt('-- from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
-    )
-  )
-end
-
-function litProgs.addLuaTemplate(bufferName)
-  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  tInsert(code.templates, bufferContents)
-end
-
-function litProgs.createLuaTemplateFile(aFilePath)
-  tInsert(code.templates, 1, '-- A Lua template file')
-  renderCodeFile(aFilePath, code.templates)
-end
-
--- from file: lakefiles.tex after line: 0
-
-function litProgs.addLakefile(bufferName)
-  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  tInsert(code.lakefile, bufferContents)
-end
-
-function litProgs.createLakefile(aFilePath)
-  renderCodeFile(aFilePath, code.lakefile)
 end

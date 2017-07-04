@@ -13,6 +13,10 @@ respective preambles provide:
 \item command to setup the correct internal state
 \stopitemize
 
+%\defineLitProgs[MkIVCode][option=context]
+%\defineLitProgs[LuaCode][option=lua]
+\defineLitProgs[LuaTemplate][option=lua]
+
 \startMkIVCode
 %D \module
 %D   [     file=t-literate-progs,
@@ -96,6 +100,8 @@ local mFloor  = math.floor
 local toStr   = tostring
 \stopLuaCode
 
+\section{Lua templates}
+
 \startLuaTemplate
 -- t-literate-progs templates
 
@@ -125,5 +131,30 @@ local table_concat = table.concat
 
 local addTemplate = litProgs.addTemplate
 \stopLuaTemplate
+
+\startLuaCode
+local function markLuaTemplateOrigin()
+  code['LuaTemplates'] = code['LuaTemplate'] or { }
+  local codeType       = code['LuaTemplates']
+  local codeStream     = codeType.curCodeStream or 'default'
+  codeType[codeStream] = codeType[codeStream] or { }
+  codeStream           = codeType[codeStream]
+  tInsert(codeStream,
+    sFmt('-- from file: %s after line: %s',
+      status.filename,
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
+    )
+  )
+end
+
+litProgs.markLuaTemplateOrigin = markLuaTemplateOrigin
+\stopLuaCode
+
+\setLitProgsOriginMarker[LuaTemplate][markLuaTemplateOrigin]
+
 
 \stopchapter

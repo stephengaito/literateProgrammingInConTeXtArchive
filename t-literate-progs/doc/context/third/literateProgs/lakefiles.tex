@@ -6,32 +6,7 @@ We use a slightly updated version of Steve Donovan's Lakefile tool to
 drive the creation of the various files required by any given 
 \type{t-literate-progs} managed \ConTeXt\ program. 
 
-\startMkIVCode
-\definetyping[Lakefile]
-\setuptyping[Lakefile][option=lua]
-
-\let\oldStopLakefile=\stopLakefile
-\def\stopLakefile{%
-  \oldStopLakefile%
-  \directlua{thirddata.literateProgs.addLakefile('_typing_')}}
-
-\def\createLakefile[#1]{
-  \directlua{thirddata.literateProgs.createLakefile('#1')}
-}
-\stopMkIVCode
-
-\startLuaCode
-
-function litProgs.addLakefile(bufferName)
-  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  tInsert(code.lakefile, bufferContents)
-end
-
-function litProgs.createLakefile(aFilePath)
-  renderCodeFile(aFilePath, code.lakefile)
-end
-
-\stopLuaCode
+\defineLitProgs[Lakefile][option=lua]
 
 \startLakefile
 -- A Lua Lakefile
@@ -112,7 +87,6 @@ target('install', installTargets)
 target('diff', diffTargets)
 
 default(buildTargets)
-
 \stopLakefile
 
 \stopchapter

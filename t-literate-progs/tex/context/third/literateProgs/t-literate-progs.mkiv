@@ -94,6 +94,36 @@
   \directlua{thirddata.literateProgs.createFixLitProgs('#1')}
 }
 
+% from file: codeManipulation.tex after line: 350
+
+\unexpanded\def\setLitProgsOriginMarker{%
+  \dotripleempty\doSetLitProgsOriginMarker%
+}
+
+\unexpanded\def\doSetLitProgsOriginMarker[#1][#2][#3]{%
+  \ifthirdargument%
+    \directlua{
+      thirddata.literateProgs.setOriginMarker('#1', '#2', '#3')
+    }
+  \else\ifsecondargument%
+    \directlua{
+      thirddata.literateProgs.setOriginMarker('#1', nil, '#2')
+    }
+  \else\iffirstargument%
+    \errmessage{
+      \string\\setLitProgsOriginMarker
+      requires at least two arguments,
+      you have provided one one.
+    }
+  \else%
+    \errmessage{
+      \string\\setLitProgsOriginMarker
+      requires at least two arguments,
+      you have provided none.
+    }
+  \fi\fi\fi%
+}
+
 % from file: mkivCode.tex after line: 0
 
 \definetyping[MkIVCode]
@@ -158,44 +188,6 @@
   \directlua{thirddata.literateProgs.createLuaFile('#1')}
 }
 
-% from file: luaTemplates.tex after line: 0
-
-\definetyping[LuaTemplate]
-\setuptyping[Template][option=lua]
-
-\let\oldStartLuaTemplate=\startLuaTemplate
-\def\startLuaTemplate{%
-  \directlua{thirddata.literateProgs.markLuaTemplateOrigin()}%
-  \oldStartLuaTemplate%
-}
-
-\let\oldStopLuaTemplate=\stopLuaTemplate
-\def\stopLuaTemplate{%
-  \oldStopLuaTemplate%
-  \directlua{thirddata.literateProgs.addLuaTemplate('_typing_')}}
-
-\def\createTemplateFile[#1]{
-  \directlua{thirddata.literateProgs.createLuaTemplateFile('#1')}
-}
-
-% from file: lakefiles.tex after line: 0
-
-\definetyping[Lakefile]
-\setuptyping[Lakefile][option=lua]
-
-\let\oldStopLakefile=\stopLakefile
-\def\stopLakefile{%
-  \oldStopLakefile%
-  \directlua{thirddata.literateProgs.addLakefile('_typing_')}}
-
-\def\createLakefile[#1]{
-  \directlua{thirddata.literateProgs.createLakefile('#1')}
-}
-
 % from file: conclusion.tex after line: 0
-
-\def\createLitProgsTableFile[#1]{
-  \directlua{thirddata.literateProgs.createLitProgsTableFile('#1')}
-}
 
 \protect \endinput

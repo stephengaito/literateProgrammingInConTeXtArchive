@@ -1,7 +1,5 @@
 -- A Lua template file
 
--- from file: preamble.tex after line: 50
-
 -- t-literate-progs templates
 
 if not modules then modules = { } end
@@ -42,17 +40,21 @@ addTemplate(
 }
 \unexpanded\def\doStart{{= litProgsName }}[#1]{%
   \iffirstargument%
-    \doStart{{= litProgsName }}Single{#1}%
+    \directlua{
+      thirddata.literateProgs.setCodeStream(
+        '{{= litProgsName }}',
+        '#1'
+      )
+    }%
   \else
-    \doStart{{= litProgsName }}Zero%
+    \directlua{
+      thirddata.literateProgs.setCodeStream(
+        '{{= litProgsName }}',
+        'default'
+      )
+    }%
   \fi%
-}
-\unexpanded\def\doStart{{= litProgsName }}Single#1{%
-  \directlua{thirddata.literateProgs.setCodeStream('#1')}%
   \oldStart{{= litProgsName }}%
-}
-\unexpanded\def\doStart{{= litProgsName }}Zero{%
-  \doStart{{= litProgsName }}Single{default}%
 }
 \let\oldStop{{= litProgsName }}=\stop{{= litProgsName }}
 \unexpanded\def\stop{{= litProgsName }}{%
@@ -64,12 +66,13 @@ addTemplate(
     )
   }
 }
-\unexpanded\def\create{{= litProgsName }}File#1#2{%
+\unexpanded\def\create{{= litProgsName }}File#1#2#3{%
   \directlua{
     thirddata.literateProgs.createCodeFile(
       '{{= litProgsName }}',
       '#1',
-      '#2'
+      '#2',
+      '#3'
     )
   }
 }
