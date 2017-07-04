@@ -414,7 +414,24 @@ local function renderCodeFile(aFilePath, codeTable)
   outFile:close()
 end
 
--- from file: codeManipulation.tex after line: 250
+-- from file: codeManipulation.tex after line: 200
+
+local function createFixLitProgs(theLitProgsName, aTracingOn)
+  local theEnv = {
+    litProgsName = theLitProgsName,
+    tracingOn    = aTracingOn
+  }
+  local templatePath = litProgs.parseTemplatePath('fixLitProgs', theEnv)
+  local theTemplate  = litProgs.navigateToTemplate(templatePath)
+  local result       = litProgs.renderer(theTemplate, theEnv, true)
+  result             = litProgs.splitString(result)
+  tex.print(result)
+  return result
+end
+
+litProgs.createFixLitProgs = createFixLitProgs
+
+-- from file: codeManipulation.tex after line: 300
 
 function litProgs.setCodeStream(aCodeStream)
   code.curCodeStream = aCodeStream
@@ -430,6 +447,8 @@ function litProgs.addCode(aCodeType, bufferName)
   local codeStream      = codeType[aCodeStream]
   tInsert(codeStream, bufferContents)
 end
+
+-- from file: codeManipulation.tex after line: 350
 
 function litProgs.createCodeFile(aCodeType,
                                  aCodeStream,

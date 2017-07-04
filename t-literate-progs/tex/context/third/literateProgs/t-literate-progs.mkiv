@@ -67,26 +67,17 @@
 
 \unexpanded\def\doDefineLitProgsTriple#1#2#3{
   \definetyping[#1][#2][#3]
-  \fixStartLitProgs{#1}
-  \fixStopLitProgs{#1}
-  \defineLitProgsCreateFile{#1}
-  %\defineLitProgsSetup{#1}
+  \fixLitProgs{#1}
 }
 
 \unexpanded\def\doDefineLitProgsDouble#1#2{
   \definetyping[#1][#2]
-  \fixStartLitProgs{#1}
-  \fixStopLitProgs{#1}
-  \defineLitProgsCreateFile{#1}
-  %\defineLitProgsSetup{#1}
+  \fixLitProgs{#1}
 }
 
 \unexpanded\def\doDefineLitProgsSingle#1{
   \definetyping[#1]
-  \fixStartLitProgs{#1}
-  \fixStopLitProgs{#1}
-  \defineLitProgsCreateFile{#1}
-  %\defineLitProgsSetup{#1}
+  \fixLitProgs{#1}
 }
 
 \unexpanded\def\doDefineLitProgsZero{
@@ -97,59 +88,10 @@
   }
 }
 
-% from file: codeManipulation.tex after line: 150
-
-\def\fixStartLitProgs#1{%
-  \letvalue{oldStart#1}=\getvalue{start#1}%
-  \setuvalue{start#1}{%
-    \dosingleempty\getvalue{start#1Direct}%
-  }
-  \setvalue{start#1Direct}{%
-    \iffirstargument%
-      \getvalue{start#1Single}%
-    \else
-      \getvalue{start#1Zero}%
-    \fi
-  }
-  \setvalue{start#1Zero}{%
-    \getvalue{start#1Single}[default]%
-  }
-  \setvalue{start#1Single}[#1]{%
-    \directlua{thirddata.literateProgs.setCodeStream('#1')}%
-    \getvalue{oldStart#1}%
-  }
-}
-
-% from file: codeManipulation.tex after line: 200
-
-\def\fixStopLitProgs#1{%
-  \letvalue{oldStop#1}=\getvalue{stop#1}%
-  \setvalue{stop#1}{%
-    \getvalue{oldStop#1}%
-    \directlua{
-      thirddata.literateProgs.addCode(
-        '#1',
-        '_typing_'
-      )
-    }
-  }
-}
-
 % from file: codeManipulation.tex after line: 250
 
-\def\callCreateCodeFile#1#2#3{%
-  \directlua{
-    thirddata.literateProgs.createCodeFile(
-      '#1',
-      '#2',
-      '#3'
-    )
-  }
-}
-\def\defineLitProgsCreateFile#1{%
-  \setevalue{create#1File}{%
-    \noexpand\callCreateCodeFile #1
-  }
+\def\fixLitProgs#1{%
+  \directlua{thirddata.literateProgs.createFixLitProgs('#1')}
 }
 
 % from file: mkivCode.tex after line: 0

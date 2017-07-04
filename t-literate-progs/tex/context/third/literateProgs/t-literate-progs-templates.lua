@@ -29,3 +29,49 @@ local table_insert = table.insert
 local table_concat = table.concat
 
 local addTemplate = litProgs.addTemplate
+
+-- from file: codeManipulation.tex after line: 150
+
+addTemplate(
+  'fixLitProgs',
+  { 'litProgsName' },
+[=[
+\let\oldStart{{= litProgsName }}=\start{{= litProgsName }}
+\unexpanded\def\start{{= litProgsName }}{%
+  \dosingleempty\doStart{{= litProgsName }}%
+}
+\unexpanded\def\doStart{{= litProgsName }}[#1]{%
+  \iffirstargument%
+    \doStart{{= litProgsName }}Single{#1}%
+  \else
+    \doStart{{= litProgsName }}Zero%
+  \fi%
+}
+\unexpanded\def\doStart{{= litProgsName }}Single#1{%
+  \directlua{thirddata.literateProgs.setCodeStream('#1')}%
+  \oldStart{{= litProgsName }}%
+}
+\unexpanded\def\doStart{{= litProgsName }}Zero{%
+  \doStart{{= litProgsName }}Single{default}%
+}
+\let\oldStop{{= litProgsName }}=\stop{{= litProgsName }}
+\unexpanded\def\stop{{= litProgsName }}{%
+  \oldStop{{= litProgsName }}%
+  \directlua{
+    thirddata.literateProgs.addCode(
+      '{{= litProgsName }}',
+      '_typing_'
+    )
+  }
+}
+\unexpanded\def\create{{= litProgsName }}File#1#2{%
+  \directlua{
+    thirddata.literateProgs.createCodeFile(
+      '{{= litProgsName }}',
+      '#1',
+      '#2'
+    )
+  }
+}
+]=]
+)
