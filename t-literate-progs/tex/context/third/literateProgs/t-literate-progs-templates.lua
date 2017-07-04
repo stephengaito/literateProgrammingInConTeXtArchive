@@ -38,24 +38,11 @@ addTemplate(
 [=[
 \let\oldStart{{= litProgsName }}=\start{{= litProgsName }}
 \unexpanded\def\start{{= litProgsName }}{%
-  \dosingleempty\doStart{{= litProgsName }}%
-}
-\unexpanded\def\doStart{{= litProgsName }}[#1]{%
-  \iffirstargument%
-    \directlua{
-      thirddata.literateProgs.setCodeStream(
-        '{{= litProgsName }}',
-        '#1'
-      )
-    }%
-  \else
-    \directlua{
-      thirddata.literateProgs.setCodeStream(
-        '{{= litProgsName }}',
-        'default'
-      )
-    }%
-  \fi%
+  \directlua{
+    thirddata.literateProgs.markCodeOrigin(
+      '{{= litProgsName }}'
+    )
+  }%
   \oldStart{{= litProgsName }}%
 }
 \let\oldStop{{= litProgsName }}=\stop{{= litProgsName }}
@@ -75,6 +62,14 @@ addTemplate(
       '#1',
       '#2',
       '#3'
+    )
+  }
+}
+\unexpanded\def\set{{= litProgsName }}Stream#1{%
+  \directlua{
+    thirddata.literateProgs.setCodeStream(
+      '{{= litProgsName }}',
+      '#1'
     )
   }
 }

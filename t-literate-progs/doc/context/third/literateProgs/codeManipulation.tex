@@ -187,24 +187,11 @@ addTemplate(
 [=[
 \let\oldStart{{= litProgsName }}=\start{{= litProgsName }}
 \unexpanded\def\start{{= litProgsName }}{%
-  \dosingleempty\doStart{{= litProgsName }}%
-}
-\unexpanded\def\doStart{{= litProgsName }}[#1]{%
-  \iffirstargument%
-    \directlua{
-      thirddata.literateProgs.setCodeStream(
-        '{{= litProgsName }}',
-        '#1'
-      )
-    }%
-  \else
-    \directlua{
-      thirddata.literateProgs.setCodeStream(
-        '{{= litProgsName }}',
-        'default'
-      )
-    }%
-  \fi%
+  \directlua{
+    thirddata.literateProgs.markCodeOrigin(
+      '{{= litProgsName }}'
+    )
+  }%
   \oldStart{{= litProgsName }}%
 }
 \let\oldStop{{= litProgsName }}=\stop{{= litProgsName }}
@@ -224,6 +211,14 @@ addTemplate(
       '#1',
       '#2',
       '#3'
+    )
+  }
+}
+\unexpanded\def\set{{= litProgsName }}Stream#1{%
+  \directlua{
+    thirddata.literateProgs.setCodeStream(
+      '{{= litProgsName }}',
+      '#1'
     )
   }
 }
@@ -267,49 +262,44 @@ local createFixLitProgs = thirddata.literateProgs.createFixLitProgs
 
 local macroBody = createFixLitProgs('Test')
 assert.isTable(macroBody)
-assert.length(macroBody, 42)
+assert.length(macroBody, 37)
 assert.isEqual(macroBody[1],  "\\let\\oldStartTest=\\startTest")
 assert.isEqual(macroBody[2],  "\\unexpanded\\def\\startTest{%")
-assert.isEqual(macroBody[3],  "  \\dosingleempty\\doStartTest%")
-assert.isEqual(macroBody[4],  "}")
-assert.isEqual(macroBody[5],  "\\unexpanded\\def\\doStartTest[#1]{%")
-assert.isEqual(macroBody[6],  "  \\iffirstargument%")
-assert.isEqual(macroBody[7],  "    \\directlua{")
-assert.isEqual(macroBody[8],  "      thirddata.literateProgs.setCodeStream(")
-assert.isEqual(macroBody[9],  "        'Test',")
-assert.isEqual(macroBody[10], "        '#1'")
-assert.isEqual(macroBody[11], "      )")
-assert.isEqual(macroBody[12], "    }%")
-assert.isEqual(macroBody[13], "  \\else")
-assert.isEqual(macroBody[14], "    \\directlua{")
-assert.isEqual(macroBody[15], "      thirddata.literateProgs.setCodeStream(")
-assert.isEqual(macroBody[16], "        'Test',")
-assert.isEqual(macroBody[17], "        'default'")
-assert.isEqual(macroBody[18], "      )")
-assert.isEqual(macroBody[19], "    }%")
-assert.isEqual(macroBody[20], "  \\fi%")
-assert.isEqual(macroBody[21], "  \\oldStartTest%")
-assert.isEqual(macroBody[22], "}")
-assert.isEqual(macroBody[23], "\\let\\oldStopTest=\\stopTest")
-assert.isEqual(macroBody[24], "\\unexpanded\\def\\stopTest{%")
-assert.isEqual(macroBody[25], "  \\oldStopTest%")
-assert.isEqual(macroBody[26], "  \\directlua{")
-assert.isEqual(macroBody[27], "    thirddata.literateProgs.addCode(")
-assert.isEqual(macroBody[28], "      'Test',")
-assert.isEqual(macroBody[29], "      '_typing_'")
-assert.isEqual(macroBody[30], "    )")
-assert.isEqual(macroBody[31], "  }")
-assert.isEqual(macroBody[32], "}")
-assert.isEqual(macroBody[33], "\\unexpanded\\def\\createTestFile#1#2#3{%")
-assert.isEqual(macroBody[34], "  \\directlua{")
-assert.isEqual(macroBody[35], "    thirddata.literateProgs.createCodeFile(")
-assert.isEqual(macroBody[36], "      'Test',")
-assert.isEqual(macroBody[37], "      '#1',")
-assert.isEqual(macroBody[38], "      '#2',")
-assert.isEqual(macroBody[39], "      '#3'")
-assert.isEqual(macroBody[40], "    )")
-assert.isEqual(macroBody[41], "  }")
-assert.isEqual(macroBody[42], "}")
+assert.isEqual(macroBody[3],  "  \\directlua{")
+assert.isEqual(macroBody[4],  "    thirddata.literateProgs.markCodeOrigin(")
+assert.isEqual(macroBody[5],  "      'Test'")
+assert.isEqual(macroBody[6],  "    )")
+assert.isEqual(macroBody[7],  "  }%")
+assert.isEqual(macroBody[8],  "  \\oldStartTest%")
+assert.isEqual(macroBody[9],  "}")
+assert.isEqual(macroBody[10], "\\let\\oldStopTest=\\stopTest")
+assert.isEqual(macroBody[11], "\\unexpanded\\def\\stopTest{%")
+assert.isEqual(macroBody[12], "  \\oldStopTest%")
+assert.isEqual(macroBody[13], "  \\directlua{")
+assert.isEqual(macroBody[14], "    thirddata.literateProgs.addCode(")
+assert.isEqual(macroBody[15], "      'Test',")
+assert.isEqual(macroBody[16], "      '_typing_'")
+assert.isEqual(macroBody[17], "    )")
+assert.isEqual(macroBody[18], "  }")
+assert.isEqual(macroBody[19], "}")
+assert.isEqual(macroBody[20], "\\unexpanded\\def\\createTestFile#1#2#3{%")
+assert.isEqual(macroBody[21], "  \\directlua{")
+assert.isEqual(macroBody[22], "    thirddata.literateProgs.createCodeFile(")
+assert.isEqual(macroBody[23], "      'Test',")
+assert.isEqual(macroBody[24], "      '#1',")
+assert.isEqual(macroBody[25], "      '#2',")
+assert.isEqual(macroBody[26], "      '#3'")
+assert.isEqual(macroBody[27], "    )")
+assert.isEqual(macroBody[28], "  }")
+assert.isEqual(macroBody[29], "}")
+assert.isEqual(macroBody[30], "\\unexpanded\\def\\setTestStream#1{%")
+assert.isEqual(macroBody[31], "  \\directlua{")
+assert.isEqual(macroBody[32], "    thirddata.literateProgs.setCodeStream(")
+assert.isEqual(macroBody[33], "      'Test',")
+assert.isEqual(macroBody[34], "      '#1'")
+assert.isEqual(macroBody[35], "    )")
+assert.isEqual(macroBody[36], "  }")
+assert.isEqual(macroBody[37], "}")
 \stopLuaTest
 \stopTestCase
 
@@ -320,10 +310,10 @@ assert.isEqual(macroBody[42], "}")
   \defineLitProgs[Test]
   \assertDefined{oldStartTest}{}
   \assertDefined{startTest}{}
-  \assertDefined{doStartTest}{}
   \assertDefined{oldStopTest}{}
   \assertDefined{stopTest}{}
   \assertDefined{createTestFile}{}
+  \assertDefined{setTestStream}{}
 \endgroup
 \stopConTest
 \stopTestCase
@@ -350,9 +340,26 @@ end
 
 litProgs.setOriginMarker = setOriginMarker
 
+local function markCodeOrigin(aCodeType)
+  code[aCodeType]        = code[aCodeType] or { }
+  local codeType         = code[aCodeType]
+  codeType.curCodeStream = codeType.curCodeStream or 'default'
+  local aCodeStream      = codeType.curCodeStream
+  codeType[aCodeStream]  = codeType[aCodeStream] or { }
+  local codeStream       = codeType[aCodeStream]
+  if type(codeStream['markOrigin']) == 'function' then
+    codeStream['markOrigin'](codeStream, aCodeType, aCodeStream)
+  elseif type(codeType['markOrigin']) == 'function' then
+    codeType['markOrigin'](codeStream, aCodeType, aCodeStream)
+  end
+end
+
+litProgs.markCodeOrigin = markCodeOrigin
+
 local function setCodeStream(aCodeType, aCodeStream)
   code[aCodeType]        = code[aCodeType] or { }
   local codeType         = code[aCodeType]
+  aCodeStream            = aCodeStream or 'default'
   codeType.curCodeStream = aCodeStream
   codeType[aCodeStream]  = codeType[aCodeStream] or { }
   local codeStream       = codeType[aCodeStream]
@@ -423,8 +430,6 @@ environment.
   \startTestCode
     this is some test "code"
   \stopTestCode
-  \assertMacroNthArgumentOnMthExpansionMatches%
-    {doStartTestCode}{1}{1}{}{}
 \endgroup
 \stopConTest
 \stopTestCase

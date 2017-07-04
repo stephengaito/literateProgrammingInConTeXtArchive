@@ -511,9 +511,26 @@ end
 
 litProgs.setOriginMarker = setOriginMarker
 
+local function markCodeOrigin(aCodeType)
+  code[aCodeType]        = code[aCodeType] or { }
+  local codeType         = code[aCodeType]
+  codeType.curCodeStream = codeType.curCodeStream or 'default'
+  local aCodeStream      = codeType.curCodeStream
+  codeType[aCodeStream]  = codeType[aCodeStream] or { }
+  local codeStream       = codeType[aCodeStream]
+  if type(codeStream['markOrigin']) == 'function' then
+    codeStream['markOrigin'](codeStream, aCodeType, aCodeStream)
+  elseif type(codeType['markOrigin']) == 'function' then
+    codeType['markOrigin'](codeStream, aCodeType, aCodeStream)
+  end
+end
+
+litProgs.markCodeOrigin = markCodeOrigin
+
 local function setCodeStream(aCodeType, aCodeStream)
   code[aCodeType]        = code[aCodeType] or { }
   local codeType         = code[aCodeType]
+  aCodeStream            = aCodeStream or 'default'
   codeType.curCodeStream = aCodeStream
   codeType[aCodeStream]  = codeType[aCodeStream] or { }
   local codeStream       = codeType[aCodeStream]
