@@ -22,17 +22,6 @@ this creates the \type{\startMkIVCode} and \type{\stopMkIVCode} macros
 together with the whole \type{\setupMkIVCode} interface tailored to our 
 specific name. 
 
-\startMkIVAltCode
-\definetyping[MkIVCode]
-\setuptyping[MkIVCode][option=tex]
-
-\let\oldStartMkIVCode=\startMkIVCode
-\def\startMkIVCode{%
-  \directlua{thirddata.literateProgs.markMkIVCodeOrigin()}
-  \oldStartMkIVCode%
-}
-\stopMkIVAltCode
-
 If we only cared about the \emph{typesetting} of the MkIVCode, this is all 
 we need to do, as \ConTeXt\ is already competent at typesetting \TeX\ and 
 Lua code fragments. However, we \emph{also} want to store the code chunk 
@@ -63,38 +52,11 @@ this confustion, we actually define \emph{two} \type{MkIVCode}
 environments, \type{MkIVCode} (itself) as well as \type{MkIVAltCode}. This 
 allows use to define each environment inside the other environment. 
 
-\startMkIVCode
-\definetyping[MkIVAltCode]
-\setuptyping[MkIVAltCode][option=tex]
-
-\let\oldStartMkIVAltCode=\startMkIVAltCode
-\def\startMkIVAltCode{%
-  \directlua{thirddata.literateProgs.markMkIVCodeOrigin()}%
-  \oldStartMkIVAltCode%
-}
-\stopMkIVCode
-
 We can now define the \type{\stopMkIVCode} macro using the 
 \type{MkIVAltCode} environment. 
 
-\startMkIVAltCode
-\let\oldStopMkIVCode=\stopMkIVCode
-\def\stopMkIVCode{%
-  \oldStopMkIVCode%
- \directlua{thirddata.literateProgs.addMkIVCode('_typing_')}
-}
-\stopMkIVAltCode
-
 Having defined the \type{\stopMkIVCode}, we can now define the 
 \type{\stopMkIVAltCode} macro using the \type{MkIVCode} environment. 
-
-\startMkIVCode
-\let\oldStopMkIVAltCode=\stopMkIVAltCode
-\def\stopMkIVAltCode{%
-  \oldStopMkIVAltCode%
-  \directlua{thirddata.literateProgs.addMkIVCode('_typing_')}
-}
-\stopMkIVCode
 
  Once the \type{MkIV} code has been captured and typeset, we need to 
 specify where we want to store it until we ultimately render it via 
@@ -107,7 +69,7 @@ macro and takes the \ConTeXt\ buffer name, in this case always
 and inserts it at the end of the \type{code.mkiv} array. 
 
 \startLuaCode
-function litProgs.markMkIVCodeOrigin()
+local function markMkIVCodeOrigin()
   tInsert(code.mkiv,
     sFmt('%% from file: %s after line: %s',
       status.filename,
@@ -120,10 +82,7 @@ function litProgs.markMkIVCodeOrigin()
   )
 end
 
-function litProgs.addMkIVCode(bufferName)
-  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  tInsert(code.mkiv, bufferContents)
-end
+litProgs.markMkIVCodeOrigin = markMkIVCodeOrigin
 \stopLuaCode
 
  
@@ -132,20 +91,7 @@ file, the module writer actively invokes the \type{\createMkIVFile} macro,
 and supplies the output file's relative path and file name complete with 
 extension. 
 
-\startMkIVCode
-\def\createMkIVFile[#1]{
-  \directlua{thirddata.literateProgs.createMkIVFile('#1')}
-}
-\stopMkIVCode
-
 The \type{\createMkIVFile} macro in turn invokes the \type{createMkIVFile} 
 Lua function. 
-
-\startLuaCode
-function litProgs.createMkIVFile(aFilePath)
-  tInsert(code.mkiv, 1, '% A ConTeXt MkIV module')
-  renderCodeFile(aFilePath, code.mkiv)
-end
-\stopLuaCode
 
 \stopchapter

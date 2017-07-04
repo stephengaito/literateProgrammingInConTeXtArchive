@@ -47,7 +47,7 @@
 \ctxloadluafile{t-literate-progs}
 \ctxloadluafile{t-literate-progs-templates}
 
-% from file: codeManipulation.tex after line: 0
+% from file: codeManipulation.tex after line: 50
 
 \unexpanded\def\defineLitProgs{%
   \dotripleempty\doDefineLitProgs%
@@ -124,49 +124,15 @@
   \fi\fi\fi%
 }
 
-% from file: mkivCode.tex after line: 0
+% from file: codeManipulation.tex after line: 450
 
-\definetyping[MkIVCode]
-\setuptyping[MkIVCode][option=tex]
+\defineLitProgs[MkIVCode][option=context]
+\defineLitProgs[LuaCode][option=lua]
+\defineLitProgs[LuaTemplate][option=lua]
 
-\let\oldStartMkIVCode=\startMkIVCode
-\def\startMkIVCode{%
-  \directlua{thirddata.literateProgs.markMkIVCodeOrigin()}
-  \oldStartMkIVCode%
-}
-
-% from file: mkivCode.tex after line: 50
-
-\definetyping[MkIVAltCode]
-\setuptyping[MkIVAltCode][option=tex]
-
-\let\oldStartMkIVAltCode=\startMkIVAltCode
-\def\startMkIVAltCode{%
-  \directlua{thirddata.literateProgs.markMkIVCodeOrigin()}%
-  \oldStartMkIVAltCode%
-}
-
-% from file: mkivCode.tex after line: 50
-
-\let\oldStopMkIVCode=\stopMkIVCode
-\def\stopMkIVCode{%
-  \oldStopMkIVCode%
- \directlua{thirddata.literateProgs.addMkIVCode('_typing_')}
-}
-
-% from file: mkivCode.tex after line: 50
-
-\let\oldStopMkIVAltCode=\stopMkIVAltCode
-\def\stopMkIVAltCode{%
-  \oldStopMkIVAltCode%
-  \directlua{thirddata.literateProgs.addMkIVCode('_typing_')}
-}
-
-% from file: mkivCode.tex after line: 100
-
-\def\createMkIVFile[#1]{
-  \directlua{thirddata.literateProgs.createMkIVFile('#1')}
-}
+\setLitProgsOriginMarker[MkIVCode][markMkIVCodeOrigin]
+\setLitProgsOriginMarker[LuaCode][markLuaCodeOrigin]
+\setLitProgsOriginMarker[LuaTemplate][markLuaTemplateOrigin]
 
 % from file: conclusion.tex after line: 0
 

@@ -460,6 +460,9 @@ function litProgs.createCodeFile(aCodeType,
   if theCode and 0 < #aFilePath then
     local outFile = io.open(aFilePath, 'w')
     if 0 < #aFileHeader then
+      if aFileHeader:match('[Cc][Oo][Nn][Tt][Ee][Xx][Tt]') then
+        outFile:write('% ')
+      end
       outFile:write(aFileHeader)
       outFile:write('\n\n')
     end
@@ -470,6 +473,16 @@ end
 \stopLuaCode
 
 \stopTestSuite
+
+\startMkIVCode
+\defineLitProgs[MkIVCode][option=context]
+\defineLitProgs[LuaCode][option=lua]
+\defineLitProgs[LuaTemplate][option=lua]
+
+\setLitProgsOriginMarker[MkIVCode][markMkIVCodeOrigin]
+\setLitProgsOriginMarker[LuaCode][markLuaCodeOrigin]
+\setLitProgsOriginMarker[LuaTemplate][markLuaTemplateOrigin]
+\stopMkIVCode
 
 % Do we need the following?
 

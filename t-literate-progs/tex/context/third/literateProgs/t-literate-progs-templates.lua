@@ -1,5 +1,7 @@
 -- A Lua template file
 
+-- from file: preamble.tex after line: 150
+
 -- t-literate-progs templates
 
 if not modules then modules = { } end

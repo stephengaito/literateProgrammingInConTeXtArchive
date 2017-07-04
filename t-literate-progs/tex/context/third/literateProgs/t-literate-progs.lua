@@ -1,5 +1,7 @@
 -- A Lua file
 
+-- from file: preamble.tex after line: 50
+
 -- This is the lua code associated with t-literate-progs.mkiv
 
 if not modules then modules = { } end
@@ -34,6 +36,28 @@ local sMatch  = string.match
 local mFloor  = math.floor
 local toStr   = tostring
 
+-- from file: preamble.tex after line: 100
+
+local function markMkIVCodeOrigin()
+  code['MkIVCode']     = code['MkIVCode'] or { }
+  local codeType       = code['MkIVCode']
+  local codeStream     = codeType.curCodeStream or 'default'
+  codeType[codeStream] = codeType[codeStream] or { }
+  codeStream           = codeType[codeStream]
+  tInsert(codeStream,
+    sFmt('%% from file: %s after line: %s',
+      status.filename,
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
+    )
+  )
+end
+
+litProgs.markMkIVCodeOrigin = markMkIVCodeOrigin
+
 local function markLuaCodeOrigin()
   code['LuaCode']      = code['LuaCode'] or { }
   local codeType       = code['LuaCode']
@@ -53,8 +77,6 @@ local function markLuaCodeOrigin()
 end
 
 litProgs.markLuaCodeOrigin = markLuaCodeOrigin
-
--- from file: preamble.tex after line: 150
 
 local function markLuaTemplateOrigin()
   code['LuaTemplate']  = code['LuaTemplate'] or { }
@@ -529,37 +551,13 @@ function litProgs.createCodeFile(aCodeType,
   if theCode and 0 < #aFilePath then
     local outFile = io.open(aFilePath, 'w')
     if 0 < #aFileHeader then
+      if aFileHeader:match('[Cc][Oo][Nn][Tt][Ee][Xx][Tt]') then
+        outFile:write('% ')
+      end
       outFile:write(aFileHeader)
       outFile:write('\n\n')
     end
     outFile:write(tConcat(theCode, '\n\n'))
     outFile:close()
   end
-end
-
--- from file: mkivCode.tex after line: 100
-
-function litProgs.markMkIVCodeOrigin()
-  tInsert(code.mkiv,
-    sFmt('%% from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
-    )
-  )
-end
-
-function litProgs.addMkIVCode(bufferName)
-  local bufferContents = buffers.getcontent(bufferName):gsub("\13", "\n")
-  tInsert(code.mkiv, bufferContents)
-end
-
--- from file: mkivCode.tex after line: 100
-
-function litProgs.createMkIVFile(aFilePath)
-  tInsert(code.mkiv, 1, '% A ConTeXt MkIV module')
-  renderCodeFile(aFilePath, code.mkiv)
 end

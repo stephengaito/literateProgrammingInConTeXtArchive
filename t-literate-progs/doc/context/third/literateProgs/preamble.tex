@@ -13,11 +13,11 @@ respective preambles provide:
 \item command to setup the correct internal state
 \stopitemize
 
-%\defineLitProgs[MkIVCode][option=context]
+\defineLitProgs[MkIVCode][option=context]
 \defineLitProgs[LuaCode][option=lua]
 \defineLitProgs[LuaTemplate][option=lua]
 
-\startMkIVCode
+\startMkIVCode[default]
 %D \module
 %D   [     file=t-literate-progs,
 %D      version=2017.05.10,
@@ -64,9 +64,9 @@ respective preambles provide:
 \ctxloadluafile{t-literate-progs-templates}
 \stopMkIVCode
 
-\startLuaCode
--- A Lua file
+\section{Lua code}
 
+\startLuaCode
 -- This is the lua code associated with t-literate-progs.mkiv
 
 if not modules then modules = { } end
@@ -103,6 +103,26 @@ local toStr   = tostring
 \stopLuaCode
 
 \startLuaCode
+local function markMkIVCodeOrigin()
+  code['MkIVCode']     = code['MkIVCode'] or { }
+  local codeType       = code['MkIVCode']
+  local codeStream     = codeType.curCodeStream or 'default'
+  codeType[codeStream] = codeType[codeStream] or { }
+  codeStream           = codeType[codeStream]
+  tInsert(codeStream,
+    sFmt('%% from file: %s after line: %s',
+      status.filename,
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
+    )
+  )
+end
+
+litProgs.markMkIVCodeOrigin = markMkIVCodeOrigin
+
 local function markLuaCodeOrigin()
   code['LuaCode']      = code['LuaCode'] or { }
   local codeType       = code['LuaCode']
@@ -122,15 +142,35 @@ local function markLuaCodeOrigin()
 end
 
 litProgs.markLuaCodeOrigin = markLuaCodeOrigin
+
+local function markLuaTemplateOrigin()
+  code['LuaTemplate']  = code['LuaTemplate'] or { }
+  local codeType       = code['LuaTemplate']
+  local codeStream     = codeType.curCodeStream or 'default'
+  codeType[codeStream] = codeType[codeStream] or { }
+  codeStream           = codeType[codeStream]
+  tInsert(codeStream,
+    sFmt('-- from file: %s after line: %s',
+      status.filename,
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
+    )
+  )
+end
+
+litProgs.markLuaTemplateOrigin = markLuaTemplateOrigin
 \stopLuaCode
 
+\setLitProgsOriginMarker[MkIVCode][markMkIVCodeOrigin]
 \setLitProgsOriginMarker[LuaCode][markLuaCodeOrigin]
+\setLitProgsOriginMarker[LuaTemplate][markLuaTemplateOrigin]
 
 \section{Lua templates}
 
 \startLuaTemplate
--- A Lua template file
-
 -- t-literate-progs templates
 
 if not modules then modules = { } end
@@ -159,30 +199,6 @@ local table_concat = table.concat
 
 local addTemplate = litProgs.addTemplate
 \stopLuaTemplate
-
-\startLuaCode
-local function markLuaTemplateOrigin()
-  code['LuaTemplate']  = code['LuaTemplate'] or { }
-  local codeType       = code['LuaTemplate']
-  local codeStream     = codeType.curCodeStream or 'default'
-  codeType[codeStream] = codeType[codeStream] or { }
-  codeStream           = codeType[codeStream]
-  tInsert(codeStream,
-    sFmt('-- from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
-    )
-  )
-end
-
-litProgs.markLuaTemplateOrigin = markLuaTemplateOrigin
-\stopLuaCode
-
-\setLitProgsOriginMarker[LuaTemplate][markLuaTemplateOrigin]
 
 
 \stopchapter
