@@ -162,6 +162,46 @@ local function markLuaTemplateOrigin()
 end
 
 litProgs.markLuaTemplateOrigin = markLuaTemplateOrigin
+
+local function markCHeaderOrigin()
+  code['CHeader']      = code['CHeader'] or { }
+  local codeType       = code['CHeader']
+  local codeStream     = codeType.curCodeStream or 'default'
+  codeType[codeStream] = codeType[codeStream] or { }
+  codeStream           = codeType[codeStream]
+  tInsert(codeStream,
+    sFmt('// from file: %s after line: %s',
+      status.filename,
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
+    )
+  )
+end
+
+litProgs.markCHeaderOrigin = markCHeaderOrigin
+
+local function markCCodeOrigin()
+  code['CCode']        = code['CCode'] or { }
+  local codeType       = code['CCode']
+  local codeStream     = codeType.curCodeStream or 'default'
+  codeType[codeStream] = codeType[codeStream] or { }
+  codeStream           = codeType[codeStream]
+  tInsert(codeStream,
+    sFmt('// from file: %s after line: %s',
+      status.filename,
+      toStr(
+        mFloor(
+          status.linenumber/code.lineModulus
+        )*code.lineModulus
+      )
+    )
+  )
+end
+
+litProgs.markCCodeOrigin = markCCodeOrigin
 \stopLuaCode
 
 \setLitProgsOriginMarker[MkIVCode][markMkIVCodeOrigin]
