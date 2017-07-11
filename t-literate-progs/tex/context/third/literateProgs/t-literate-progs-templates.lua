@@ -73,7 +73,7 @@ addTemplate(
     )
   }
 }
-\unexpanded\def\setPrepend{{= litProgsName}}#1{%
+\unexpanded\def\prepend{{= litProgsName}}#1{%
   \directlua{
     thirddata.literateProgs.setPrepend(
       '{{= litProgsName }}',

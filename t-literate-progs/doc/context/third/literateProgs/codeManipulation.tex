@@ -222,7 +222,7 @@ addTemplate(
     )
   }
 }
-\unexpanded\def\setPrepend{{= litProgsName}}#1{%
+\unexpanded\def\prepend{{= litProgsName}}#1{%
   \directlua{
     thirddata.literateProgs.setPrepend(
       '{{= litProgsName }}',
@@ -308,7 +308,7 @@ assert.isEqual(macroBody[34], "      '#1'")
 assert.isEqual(macroBody[35], "    )")
 assert.isEqual(macroBody[36], "  }")
 assert.isEqual(macroBody[37], "}")
-assert.isEqual(macroBody[38], "\\unexpanded\\def\\setPrependTest#1{%")
+assert.isEqual(macroBody[38], "\\unexpanded\\def\\prependTest#1{%")
 assert.isEqual(macroBody[39], "  \\directlua{")
 assert.isEqual(macroBody[40], "    thirddata.literateProgs.setPrepend(")
 assert.isEqual(macroBody[41], "      'Test',")
