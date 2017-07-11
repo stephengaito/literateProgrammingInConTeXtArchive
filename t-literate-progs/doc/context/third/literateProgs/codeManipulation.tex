@@ -222,6 +222,14 @@ addTemplate(
     )
   }
 }
+\unexpanded\def\setPrepend{{= litProgsName}}#1{%
+  \directlua{
+    thirddata.literateProgs.setPrepend(
+      '{{= litProgsName }}',
+      '#1'
+    )
+  }
+}
 ]=]
 )
 \stopLuaTemplate
@@ -262,7 +270,7 @@ local createFixLitProgs = thirddata.literateProgs.createFixLitProgs
 
 local macroBody = createFixLitProgs('Test')
 assert.isTable(macroBody)
-assert.length(macroBody, 37)
+assert.length(macroBody, 45)
 assert.isEqual(macroBody[1],  "\\let\\oldStartTest=\\startTest")
 assert.isEqual(macroBody[2],  "\\unexpanded\\def\\startTest{%")
 assert.isEqual(macroBody[3],  "  \\directlua{")
@@ -300,6 +308,14 @@ assert.isEqual(macroBody[34], "      '#1'")
 assert.isEqual(macroBody[35], "    )")
 assert.isEqual(macroBody[36], "  }")
 assert.isEqual(macroBody[37], "}")
+assert.isEqual(macroBody[38], "\\unexpanded\\def\\setPrependTest#1{%")
+assert.isEqual(macroBody[39], "  \\directlua{")
+assert.isEqual(macroBody[40], "    thirddata.literateProgs.setPrepend(")
+assert.isEqual(macroBody[41], "      'Test',")
+assert.isEqual(macroBody[42], "      '#1'")
+assert.isEqual(macroBody[43], "    )")
+assert.isEqual(macroBody[44], "  }")
+assert.isEqual(macroBody[45], "}")
 \stopLuaTest
 \stopTestCase
 
@@ -347,11 +363,8 @@ local function markCodeOrigin(aCodeType)
   local aCodeStream      = codeType.curCodeStream
   codeType[aCodeStream]  = codeType[aCodeStream] or { }
   local codeStream       = codeType[aCodeStream]
-  if type(codeStream['markOrigin']) == 'function' then
-    codeStream['markOrigin'](codeStream, aCodeType, aCodeStream)
-  elseif type(codeType['markOrigin']) == 'function' then
-    codeType['markOrigin'](codeStream, aCodeType, aCodeStream)
-  end
+  codeStream.fileName    = status.filename
+  codeStream.startLine   = status.linenumber
 end
 
 litProgs.markCodeOrigin = markCodeOrigin
@@ -361,26 +374,53 @@ local function setCodeStream(aCodeType, aCodeStream)
   local codeType         = code[aCodeType]
   aCodeStream            = aCodeStream or 'default'
   codeType.curCodeStream = aCodeStream
-  codeType[aCodeStream]  = codeType[aCodeStream] or { }
-  local codeStream       = codeType[aCodeStream]
-  if type(codeStream['markOrigin']) == 'function' then
-    codeStream['markOrigin'](codeStream, aCodeType, aCodeStream)
-  elseif type(codeType['markOrigin']) == 'function' then
-    codeType['markOrigin'](codeStream, aCodeType, aCodeStream)
-  end
 end
 
 litProgs.setCodeStream = setCodeStream
 
+local function setPrepend(aCodeType, aCodeStream)
+  code[aCodeType]        = code[aCodeType] or { }
+  local codeType         = code[aCodeType]
+  aCodeStream            = aCodeStream or 'default'
+  codeType.curCodeStream = aCodeStream
+  codeType[aCodeStream]  = codeType[aCodeStream] or { }
+  local codeStream       = codeType[aCodeStream]
+  codeStream.prepend     = true
+end
+
+litProgs.setPrepend = setPrepend
+
 local function addCode(aCodeType, bufferName)
   local bufferContents  =
     buffers.getcontent(bufferName):gsub("\13", "\n")
+
   code[aCodeType]       = code[aCodeType] or { }
   local codeType        = code[aCodeType]
   local aCodeStream     = codeType.curCodeStream or 'default'
   codeType[aCodeStream] = codeType[aCodeStream] or { }
   local codeStream      = codeType[aCodeStream]
-  tInsert(codeStream, bufferContents)
+
+  local codeOrigin      = nil
+    if type(codeStream['markOrigin']) == 'function' then
+      codeOrigin =
+        codeStream['markOrigin'](codeStream, aCodeType, aCodeStream)
+    elseif type(codeType['markOrigin']) == 'function' then
+      codeOrigin =
+        codeType['markOrigin'](codeStream, aCodeType, aCodeStream)
+    end
+
+  if codeStream.prepend then
+    tInsert(codeStream, 1, bufferContents)
+    if codeOrigin then 
+      tInsert(codeStream, 1, codeOrigin)
+    end
+  else
+    if codeOrigin then
+      tInsert(codeStream, codeOrigin)
+    end
+    tInsert(codeStream, bufferContents)
+  end
+  codeStream.prepend = nil
 end
 
 litProgs.addCode = addCode
@@ -404,7 +444,7 @@ litProgs.addCode = addCode
     \errmessage{
       \string\\setLitProgsOriginMarker
       requires at least two arguments,
-      you have provided one one.
+      you have only provided one.
     }
   \else%
     \errmessage{

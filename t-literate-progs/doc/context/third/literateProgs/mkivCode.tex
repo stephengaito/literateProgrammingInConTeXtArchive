@@ -69,13 +69,13 @@ macro and takes the \ConTeXt\ buffer name, in this case always
 and inserts it at the end of the \type{code.mkiv} array. 
 
 \startLuaCode
-local function markMkIVCodeOrigin()
+local function markMkIVCodeOrigin(fileName, startLine)
   tInsert(code.mkiv,
     sFmt('%% from file: %s after line: %s',
-      status.filename,
+      fileName,
       toStr(
         mFloor(
-          status.linenumber/code.lineModulus
+          startLine/code.lineModulus
         )*code.lineModulus
       )
     )

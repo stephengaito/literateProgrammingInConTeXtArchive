@@ -92,7 +92,6 @@ code.templates   = {}
 code.lakefile    = {}
 code.lineModulus = 50
 
-local pp = require('pl/pretty')
 local tInsert = table.insert
 local tRemove = table.remove
 local tConcat = table.concat
@@ -111,14 +110,12 @@ local function markMkIVCodeOrigin()
   local codeStream     = codeType.curCodeStream or 'default'
   codeType[codeStream] = codeType[codeStream] or { }
   codeStream           = codeType[codeStream]
-  tInsert(codeStream,
-    sFmt('%% from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
+  return sFmt('%% from file: %s after line: %s',
+    codeStream.fileName,
+    toStr(
+      mFloor(
+        codeStream.startLine/code.lineModulus
+      )*code.lineModulus
     )
   )
 end
@@ -131,14 +128,12 @@ local function markLuaCodeOrigin()
   local codeStream     = codeType.curCodeStream or 'default'
   codeType[codeStream] = codeType[codeStream] or { }
   codeStream           = codeType[codeStream]
-  tInsert(codeStream,
-    sFmt('-- from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
+  return sFmt('-- from file: %s after line: %s',
+    codeStream.fileName,
+    toStr(
+      mFloor(
+        codeStream.startLine/code.lineModulus
+      )*code.lineModulus
     )
   )
 end
@@ -151,14 +146,12 @@ local function markLuaTemplateOrigin()
   local codeStream     = codeType.curCodeStream or 'default'
   codeType[codeStream] = codeType[codeStream] or { }
   codeStream           = codeType[codeStream]
-  tInsert(codeStream,
-    sFmt('-- from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
+  return sFmt('-- from file: %s after line: %s',
+    codeStream.fileName,
+    toStr(
+      mFloor(
+        codeStream.startLine/code.lineModulus
+      )*code.lineModulus
     )
   )
 end
@@ -171,14 +164,12 @@ local function markCHeaderOrigin()
   local codeStream     = codeType.curCodeStream or 'default'
   codeType[codeStream] = codeType[codeStream] or { }
   codeStream           = codeType[codeStream]
-  tInsert(codeStream,
-    sFmt('// from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
+  return sFmt('// from file: %s after line: %s',
+    codeStream.fileName,
+    toStr(
+      mFloor(
+        codeStream.startLine/code.lineModulus
+      )*code.lineModulus
     )
   )
 end
@@ -191,14 +182,12 @@ local function markCCodeOrigin()
   local codeStream     = codeType.curCodeStream or 'default'
   codeType[codeStream] = codeType[codeStream] or { }
   codeStream           = codeType[codeStream]
-  tInsert(codeStream,
-    sFmt('// from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
+  return sFmt('// from file: %s after line: %s',
+    codeStream.fileName,
+    toStr(
+      mFloor(
+        codeStream.startLine/code.lineModulus
+      )*code.lineModulus
     )
   )
 end

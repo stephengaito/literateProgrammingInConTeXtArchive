@@ -25,7 +25,6 @@ code.templates   = {}
 code.lakefile    = {}
 code.lineModulus = 50
 
-local pp = require('pl/pretty')
 local tInsert = table.insert
 local tRemove = table.remove
 local tConcat = table.concat
@@ -44,14 +43,12 @@ local function markMkIVCodeOrigin()
   local codeStream     = codeType.curCodeStream or 'default'
   codeType[codeStream] = codeType[codeStream] or { }
   codeStream           = codeType[codeStream]
-  tInsert(codeStream,
-    sFmt('%% from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
+  return sFmt('%% from file: %s after line: %s',
+    codeStream.fileName,
+    toStr(
+      mFloor(
+        codeStream.startLine/code.lineModulus
+      )*code.lineModulus
     )
   )
 end
@@ -64,14 +61,12 @@ local function markLuaCodeOrigin()
   local codeStream     = codeType.curCodeStream or 'default'
   codeType[codeStream] = codeType[codeStream] or { }
   codeStream           = codeType[codeStream]
-  tInsert(codeStream,
-    sFmt('-- from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
+  return sFmt('-- from file: %s after line: %s',
+    codeStream.fileName,
+    toStr(
+      mFloor(
+        codeStream.startLine/code.lineModulus
+      )*code.lineModulus
     )
   )
 end
@@ -84,14 +79,12 @@ local function markLuaTemplateOrigin()
   local codeStream     = codeType.curCodeStream or 'default'
   codeType[codeStream] = codeType[codeStream] or { }
   codeStream           = codeType[codeStream]
-  tInsert(codeStream,
-    sFmt('-- from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
+  return sFmt('-- from file: %s after line: %s',
+    codeStream.fileName,
+    toStr(
+      mFloor(
+        codeStream.startLine/code.lineModulus
+      )*code.lineModulus
     )
   )
 end
@@ -104,14 +97,12 @@ local function markCHeaderOrigin()
   local codeStream     = codeType.curCodeStream or 'default'
   codeType[codeStream] = codeType[codeStream] or { }
   codeStream           = codeType[codeStream]
-  tInsert(codeStream,
-    sFmt('// from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
+  return sFmt('// from file: %s after line: %s',
+    codeStream.fileName,
+    toStr(
+      mFloor(
+        codeStream.startLine/code.lineModulus
+      )*code.lineModulus
     )
   )
 end
@@ -124,14 +115,12 @@ local function markCCodeOrigin()
   local codeStream     = codeType.curCodeStream or 'default'
   codeType[codeStream] = codeType[codeStream] or { }
   codeStream           = codeType[codeStream]
-  tInsert(codeStream,
-    sFmt('// from file: %s after line: %s',
-      status.filename,
-      toStr(
-        mFloor(
-          status.linenumber/code.lineModulus
-        )*code.lineModulus
-      )
+  return sFmt('// from file: %s after line: %s',
+    codeStream.fileName,
+    toStr(
+      mFloor(
+        codeStream.startLine/code.lineModulus
+      )*code.lineModulus
     )
   )
 end
@@ -558,11 +547,8 @@ local function markCodeOrigin(aCodeType)
   local aCodeStream      = codeType.curCodeStream
   codeType[aCodeStream]  = codeType[aCodeStream] or { }
   local codeStream       = codeType[aCodeStream]
-  if type(codeStream['markOrigin']) == 'function' then
-    codeStream['markOrigin'](codeStream, aCodeType, aCodeStream)
-  elseif type(codeType['markOrigin']) == 'function' then
-    codeType['markOrigin'](codeStream, aCodeType, aCodeStream)
-  end
+  codeStream.fileName    = status.filename
+  codeStream.startLine   = status.linenumber
 end
 
 litProgs.markCodeOrigin = markCodeOrigin
@@ -572,26 +558,53 @@ local function setCodeStream(aCodeType, aCodeStream)
   local codeType         = code[aCodeType]
   aCodeStream            = aCodeStream or 'default'
   codeType.curCodeStream = aCodeStream
-  codeType[aCodeStream]  = codeType[aCodeStream] or { }
-  local codeStream       = codeType[aCodeStream]
-  if type(codeStream['markOrigin']) == 'function' then
-    codeStream['markOrigin'](codeStream, aCodeType, aCodeStream)
-  elseif type(codeType['markOrigin']) == 'function' then
-    codeType['markOrigin'](codeStream, aCodeType, aCodeStream)
-  end
 end
 
 litProgs.setCodeStream = setCodeStream
 
+local function setPrepend(aCodeType, aCodeStream)
+  code[aCodeType]        = code[aCodeType] or { }
+  local codeType         = code[aCodeType]
+  aCodeStream            = aCodeStream or 'default'
+  codeType.curCodeStream = aCodeStream
+  codeType[aCodeStream]  = codeType[aCodeStream] or { }
+  local codeStream       = codeType[aCodeStream]
+  codeStream.prepend     = true
+end
+
+litProgs.setPrepend = setPrepend
+
 local function addCode(aCodeType, bufferName)
   local bufferContents  =
     buffers.getcontent(bufferName):gsub("\13", "\n")
+
   code[aCodeType]       = code[aCodeType] or { }
   local codeType        = code[aCodeType]
   local aCodeStream     = codeType.curCodeStream or 'default'
   codeType[aCodeStream] = codeType[aCodeStream] or { }
   local codeStream      = codeType[aCodeStream]
-  tInsert(codeStream, bufferContents)
+
+  local codeOrigin      = nil
+    if type(codeStream['markOrigin']) == 'function' then
+      codeOrigin =
+        codeStream['markOrigin'](codeStream, aCodeType, aCodeStream)
+    elseif type(codeType['markOrigin']) == 'function' then
+      codeOrigin =
+        codeType['markOrigin'](codeStream, aCodeType, aCodeStream)
+    end
+
+  if codeStream.prepend then
+    tInsert(codeStream, 1, bufferContents)
+    if codeOrigin then
+      tInsert(codeStream, 1, codeOrigin)
+    end
+  else
+    if codeOrigin then
+      tInsert(codeStream, codeOrigin)
+    end
+    tInsert(codeStream, bufferContents)
+  end
+  codeStream.prepend = nil
 end
 
 litProgs.addCode = addCode
