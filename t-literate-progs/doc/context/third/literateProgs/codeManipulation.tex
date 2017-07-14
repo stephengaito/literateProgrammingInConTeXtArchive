@@ -456,12 +456,10 @@ litProgs.addCode = addCode
 }
 \stopMkIVCode
 
-\startTestCase[should be able to collect code I]
+\startTestCase[should be able to collect code]
 
-This test case is tested in two parts, part I and part II.
-
-In this part we test the \ConTeXt\ level behaviour of the \quote{TestCode} 
-environment. 
+We use a LuaConTest to ensure that the \type{TestCode} environment 
+captures its contents. 
 
 \startConTest
 \begingroup
@@ -470,28 +468,18 @@ environment.
   \startTestCode
     this is some test "code"
   \stopTestCode
+  \startLuaConTest
+    local code = thirddata.literateProgs.code
+    assert.isNotNil(code['TestCode'], 'code')
+    assert.isEqual(code['TestCode'].curCodeStream, 'default')
+    code = code['TestCode']
+    assert.isNotNil(code['default'], 'TestCode')
+    code = code['default']
+    assert.length(code, 1)
+    assert.isEqual(code[1], 'this is some test "code"')
+  \stopLuaConTest
 \endgroup
 \stopConTest
-\stopTestCase
-
-\startTestCase[should be able to collect code II]
-
-In this second part, we test the Lua level behaviour of the 
-\quote{TestCode} environment. We are actively using the fact that the use 
-of the \quote{TestCode} environment in the previous part of this extended 
-test case, has left over side-effects, which we can now detect, in the Lua 
-\type{code} data structure. 
-
-\startLuaTest
-  local code = thirddata.literateProgs.code
-  assert.isNotNil(code['TestCode'], 'code')
-  assert.isEqual(code['TestCode'].curCodeStream, 'default')
-  code = code['TestCode']
-  assert.isNotNil(code['default'], 'TestCode')
-  code = code['default']
-  assert.length(code, 1)
-  assert.isEqual(code[1], 'this is some test "code"')
-\stopLuaTest
 \stopTestCase
 
 \startLuaCode
