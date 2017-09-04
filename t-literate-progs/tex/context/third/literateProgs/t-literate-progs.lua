@@ -522,7 +522,7 @@ end
 
 litProgs.createFixLitProgs = createFixLitProgs
 
--- from file: codeManipulation.tex after line: 300
+-- from file: codeManipulation.tex after line: 350
 
 local function setOriginMarker(aCodeType, aCodeStream, anOriginMarker)
   if type(litProgs[anOriginMarker]) == 'function' then
@@ -609,7 +609,7 @@ end
 
 litProgs.addCode = addCode
 
--- from file: codeManipulation.tex after line: 450
+-- from file: codeManipulation.tex after line: 500
 
 function litProgs.createCodeFile(aCodeType,
                                  aCodeStream,

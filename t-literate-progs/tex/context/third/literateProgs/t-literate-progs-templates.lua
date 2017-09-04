@@ -49,10 +49,16 @@ addTemplate(
 \unexpanded\def\stop{{= litProgsName }}{%
   \oldStop{{= litProgsName }}%
   \directlua{
-    thirddata.literateProgs.addCode(
-      '{{= litProgsName }}',
-      '_typing_'
-    )
+    if thirddata.literateProgs.add{{= litProgsName }} ~= nil then
+      thirddata.literateProgs.add{{= litProgsName }}(
+        '_typing_'
+      )
+    else
+      thirddata.literateProgs.addCode(
+        '{{= litProgsName }}',
+        '_typing_'
+      )
+    end
   }
 }
 \unexpanded\def\create{{= litProgsName }}File#1#2#3{%
