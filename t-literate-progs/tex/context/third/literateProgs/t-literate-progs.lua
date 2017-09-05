@@ -522,7 +522,7 @@ end
 
 litProgs.createFixLitProgs = createFixLitProgs
 
--- from file: codeManipulation.tex after line: 350
+-- from file: codeManipulation.tex after line: 300
 
 local function setOriginMarker(aCodeType, aCodeStream, anOriginMarker)
   if type(litProgs[anOriginMarker]) == 'function' then
@@ -574,10 +574,18 @@ end
 
 litProgs.setPrepend = setPrepend
 
-local function addCode(aCodeType, bufferName)
+local function addCodeDispatcher(aCodeType, bufferName)
   local bufferContents  =
     buffers.getcontent(bufferName):gsub("\13", "\n")
 
+  if litProgs.addCode[aCodeType] ~= nil then
+    litProgs.addCode[aCodeType](bufferContents)
+  else
+    litProgs.addCode.default(aCodeType, bufferContents)
+  end
+end
+
+local function addCodeDefault(aCodeType, bufferContents)
   code[aCodeType]       = code[aCodeType] or { }
   local codeType        = code[aCodeType]
   local aCodeStream     = codeType.curCodeStream or 'default'
@@ -607,7 +615,9 @@ local function addCode(aCodeType, bufferName)
   codeStream.prepend = nil
 end
 
-litProgs.addCode = addCode
+litProgs.addCodeDispatcher = addCodeDispatcher
+litProgs.addCode           = {}
+litProgs.addCode.default   = addCodeDefault
 
 -- from file: codeManipulation.tex after line: 500
 

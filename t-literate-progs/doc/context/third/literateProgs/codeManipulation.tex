@@ -198,16 +198,10 @@ addTemplate(
 \unexpanded\def\stop{{= litProgsName }}{%
   \oldStop{{= litProgsName }}%
   \directlua{
-    if thirddata.literateProgs.add{{= litProgsName }} ~= nil then
-      thirddata.literateProgs.add{{= litProgsName }}(
-        '_typing_'
-      )
-    else
-      thirddata.literateProgs.addCode(
-        '{{= litProgsName }}',
-        '_typing_'
-      )
-    end
+    thirddata.literateProgs.addCodeDispatcher(
+      '{{= litProgsName }}',
+      '_typing_'
+    )
   }
 }
 \unexpanded\def\create{{= litProgsName }}File#1#2#3{%
@@ -276,7 +270,7 @@ local createFixLitProgs = thirddata.literateProgs.createFixLitProgs
 
 local macroBody = createFixLitProgs('Test')
 assert.isTable(macroBody)
-assert.length(macroBody, 51)
+assert.length(macroBody, 45)
 assert.isEqual(macroBody[1],  "\\let\\oldStartTest=\\startTest")
 assert.isEqual(macroBody[2],  "\\unexpanded\\def\\startTest{%")
 assert.isEqual(macroBody[3],  "  \\directlua{")
@@ -290,45 +284,38 @@ assert.isEqual(macroBody[10], "\\let\\oldStopTest=\\stopTest")
 assert.isEqual(macroBody[11], "\\unexpanded\\def\\stopTest{%")
 assert.isEqual(macroBody[12], "  \\oldStopTest%")
 assert.isEqual(macroBody[13], "  \\directlua{")
-assert.isEqual(macroBody[14],
-  "    if thirddata.literateProgs.addTest ~= nil then")
-assert.isEqual(macroBody[15], "      thirddata.literateProgs.addTest(")
-assert.isEqual(macroBody[16], "        '_typing_'")
-assert.isEqual(macroBody[17], "      )")
-assert.isEqual(macroBody[18], "    else")
-assert.isEqual(macroBody[19], "      thirddata.literateProgs.addCode(")
-assert.isEqual(macroBody[20], "        'Test',")
-assert.isEqual(macroBody[21], "        '_typing_'")
-assert.isEqual(macroBody[22], "      )")
-assert.isEqual(macroBody[23], "    end")
-assert.isEqual(macroBody[24], "  }")
-assert.isEqual(macroBody[25], "}")
-assert.isEqual(macroBody[26], "\\unexpanded\\def\\createTestFile#1#2#3{%")
-assert.isEqual(macroBody[27], "  \\directlua{")
-assert.isEqual(macroBody[28], "    thirddata.literateProgs.createCodeFile(")
-assert.isEqual(macroBody[29], "      'Test',")
-assert.isEqual(macroBody[30], "      '#1',")
-assert.isEqual(macroBody[31], "      '#2',")
-assert.isEqual(macroBody[32], "      '#3'")
-assert.isEqual(macroBody[33], "    )")
-assert.isEqual(macroBody[34], "  }")
-assert.isEqual(macroBody[35], "}")
-assert.isEqual(macroBody[36], "\\unexpanded\\def\\setTestStream#1{%")
-assert.isEqual(macroBody[37], "  \\directlua{")
-assert.isEqual(macroBody[38], "    thirddata.literateProgs.setCodeStream(")
-assert.isEqual(macroBody[39], "      'Test',")
-assert.isEqual(macroBody[40], "      '#1'")
-assert.isEqual(macroBody[41], "    )")
-assert.isEqual(macroBody[42], "  }")
-assert.isEqual(macroBody[43], "}")
-assert.isEqual(macroBody[44], "\\unexpanded\\def\\prependTest#1{%")
-assert.isEqual(macroBody[45], "  \\directlua{")
-assert.isEqual(macroBody[46], "    thirddata.literateProgs.setPrepend(")
-assert.isEqual(macroBody[47], "      'Test',")
-assert.isEqual(macroBody[48], "      '#1'")
-assert.isEqual(macroBody[49], "    )")
-assert.isEqual(macroBody[50], "  }")
-assert.isEqual(macroBody[51], "}")
+assert.isEqual(macroBody[14], "    thirddata.literateProgs.addCodeDispatcher(")
+assert.isEqual(macroBody[15], "      'Test',")
+assert.isEqual(macroBody[16], "      '_typing_'")
+assert.isEqual(macroBody[17], "    )")
+assert.isEqual(macroBody[18], "  }")
+assert.isEqual(macroBody[19], "}")
+assert.isEqual(macroBody[20], "\\unexpanded\\def\\createTestFile#1#2#3{%")
+assert.isEqual(macroBody[21], "  \\directlua{")
+assert.isEqual(macroBody[22], "    thirddata.literateProgs.createCodeFile(")
+assert.isEqual(macroBody[23], "      'Test',")
+assert.isEqual(macroBody[24], "      '#1',")
+assert.isEqual(macroBody[25], "      '#2',")
+assert.isEqual(macroBody[26], "      '#3'")
+assert.isEqual(macroBody[27], "    )")
+assert.isEqual(macroBody[28], "  }")
+assert.isEqual(macroBody[29], "}")
+assert.isEqual(macroBody[30], "\\unexpanded\\def\\setTestStream#1{%")
+assert.isEqual(macroBody[31], "  \\directlua{")
+assert.isEqual(macroBody[32], "    thirddata.literateProgs.setCodeStream(")
+assert.isEqual(macroBody[33], "      'Test',")
+assert.isEqual(macroBody[34], "      '#1'")
+assert.isEqual(macroBody[35], "    )")
+assert.isEqual(macroBody[36], "  }")
+assert.isEqual(macroBody[37], "}")
+assert.isEqual(macroBody[38], "\\unexpanded\\def\\prependTest#1{%")
+assert.isEqual(macroBody[39], "  \\directlua{")
+assert.isEqual(macroBody[40], "    thirddata.literateProgs.setPrepend(")
+assert.isEqual(macroBody[41], "      'Test',")
+assert.isEqual(macroBody[42], "      '#1'")
+assert.isEqual(macroBody[43], "    )")
+assert.isEqual(macroBody[44], "  }")
+assert.isEqual(macroBody[45], "}")
 \stopLuaTest
 \stopTestCase
 
@@ -403,10 +390,18 @@ end
 
 litProgs.setPrepend = setPrepend
 
-local function addCode(aCodeType, bufferName)
+local function addCodeDispatcher(aCodeType, bufferName)
   local bufferContents  =
     buffers.getcontent(bufferName):gsub("\13", "\n")
 
+  if litProgs.addCode[aCodeType] ~= nil then
+    litProgs.addCode[aCodeType](bufferContents)
+  else
+    litProgs.addCode.default(aCodeType, bufferContents)
+  end
+end
+
+local function addCodeDefault(aCodeType, bufferContents)
   code[aCodeType]       = code[aCodeType] or { }
   local codeType        = code[aCodeType]
   local aCodeStream     = codeType.curCodeStream or 'default'
@@ -436,7 +431,9 @@ local function addCode(aCodeType, bufferName)
   codeStream.prepend = nil
 end
 
-litProgs.addCode = addCode
+litProgs.addCodeDispatcher = addCodeDispatcher
+litProgs.addCode           = {}
+litProgs.addCode.default   = addCodeDefault
 \stopLuaCode
 
 \startMkIVCode
@@ -504,24 +501,17 @@ captures its contents using a specific addTestCodeCode Lua function.
 \begingroup
   \defineLitProgs[TestCode]
   \directlua{
-    local function addTestCode(aBufferName)
-      thirddata.literateProgs.addCode('SpecificTestCode', aBufferName)
+    local function addTestCode(bufferContents)
+      thirddata.literateProgs.testCodeAdded = true
     end
-    thirddata.literateProgs.addTestCode = addTestCode
+    thirddata.literateProgs.addCode.TestCode = addTestCode
   }
   \traceContextMacro{doStartTestCode}{1}
   \startTestCode
     this is some test "code"
   \stopTestCode
   \startLuaConTest
-    local code = thirddata.literateProgs.code
-    assert.isNotNil(code['SpecificTestCode'], 'code')
-    assert.isEqual(code['SpecificTestCode'].curCodeStream, 'default')
-    code = code['SpecificTestCode']
-    assert.isNotNil(code['default'], 'SpecificTestCode')
-    code = code['default']
-    assert.length(code, 1)
-    assert.isEqual(code[1], 'this is some test "code"')
+    assert.isTrue(thirddata.literateProgs.testCodeAdded)
   \stopLuaConTest
 \endgroup
 \stopConTest
