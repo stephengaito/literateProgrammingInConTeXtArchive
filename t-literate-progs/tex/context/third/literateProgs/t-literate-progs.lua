@@ -633,6 +633,8 @@ function litProgs.createCodeFile(aCodeType,
     if 0 < #aFileHeader then
       if aFileHeader:match('[Cc][Oo][Nn][Tt][Ee][Xx][Tt]') then
         outFile:write('% ')
+      elseif aFileHeader:match('^!/.*bin') then
+        outFile:write('#')
       end
       outFile:write(aFileHeader)
       outFile:write('\n\n')
