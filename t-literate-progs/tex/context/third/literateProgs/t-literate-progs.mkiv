@@ -126,14 +126,50 @@
   \fi\fi\fi%
 }
 
-% from file: codeManipulation.tex after line: 500
+% from file: codeManipulation.tex after line: 550
 
-\defineLitProgs[MkIVCode][option=context]
-\defineLitProgs[LuaCode][option=lua]
-\defineLitProgs[LuaTemplate][option=lua]
-\defineLitProgs[CHeader][option=cpp]
-\defineLitProgs[CCode][option=cpp]
-\defineLitProgs[Lakefile][option=lua]
+\definetextbackground[LitProgFrame]
+\setuptextbackground%
+  [LitProgFrame]%
+  [location=paragraph, background=color, backgroundcolor=gray]
+
+% from file: codeManipulation.tex after line: 550
+
+\defineLitProgs%
+  [MkIVCode]%
+  [ option=context, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\defineLitProgs%
+  [LuaCode]%
+  [option=lua, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\defineLitProgs%
+  [LuaTemplate]%
+  [option=lua, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\defineLitProgs%
+  [CHeader]%
+  [option=cpp, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\defineLitProgs%
+  [CCode]%
+  [option=cpp, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\defineLitProgs%
+  [Lakefile]%
+  [option=lua, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
 
 \setLitProgsOriginMarker[MkIVCode][markMkIVCodeOrigin]
 \setLitProgsOriginMarker[LuaCode][markLuaCodeOrigin]

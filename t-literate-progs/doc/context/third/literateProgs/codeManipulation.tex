@@ -544,13 +544,60 @@ end
 
 \stopTestSuite
 
+We now make use of the newly defined \type{\defineLitProgs} macro to 
+define a number of standard litterate programming environments: 
+\type{MkIVCode}, \type{LuaCode}, \type{LuaTemplate}, \type{CHeader}, 
+\type{CCode} and \type{Lakefile}. 
+
+However before we do this we need to provide a uniform way to denote code 
+contexts by using \ConTeXt\ text backgrounds. 
+
 \startMkIVCode
-\defineLitProgs[MkIVCode][option=context]
-\defineLitProgs[LuaCode][option=lua]
-\defineLitProgs[LuaTemplate][option=lua]
-\defineLitProgs[CHeader][option=cpp]
-\defineLitProgs[CCode][option=cpp]
-\defineLitProgs[Lakefile][option=lua]
+\definetextbackground[LitProgFrame]
+\setuptextbackground%
+  [LitProgFrame]%
+  [location=paragraph, background=color, backgroundcolor=gray]
+\stopMkIVCode
+
+Using this newly defined \type{LitProgFrame} we now define our standard 
+litterate programming environments. 
+
+\startMkIVCode
+\defineLitProgs%
+  [MkIVCode]%
+  [ option=context, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\defineLitProgs%
+  [LuaCode]%
+  [option=lua, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\defineLitProgs%
+  [LuaTemplate]%
+  [option=lua, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\defineLitProgs%
+  [CHeader]%
+  [option=cpp, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\defineLitProgs%
+  [CCode]%
+  [option=cpp, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\defineLitProgs%
+  [Lakefile]%
+  [option=lua, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
 
 \setLitProgsOriginMarker[MkIVCode][markMkIVCodeOrigin]
 \setLitProgsOriginMarker[LuaCode][markLuaCodeOrigin]
