@@ -549,6 +549,11 @@ local function markCodeOrigin(aCodeType)
   local codeStream       = codeType[aCodeStream]
   codeStream.fileName    = status.filename
   codeStream.startLine   = status.linenumber
+  tex.print({
+   '\\blank[medium]\\noindent',
+   '{\\darkgray '..aCodeType..' : '..aCodeStream..'}',
+   ''
+   })
 end
 
 litProgs.markCodeOrigin = markCodeOrigin
