@@ -77,7 +77,17 @@ addTemplate(
   \directlua{
     thirddata.literateProgs.setPrepend(
       '{{= litProgsName }}',
-      '#1'
+      '#1',
+      true
+    )
+  }
+}
+\unexpanded\def\append{{= litProgsName}}#1{%
+  \directlua{
+    thirddata.literateProgs.setPrepend(
+      '{{= litProgsName }}',
+      '#1',
+      false
     )
   }
 }

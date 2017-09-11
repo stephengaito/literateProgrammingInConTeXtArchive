@@ -505,7 +505,7 @@ local function renderCodeFile(aFilePath, codeTable)
   outFile:close()
 end
 
--- from file: codeManipulation.tex after line: 200
+-- from file: codeManipulation.tex after line: 250
 
 local function createFixLitProgs(theLitProgsName, aTracingOn)
   local theEnv = {
@@ -522,7 +522,7 @@ end
 
 litProgs.createFixLitProgs = createFixLitProgs
 
--- from file: codeManipulation.tex after line: 300
+-- from file: codeManipulation.tex after line: 350
 
 local function setOriginMarker(aCodeType, aCodeStream, anOriginMarker)
   if type(litProgs[anOriginMarker]) == 'function' then
@@ -567,14 +567,14 @@ end
 
 litProgs.setCodeStream = setCodeStream
 
-local function setPrepend(aCodeType, aCodeStream)
+local function setPrepend(aCodeType, aCodeStream, setValue)
   code[aCodeType]        = code[aCodeType] or { }
   local codeType         = code[aCodeType]
   aCodeStream            = aCodeStream or 'default'
   codeType.curCodeStream = aCodeStream
   codeType[aCodeStream]  = codeType[aCodeStream] or { }
   local codeStream       = codeType[aCodeStream]
-  codeStream.prepend     = true
+  codeStream.prepend     = setValue
 end
 
 litProgs.setPrepend = setPrepend
@@ -648,3 +648,21 @@ function litProgs.createCodeFile(aCodeType,
     outFile:close()
   end
 end
+
+-- from file: codeManipulation.tex after line: 600
+
+local function cHeaderIncludeGuard(aCodeStream, aGuard)
+  setCodeStream('CHeader', aCodeStream)
+  markCodeOrigin('CHeader')
+  setPrepend('CHeader', aCodeStream, true)
+  local bufferContents = [=[
+#ifndef ]=]..aGuard..[=[_H
+#define ]=]..aGuard..[=[_H
+]=]
+  addCodeDefault('CHeader', bufferContents)
+  setPrepend('CHeader', aCodeStream, false)
+  bufferContents = '#endif'
+  addCodeDefault('CHeader', bufferContents)
+end
+
+thirddata.literateProgs.cHeaderIncludeGuard = cHeaderIncludeGuard

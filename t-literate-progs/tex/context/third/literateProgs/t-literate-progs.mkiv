@@ -96,7 +96,7 @@
   \directlua{thirddata.literateProgs.createFixLitProgs('#1')}
 }
 
-% from file: codeManipulation.tex after line: 400
+% from file: codeManipulation.tex after line: 450
 
 \unexpanded\def\setLitProgsOriginMarker{%
   \dotripleempty\doSetLitProgsOriginMarker%
@@ -176,6 +176,14 @@
 \setLitProgsOriginMarker[LuaTemplate][markLuaTemplateOrigin]
 \setLitProgsOriginMarker[CHeader][markCHeaderOrigin]
 \setLitProgsOriginMarker[CCode][markCCodeOrigin]
+
+% from file: codeManipulation.tex after line: 600
+
+\def\CHeaderIncludeGuard#1#2{
+  \directlua{
+    thirddata.literateProgs.cHeaderIncludeGuard('#1', '#2')
+  }
+}
 
 % from file: conclusion.tex after line: 0
 

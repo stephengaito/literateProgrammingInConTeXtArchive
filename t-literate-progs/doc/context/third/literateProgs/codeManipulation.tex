@@ -226,7 +226,17 @@ addTemplate(
   \directlua{
     thirddata.literateProgs.setPrepend(
       '{{= litProgsName }}',
-      '#1'
+      '#1',
+      true
+    )
+  }
+}
+\unexpanded\def\append{{= litProgsName}}#1{%
+  \directlua{
+    thirddata.literateProgs.setPrepend(
+      '{{= litProgsName }}',
+      '#1',
+      false
     )
   }
 }
@@ -270,7 +280,7 @@ local createFixLitProgs = thirddata.literateProgs.createFixLitProgs
 
 local macroBody = createFixLitProgs('Test')
 assert.isTable(macroBody)
-assert.length(macroBody, 45)
+assert.length(macroBody, 55)
 assert.isEqual(macroBody[1],  "\\let\\oldStartTest=\\startTest")
 assert.isEqual(macroBody[2],  "\\unexpanded\\def\\startTest{%")
 assert.isEqual(macroBody[3],  "  \\directlua{")
@@ -312,10 +322,20 @@ assert.isEqual(macroBody[38], "\\unexpanded\\def\\prependTest#1{%")
 assert.isEqual(macroBody[39], "  \\directlua{")
 assert.isEqual(macroBody[40], "    thirddata.literateProgs.setPrepend(")
 assert.isEqual(macroBody[41], "      'Test',")
-assert.isEqual(macroBody[42], "      '#1'")
-assert.isEqual(macroBody[43], "    )")
-assert.isEqual(macroBody[44], "  }")
-assert.isEqual(macroBody[45], "}")
+assert.isEqual(macroBody[42], "      '#1',")
+assert.isEqual(macroBody[43], "      true")
+assert.isEqual(macroBody[44], "    )")
+assert.isEqual(macroBody[45], "  }")
+assert.isEqual(macroBody[46], "}")
+assert.isEqual(macroBody[47], "\\unexpanded\\def\\appendTest#1{%")
+assert.isEqual(macroBody[48], "  \\directlua{")
+assert.isEqual(macroBody[49], "    thirddata.literateProgs.setPrepend(")
+assert.isEqual(macroBody[50], "      'Test',")
+assert.isEqual(macroBody[51], "      '#1',")
+assert.isEqual(macroBody[52], "      false")
+assert.isEqual(macroBody[53], "    )")
+assert.isEqual(macroBody[54], "  }")
+assert.isEqual(macroBody[55], "}")
 \stopLuaTest
 \stopTestCase
 
@@ -330,6 +350,8 @@ assert.isEqual(macroBody[45], "}")
   \assertDefined{stopTest}{}
   \assertDefined{createTestFile}{}
   \assertDefined{setTestStream}{}
+  \assertDefined{prependTest}{}
+  \assertDefined{appendTest}{}
 \endgroup
 \stopConTest
 \stopTestCase
@@ -383,14 +405,14 @@ end
 
 litProgs.setCodeStream = setCodeStream
 
-local function setPrepend(aCodeType, aCodeStream)
+local function setPrepend(aCodeType, aCodeStream, setValue)
   code[aCodeType]        = code[aCodeType] or { }
   local codeType         = code[aCodeType]
   aCodeStream            = aCodeStream or 'default'
   codeType.curCodeStream = aCodeStream
   codeType[aCodeStream]  = codeType[aCodeStream] or { }
   local codeStream       = codeType[aCodeStream]
-  codeStream.prepend     = true
+  codeStream.prepend     = setValue
 end
 
 litProgs.setPrepend = setPrepend
@@ -610,6 +632,35 @@ litterate programming environments.
 \setLitProgsOriginMarker[CHeader][markCHeaderOrigin]
 \setLitProgsOriginMarker[CCode][markCCodeOrigin]
 \stopMkIVCode
+
+For \type{CHeader}s, we need to create the standard \type{#include} guard. 
+We do this using the \type{\CHeaderIncludeGuard} macro as follows. 
+
+\startMkIVCode
+\def\CHeaderIncludeGuard#1#2{
+  \directlua{
+    thirddata.literateProgs.cHeaderIncludeGuard('#1', '#2')
+  }
+}
+\stopMkIVCode
+
+\startLuaCode
+local function cHeaderIncludeGuard(aCodeStream, aGuard)
+  setCodeStream('CHeader', aCodeStream)
+  markCodeOrigin('CHeader')
+  setPrepend('CHeader', aCodeStream, true)
+  local bufferContents = [=[
+#ifndef ]=]..aGuard..[=[_H
+#define ]=]..aGuard..[=[_H
+]=]
+  addCodeDefault('CHeader', bufferContents)
+  setPrepend('CHeader', aCodeStream, false)
+  bufferContents = '#endif'
+  addCodeDefault('CHeader', bufferContents)
+end
+
+thirddata.literateProgs.cHeaderIncludeGuard = cHeaderIncludeGuard
+\stopLuaCode
 
 % Do we need the following?
 
