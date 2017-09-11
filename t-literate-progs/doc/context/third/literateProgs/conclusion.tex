@@ -29,24 +29,39 @@ program creation code.
 
 \section[title=Creating module files]
 
+\addDocumentDirectory%
+  {t-literate-progs/doc/context/third/literateProgs}
+
 \createMkIVCodeFile%
   {default}%
-  {../../../../../build/t-literate-progs.mkiv}%
+  {t-literate-progs.mkiv}%
   {A ConTeXt MkIV module}
 
 \createLuaCodeFile%
   {default}%
-  {../../../../../build/t-literate-progs.lua}%
+  {t-literate-progs.lua}%
   {-- A Lua file}
 
 \createLuaTemplateFile%
   {default}%
-  {../../../../../build/t-literate-progs-templates.lua}%
+  {t-literate-progs-templates.lua}%
   {-- A Lua template file}
+
+\addMainDocument{literateProgs.tex}
+\addSubDocument{overview.tex}
+\addSubDocument{preamble.tex}
+\addSubDocument{rendering.tex}
+\addSubDocument{codeManipulation.tex}
+\addSubDocument{lakefiles.tex}
+\addSubDocument{conclusion.tex}
+\addConTeXtModuleDirectory%
+  {t-literate-progs/tex/context/third/literateProgs}
+
+\compileLakefile{default}
 
 \createLakefileFile%
   {default}%
-  {../../../../../build/lakefile}%
+  {lakefile}%
   {-- A Lua Lakefile}
-
+  
 \stopchapter

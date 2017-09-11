@@ -545,15 +545,37 @@ captures its contents using a specific addTestCodeCode Lua function.
 \stopTestCase
 
 \startLuaCode
-function litProgs.createCodeFile(aCodeType,
-                                 aCodeStream,
-                                 aFilePath,
-                                 aFileHeader)
+local function createCodeFile(aCodeType,
+                              aCodeStream,
+                              aFilePath,
+                              aFileHeader)
+  if not build.buildDir then
+    texio.write('\nERROR: document directory NOT yet defined\n')
+    texio.write('       NOT creating code file ['..aFilePath..']\n\n')
+    return
+  end
+
   local theCode = code[aCodeType]
   if #aCodeStream < 1 then aCodeStream = 'default' end
   if theCode then theCode = theCode[aCodeStream] end
-  if theCode and 0 < #aFilePath then
-    local outFile = io.open(aFilePath, 'w')
+
+  if not theCode then
+    texio.write('\nERROR: no code found for code stream ['..aCodeStream..'] and code type ['..aCodeType..']\n\n')
+    return
+  end
+  if #aFilePath < 1 then
+    texio.write('\nERROR: no file name provided for code type ['..aCodeType..']\n\n')
+    return
+  end
+
+  build.srcTargets = build.srcTargets or { }
+  tInsert(build.srcTargets, aFilePath)
+  if build.buildDir then 
+    aFilePath = build.buildDir .. '/build/' .. aFilePath
+  end
+  local outFile = io.open(aFilePath, 'w')
+  if outFile then
+    texio.write('creating code file: ['..aFilePath..']\n')
     if 0 < #aFileHeader then
       if aFileHeader:match('[Cc][Oo][Nn][Tt][Ee][Xx][Tt]') then
         outFile:write('% ')
@@ -565,8 +587,12 @@ function litProgs.createCodeFile(aCodeType,
     end
     outFile:write(tConcat(theCode, '\n\n'))
     outFile:close()
+  else
+    texio.write("\nERROR: could NOT open ["..aFilePath.."]\n")
   end
 end
+
+litProgs.createCodeFile = createCodeFile
 \stopLuaCode
 
 \stopTestSuite

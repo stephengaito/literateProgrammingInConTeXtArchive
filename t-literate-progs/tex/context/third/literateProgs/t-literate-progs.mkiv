@@ -126,14 +126,14 @@
   \fi\fi\fi%
 }
 
-% from file: codeManipulation.tex after line: 550
+% from file: codeManipulation.tex after line: 600
 
 \definetextbackground[LitProgFrame]
 \setuptextbackground%
   [LitProgFrame]%
   [location=paragraph, background=color, backgroundcolor=gray]
 
-% from file: codeManipulation.tex after line: 550
+% from file: codeManipulation.tex after line: 600
 
 \defineLitProgs%
   [MkIVCode]%
@@ -177,11 +177,45 @@
 \setLitProgsOriginMarker[CHeader][markCHeaderOrigin]
 \setLitProgsOriginMarker[CCode][markCCodeOrigin]
 
-% from file: codeManipulation.tex after line: 600
+% from file: codeManipulation.tex after line: 650
 
 \def\CHeaderIncludeGuard#1#2{
   \directlua{
     thirddata.literateProgs.cHeaderIncludeGuard('#1', '#2')
+  }
+}
+
+% from file: lakefiles.tex after line: 0
+
+\def\addMainDocument#1{
+  \directlua{
+    thirddata.literateProgs.addMainDocument('#1')
+  }
+}
+
+\def\addSubDocument#1{
+  \directlua{
+    thirddata.literateProgs.addSubDocument('#1')
+  }
+}
+
+\def\addDocumentDirectory#1{
+  \directlua{
+    thirddata.literateProgs.addDocumentDirectory('#1')
+  }
+}
+
+\def\addConTeXtModuleDirectory#1{
+  \directlua{
+    thirddata.literateProgs.addConTeXtModuleDirectory('#1')
+  }
+}
+
+% from file: lakefiles.tex after line: 50
+
+\def\compileLakefile#1{
+  \directlua{
+    thirddata.literateProgs.compileLakefile('#1')
   }
 }
 

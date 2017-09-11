@@ -24,6 +24,8 @@ code.lua         = {}
 code.templates   = {}
 code.lakefile    = {}
 code.lineModulus = 50
+litProgs.build   = {}
+local build      = litProgs.build
 
 local tInsert = table.insert
 local tRemove = table.remove
@@ -176,6 +178,8 @@ local function prettyPrint(anObj, indent)
 end
 
 litProgs.prettyPrint = prettyPrint
+
+lPPrint = prettyPrint
 
 -- from file: rendering.tex after line: 150
 
@@ -626,15 +630,37 @@ litProgs.addCode.default   = addCodeDefault
 
 -- from file: codeManipulation.tex after line: 500
 
-function litProgs.createCodeFile(aCodeType,
-                                 aCodeStream,
-                                 aFilePath,
-                                 aFileHeader)
+local function createCodeFile(aCodeType,
+                              aCodeStream,
+                              aFilePath,
+                              aFileHeader)
+  if not build.buildDir then
+    texio.write('\nERROR: document directory NOT yet defined\n')
+    texio.write('       NOT creating code file ['..aFilePath..']\n\n')
+    return
+  end
+
   local theCode = code[aCodeType]
   if #aCodeStream < 1 then aCodeStream = 'default' end
   if theCode then theCode = theCode[aCodeStream] end
-  if theCode and 0 < #aFilePath then
-    local outFile = io.open(aFilePath, 'w')
+
+  if not theCode then
+    texio.write('\nERROR: no code found for code stream ['..aCodeStream..'] and code type ['..aCodeType..']\n\n')
+    return
+  end
+  if #aFilePath < 1 then
+    texio.write('\nERROR: no file name provided for code type ['..aCodeType..']\n\n')
+    return
+  end
+
+  build.srcTargets = build.srcTargets or { }
+  tInsert(build.srcTargets, aFilePath)
+  if build.buildDir then
+    aFilePath = build.buildDir .. '/build/' .. aFilePath
+  end
+  local outFile = io.open(aFilePath, 'w')
+  if outFile then
+    texio.write('creating code file: ['..aFilePath..']\n')
     if 0 < #aFileHeader then
       if aFileHeader:match('[Cc][Oo][Nn][Tt][Ee][Xx][Tt]') then
         outFile:write('% ')
@@ -646,10 +672,14 @@ function litProgs.createCodeFile(aCodeType,
     end
     outFile:write(tConcat(theCode, '\n\n'))
     outFile:close()
+  else
+    texio.write("\nERROR: could NOT open ["..aFilePath.."]\n")
   end
 end
 
--- from file: codeManipulation.tex after line: 600
+litProgs.createCodeFile = createCodeFile
+
+-- from file: codeManipulation.tex after line: 650
 
 local function cHeaderIncludeGuard(aCodeStream, aGuard)
   setCodeStream('CHeader', aCodeStream)
@@ -666,3 +696,51 @@ local function cHeaderIncludeGuard(aCodeStream, aGuard)
 end
 
 thirddata.literateProgs.cHeaderIncludeGuard = cHeaderIncludeGuard
+
+-- from file: lakefiles.tex after line: 0
+
+local function addMainDocument(aDocument)
+  build.mainDoc = aDocument
+end
+
+litProgs.addMainDocument = addMainDocument
+
+local function addSubDocument(aDocument)
+  build.subDocs = build.subDocs or { }
+  tInsert(build.subDocs, aDocument)
+end
+
+litProgs.addSubDocument = addSubDocument
+
+local function addDocumentDirectory(aDirectory)
+  build.docDir   = aDirectory
+  build.buildDir = aDirectory:gsub('[^/]+', '..')
+end
+
+litProgs.addDocumentDirectory = addDocumentDirectory
+
+local function addConTeXtModuleDirectory(aDirectory)
+  build.contextModuleDir = aDirectory
+end
+
+litProgs.addConTeXtModuleDirectory = addConTeXtModuleDirectory
+
+-- from file: lakefiles.tex after line: 50
+
+local function compileLakefile(aCodeStream)
+  texio.write(lPPrint(build))
+  setCodeStream('Lakefile', aCodeStream)
+  markCodeOrigin('Lakefile')
+  local lfContents = {}
+  tInsert(lfContents, "local docDir = '"..build.docDir.."'")
+  tInsert(lfContents, "local moduleDir = '"..build.contextModuleDir.."'")
+  tInsert(lfContents, 'local docFiles = {')
+  tInsert(lfContents, "  '"..build.mainDoc.."',")
+  for i, aSubDoc in ipairs(build.subDocs) do
+    tInsert(lfContents, "  '"..aSubDoc.."',")
+  end
+  tInsert(lfContents, '}')
+  addCodeDefault('Lakefile', tConcat(lfContents, '\n'))
+end
+
+litProgs.compileLakefile = compileLakefile

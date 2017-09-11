@@ -1,0 +1,85 @@
+-- A Lua Lakefile
+
+--local docDir    =
+--local moduleDir =
+--local docFiles = {
+
+--local contextDoc =
+--  'cd '..docDir..' ; context literateProgs.tex '
+
+--local srcTargets = {
+--  't-literate-progs.mkiv',
+--  't-literate-progs.lua',
+--  't-literate-progs-templates.lua'
+--}
+
+local buildTargets   = { }
+local diffTargets    = { }
+local installTargets = { }
+
+for i, aTarget in ipairs(moduleTargets) do
+
+  table.insert(buildTargets, target(
+    'build/'..aTarget,
+    srcFiles,
+    contextDoc
+  ))
+
+  table.insert(diffTargets, target(
+    'diff-'..aTarget,
+    'build/'..aTarget,
+    'diff $(DEPENDS) '..moduleDir..'/'..aTarget
+  ))
+
+  table.insert(installTargets, target(
+    moduleDir..'/'..aTarget,
+    'build/'..aTarget,
+    'cp $(DEPENDS) $(TARGET)'
+  ))
+end
+
+table.insert(buildTargets, target(
+  'build/lakefile',
+  srcFiles,
+  contextDoc
+))
+
+table.insert(diffTargets, target(
+  'diff-lakefile',
+  'build/lakefile',
+  'diff $(DEPENDS) lakefile'
+))
+
+table.insert(installTargets, target(
+  'lakefile',
+  'build/lakefile',
+  'cp $(DEPENDS) $(TARGET)'
+))
+
+target('install', installTargets)
+
+target('diff', diffTargets)
+
+default(buildTargets)
+
+local docDir = t-literate-progs/doc/context/third/literateProgs
+
+local moduleDir = t-literate-progs/tex/context/third/literateProgs
+
+local docFiles = {
+
+  literateProgs.tex,
+
+  overview.tex,
+
+  preamble.tex,
+
+  rendering.tex,
+
+  codeManipulation.tex,
+
+  lakefiles.tex,
+
+  conclusion.tex,
+
+}

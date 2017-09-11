@@ -6,34 +6,97 @@ We use a slightly updated version of Steve Donovan's Lakefile tool to
 drive the creation of the various files required by any given 
 \type{t-literate-progs} managed \ConTeXt\ program. 
 
+\startMkIVCode
+\def\addMainDocument#1{
+  \directlua{
+    thirddata.literateProgs.addMainDocument('#1')
+  }
+}
+
+\def\addSubDocument#1{
+  \directlua{
+    thirddata.literateProgs.addSubDocument('#1')
+  }
+}
+
+\def\addDocumentDirectory#1{
+  \directlua{
+    thirddata.literateProgs.addDocumentDirectory('#1')
+  }
+}
+
+\def\addConTeXtModuleDirectory#1{
+  \directlua{
+    thirddata.literateProgs.addConTeXtModuleDirectory('#1')
+  }
+}
+\stopMkIVCode
+
+\startLuaCode
+local function addMainDocument(aDocument)
+  build.mainDoc = aDocument
+end
+
+litProgs.addMainDocument = addMainDocument
+
+local function addSubDocument(aDocument)
+  build.subDocs = build.subDocs or { }
+  tInsert(build.subDocs, aDocument)
+end
+
+litProgs.addSubDocument = addSubDocument
+
+local function addDocumentDirectory(aDirectory)
+  build.docDir   = aDirectory
+  build.buildDir = aDirectory:gsub('[^/]+', '..')
+end
+
+litProgs.addDocumentDirectory = addDocumentDirectory
+
+local function addConTeXtModuleDirectory(aDirectory)
+  build.contextModuleDir = aDirectory
+end
+
+litProgs.addConTeXtModuleDirectory = addConTeXtModuleDirectory
+\stopLuaCode
+
+\startMkIVCode
+\def\compileLakefile#1{
+  \directlua{
+    thirddata.literateProgs.compileLakefile('#1')
+  }
+}
+\stopMkIVCode
+
+\startLuaCode
+local function compileLakefile(aCodeStream)
+  texio.write(lPPrint(build))
+  setCodeStream('Lakefile', aCodeStream)
+  markCodeOrigin('Lakefile')
+  local lfContents = {}
+  tInsert(lfContents, "local docDir = '"..build.docDir.."'")
+  tInsert(lfContents, "local moduleDir = '"..build.contextModuleDir.."'")
+  tInsert(lfContents, 'local docFiles = {')
+  tInsert(lfContents, "  '"..build.mainDoc.."',")
+  for i, aSubDoc in ipairs(build.subDocs) do
+    tInsert(lfContents, "  '"..aSubDoc.."',")
+  end
+  tInsert(lfContents, '}')
+  addCodeDefault('Lakefile', tConcat(lfContents, '\n'))
+end
+
+litProgs.compileLakefile = compileLakefile
+\stopLuaCode
+
 \startLakefile
-local docDir    =
-  't-literate-progs/doc/context/third/literateProgs'
-local moduleDir =
-  't-literate-progs/tex/context/third/literateProgs'
-local srcFiles = {
-  docDir..'/literateProgs.tex',
-  docDir..'/overview.tex',
-  docDir..'/preamble.tex',
-  docDir..'/rendering.tex',
-  docDir..'/mkivCode.tex',
-  docDir..'/mkivTests.tex',
-  docDir..'/luaCode.tex',
-  docDir..'/luaTests.tex',
-  docDir..'/luaTemplates.tex',
-  docDir..'/luaTemplateTests.tex',
-  docDir..'/lakefiles.tex',
-  docDir..'/conclusion.tex'
-}
+--local contextDoc = 
+--  'cd '..docDir..' ; context literateProgs.tex '
 
-local contextDoc = 
-  'cd '..docDir..' ; context literateProgs.tex '
-
-local moduleTargets = {
-  't-literate-progs.mkiv',
-  't-literate-progs.lua',
-  't-literate-progs-templates.lua'
-}
+--local srcTargets = {
+--  't-literate-progs.mkiv',
+--  't-literate-progs.lua',
+--  't-literate-progs-templates.lua'
+--}
 
 local buildTargets   = { }
 local diffTargets    = { }
