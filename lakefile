@@ -1,78 +1,107 @@
 -- A Lua Lakefile
 
-local docDir    =
-  't-literate-progs/doc/context/third/literateProgs'
-local moduleDir =
-  't-literate-progs/tex/context/third/literateProgs'
-local srcFiles = {
-  docDir..'/literateProgs.tex',
-  docDir..'/overview.tex',
-  docDir..'/preamble.tex',
-  docDir..'/rendering.tex',
-  docDir..'/mkivCode.tex',
-  docDir..'/mkivTests.tex',
-  docDir..'/luaCode.tex',
-  docDir..'/luaTests.tex',
-  docDir..'/luaTemplates.tex',
-  docDir..'/luaTemplateTests.tex',
-  docDir..'/lakefiles.tex',
-  docDir..'/conclusion.tex'
+local tInsert    = table.insert
+
+local docDir     = 't-literate-progs/doc/context/third/literateProgs'
+local moduleDir  = 't-literate-progs/tex/context/third/literateProgs'
+
+local contextDoc = 'cd t-literate-progs/doc/context/third/literateProgs ; context literateProgs.tex'
+
+local docFiles = {
+  'literateProgs.tex',
+  'overview.tex',
+  'preamble.tex',
+  'rendering.tex',
+  'codeManipulation.tex',
+  'lakefiles.tex',
+  'conclusion.tex',
 }
 
-local contextDoc =
-  'cd '..docDir..' ; context literateProgs.tex '
-
-local moduleTargets = {
+local srcFiles = {
   't-literate-progs.mkiv',
   't-literate-progs.lua',
-  't-literate-progs-templates.lua'
+  't-literate-progs-templates.lua',
 }
 
-local buildTargets   = { }
-local diffTargets    = { }
-local installTargets = { }
+local buildTargets   = {}
+local diffTargets    = {}
+local installTargets = {}
 
-for i, aTarget in ipairs(moduleTargets) do
-
-  table.insert(buildTargets, target(
-    'build/'..aTarget,
-    srcFiles,
-    contextDoc
-  ))
-
-  table.insert(diffTargets, target(
-    'diff-'..aTarget,
-    'build/'..aTarget,
-    'diff $(DEPENDS) '..moduleDir..'/'..aTarget
-  ))
-
-  table.insert(installTargets, target(
-    moduleDir..'/'..aTarget,
-    'build/'..aTarget,
-    'cp $(DEPENDS) $(TARGET)'
-  ))
-end
-
-table.insert(buildTargets, target(
-  'build/lakefile',
-  srcFiles,
+tInsert(buildTargets, target(
+  'build/t-literate-progs.mkiv',
+  docFiles,
   contextDoc
 ))
 
-table.insert(diffTargets, target(
+tInsert(buildTargets, target(
+  'build/t-literate-progs.lua',
+  docFiles,
+  contextDoc
+))
+
+tInsert(buildTargets, target(
+  'build/t-literate-progs-templates.lua',
+  docFiles,
+  contextDoc
+))
+
+tInsert(diffTargets, target(
+  'diff-t-literate-progs.mkiv',
+  'build/t-literate-progs.mkiv',
+  'diff build/t-literate-progs.mkiv t-literate-progs/tex/context/third/literateProgs/t-literate-progs.mkiv'
+))
+
+tInsert(diffTargets, target(
+  'diff-t-literate-progs.lua',
+  'build/t-literate-progs.lua',
+  'diff build/t-literate-progs.lua t-literate-progs/tex/context/third/literateProgs/t-literate-progs.lua'
+))
+
+tInsert(diffTargets, target(
+  'diff-t-literate-progs-templates.lua',
+  'build/t-literate-progs-templates.lua',
+  'diff build/t-literate-progs-templates.lua t-literate-progs/tex/context/third/literateProgs/t-literate-progs-templates.lua'
+))
+
+tInsert(installTargets, target(
+  't-literate-progs/tex/context/third/literateProgs/t-literate-progs.mkiv',
+  'build/t-literate-progs.mkiv',
+  'cp build/t-literate-progs.mkiv t-literate-progs/tex/context/third/literateProgs/t-literate-progs.mkiv'
+))
+
+tInsert(installTargets, target(
+  't-literate-progs/tex/context/third/literateProgs/t-literate-progs.lua',
+  'build/t-literate-progs.lua',
+  'cp build/t-literate-progs.lua t-literate-progs/tex/context/third/literateProgs/t-literate-progs.lua'
+))
+
+tInsert(installTargets, target(
+  't-literate-progs/tex/context/third/literateProgs/t-literate-progs-templates.lua',
+  'build/t-literate-progs-templates.lua',
+  'cp build/t-literate-progs-templates.lua t-literate-progs/tex/context/third/literateProgs/t-literate-progs-templates.lua'
+))
+
+tInsert(buildTargets, target(
+  'build/lakefile',
+  docFiles,
+  contextDoc
+))
+
+tInsert(diffTargets, target(
   'diff-lakefile',
   'build/lakefile',
-  'diff $(DEPENDS) lakefile'
+  'diff build/lakefile lakefile'
 ))
 
-table.insert(installTargets, target(
+tInsert(installTargets, target(
   'lakefile',
   'build/lakefile',
-  'cp $(DEPENDS) $(TARGET)'
+ 'cp build/lakefile lakefile'
 ))
 
+
+-- some additional lake file items
+
 target('install', installTargets)
-
 target('diff', diffTargets)
-
 default(buildTargets)
