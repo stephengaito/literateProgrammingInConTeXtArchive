@@ -23,9 +23,10 @@ local srcFiles = {
   't-literate-progs-templates.lua',
 }
 
-local buildTargets   = {}
-local diffTargets    = {}
-local installTargets = {}
+-------------------------------------
+-- ADD build targets for each srcFile
+
+local buildTargets = {}
 
 tInsert(buildTargets, target(
   'build/t-literate-progs.mkiv',
@@ -44,6 +45,11 @@ tInsert(buildTargets, target(
   docFiles,
   contextDoc
 ))
+
+------------------------------------
+-- ADD diff targets for each srcFile
+
+local diffTargets = {}
 
 tInsert(diffTargets, target(
   'diff-t-literate-progs.mkiv',
@@ -63,6 +69,11 @@ tInsert(diffTargets, target(
   'diff build/t-literate-progs-templates.lua t-literate-progs/tex/context/third/literateProgs/t-literate-progs-templates.lua'
 ))
 
+---------------------------------------
+-- ADD install targets for each srcFile
+
+local installTargets = {}
+
 tInsert(installTargets, target(
   't-literate-progs/tex/context/third/literateProgs/t-literate-progs.mkiv',
   'build/t-literate-progs.mkiv',
@@ -80,6 +91,9 @@ tInsert(installTargets, target(
   'build/t-literate-progs-templates.lua',
   'cp build/t-literate-progs-templates.lua t-literate-progs/tex/context/third/literateProgs/t-literate-progs-templates.lua'
 ))
+
+-------------------------------
+-- ADD targets for the lakefile
 
 tInsert(buildTargets, target(
   'build/lakefile',

@@ -655,9 +655,7 @@ local function createCodeFile(aCodeType,
 
   build.srcTargets = build.srcTargets or { }
   tInsert(build.srcTargets, aFilePath)
-  if build.buildDir then
-    aFilePath = build.buildDir .. '/build/' .. aFilePath
-  end
+  aFilePath = build.buildDir .. '/build/' .. aFilePath
   local outFile = io.open(aFilePath, 'w')
   if outFile then
     texio.write('creating code file: ['..aFilePath..']\n')
@@ -728,6 +726,9 @@ litProgs.addConTeXtModuleDirectory = addConTeXtModuleDirectory
 -- from file: lakefiles.tex after line: 50
 
 local function addBuildTargets(lf)
+  tInsert(lf, "-------------------------------------")
+  tInsert(lf, "-- ADD build targets for each srcFile\n")
+  tInsert(lf, "local buildTargets = {}\n")
   for i, aSrcFile in ipairs(build.srcTargets) do
     tInsert(lf, "tInsert(buildTargets, target(")
     tInsert(lf, "  'build/"..aSrcFile.."',")
@@ -738,6 +739,9 @@ local function addBuildTargets(lf)
 end
 
 local function addDiffTargets(lf)
+  tInsert(lf, "------------------------------------")
+  tInsert(lf, "-- ADD diff targets for each srcFile\n")
+  tInsert(lf, "local diffTargets = {}\n")
   for i, aSrcFile in ipairs(build.srcTargets) do
     tInsert(lf, "tInsert(diffTargets, target(")
     tInsert(lf, "  'diff-"..aSrcFile.."',")
@@ -748,6 +752,9 @@ local function addDiffTargets(lf)
 end
 
 local function addInstallTargets(lf)
+  tInsert(lf, "---------------------------------------")
+  tInsert(lf, "-- ADD install targets for each srcFile\n")
+  tInsert(lf, "local installTargets = {}\n")
   for i, aSrcFile in ipairs(build.srcTargets) do
     tInsert(lf, "tInsert(installTargets, target(")
     tInsert(lf, "  '"..build.contextModuleDir.."/"..aSrcFile.."',")
@@ -758,6 +765,8 @@ local function addInstallTargets(lf)
 end
 
 local function addLakefileTargets(lf)
+  tInsert(lf, "-------------------------------")
+  tInsert(lf, "-- ADD targets for the lakefile\n")
   tInsert(lf, "tInsert(buildTargets, target(")
   tInsert(lf, "  'build/lakefile',")
   tInsert(lf, "  docFiles,")
@@ -795,9 +804,6 @@ local function compileLakefile(aCodeStream)
     tInsert(lf, "  '"..aSrcFile.."',")
   end
   tInsert(lf, '}\n')
-  tInsert(lf, "local buildTargets   = {}")
-  tInsert(lf, "local diffTargets    = {}")
-  tInsert(lf, "local installTargets = {}\n")
   addBuildTargets(lf)
   addDiffTargets(lf)
   addInstallTargets(lf)
