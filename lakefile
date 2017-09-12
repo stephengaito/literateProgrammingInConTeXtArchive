@@ -2,11 +2,6 @@
 
 local tInsert    = table.insert
 
-local docDir     = 't-literate-progs/doc/context/third/literateProgs'
-local moduleDir  = 't-literate-progs/tex/context/third/literateProgs'
-
-local contextDoc = 'cd t-literate-progs/doc/context/third/literateProgs ; context literateProgs.tex'
-
 local docFiles = {
   'literateProgs.tex',
   'overview.tex',
@@ -31,19 +26,19 @@ local buildTargets = {}
 tInsert(buildTargets, target(
   'build/t-literate-progs.mkiv',
   docFiles,
-  contextDoc
+  'cd t-literate-progs/doc/context/third/literateProgs ; context --once literateProgs.tex'
 ))
 
 tInsert(buildTargets, target(
   'build/t-literate-progs.lua',
   docFiles,
-  contextDoc
+  'cd t-literate-progs/doc/context/third/literateProgs ; context --once literateProgs.tex'
 ))
 
 tInsert(buildTargets, target(
   'build/t-literate-progs-templates.lua',
   docFiles,
-  contextDoc
+  'cd t-literate-progs/doc/context/third/literateProgs ; context --once literateProgs.tex'
 ))
 
 ------------------------------------
@@ -98,7 +93,7 @@ tInsert(installTargets, target(
 tInsert(buildTargets, target(
   'build/lakefile',
   docFiles,
-  contextDoc
+  'cd t-literate-progs/doc/context/third/literateProgs ; context --once literateProgs.tex'
 ))
 
 tInsert(diffTargets, target(
