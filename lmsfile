@@ -1,0 +1,30 @@
+-- A Lua Make System file
+
+require 'lms.litProgs'
+
+litProgs.targets{
+  mainDoc  = 'literateProgs.tex',
+  docFiles = {
+    'overview.tex',
+    'preamble.tex',
+    'rendering.tex',
+    'codeManipulation.tex',
+    'lmsfiles.tex',
+    'conclusion.tex',
+  },
+  srcFiles = {
+    't-literate-progs.mkiv',
+    't-literate-progs.lua',
+    't-literate-progs-templates.lua',
+  },
+  buildDir  = 'build',
+  docDir    = 't-literate-progs/doc/context/third/literateProgs',
+  moduleDir = 't-literate-progs/tex/context/third/literateProgs',
+}
+
+-- some additional lua make file items
+
+target{'doc',     docTargets}
+target{'diff',    diffTargets}
+target{'install', installTargets}
+target{'default', buildTargets}

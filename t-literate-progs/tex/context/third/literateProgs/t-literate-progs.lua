@@ -22,7 +22,7 @@ local code       = litProgs.code
 code.mkiv        = {}
 code.lua         = {}
 code.templates   = {}
-code.lakefile    = {}
+code.lmsfile     = {}
 code.lineModulus = 50
 litProgs.build   = {}
 local build      = litProgs.build
@@ -695,7 +695,7 @@ end
 
 thirddata.literateProgs.cHeaderIncludeGuard = cHeaderIncludeGuard
 
--- from file: lakefiles.tex after line: 0
+-- from file: lmsfiles.tex after line: 0
 
 local function addMainDocument(aDocument)
   build.mainDoc = aDocument
@@ -723,96 +723,39 @@ end
 
 litProgs.addConTeXtModuleDirectory = addConTeXtModuleDirectory
 
--- from file: lakefiles.tex after line: 50
+-- from file: lmsfiles.tex after line: 50
 
-local function addBuildTargets(lf)
-  tInsert(lf, "-------------------------------------")
-  tInsert(lf, "-- ADD build targets for each srcFile\n")
-  tInsert(lf, "local buildTargets = {}\n")
-  for i, aSrcFile in ipairs(build.srcTargets) do
-    tInsert(lf, "tInsert(buildTargets, target(")
-    tInsert(lf, "  'build/"..aSrcFile.."',")
-    tInsert(lf, "  docFiles,")
-    tInsert(lf, "  'cd "..build.docDir.." ; context --once "..build.mainDoc.."'")
-    tInsert(lf, "))\n")
-  end
-end
-
-local function addDiffTargets(lf)
-  tInsert(lf, "------------------------------------")
-  tInsert(lf, "-- ADD diff targets for each srcFile\n")
-  tInsert(lf, "local diffTargets = {}\n")
-  for i, aSrcFile in ipairs(build.srcTargets) do
-    tInsert(lf, "tInsert(diffTargets, target(")
-    tInsert(lf, "  'diff-"..aSrcFile.."',")
-    tInsert(lf, "  'build/"..aSrcFile.."',")
-    tInsert(lf, "  'diff build/"..aSrcFile.." "..build.contextModuleDir.."/"..aSrcFile.."'")
-    tInsert(lf, "))\n")
-  end
-end
-
-local function addInstallTargets(lf)
-  tInsert(lf, "---------------------------------------")
-  tInsert(lf, "-- ADD install targets for each srcFile\n")
-  tInsert(lf, "local installTargets = {}\n")
-  for i, aSrcFile in ipairs(build.srcTargets) do
-    tInsert(lf, "tInsert(installTargets, target(")
-    tInsert(lf, "  '"..build.contextModuleDir.."/"..aSrcFile.."',")
-    tInsert(lf, "  'build/"..aSrcFile.."',")
-    tInsert(lf, "  'cp build/"..aSrcFile.." "..build.contextModuleDir.."/"..aSrcFile.."'")
-    tInsert(lf, "))\n")
-  end
-end
-
-local function addLakefileTargets(lf)
-  tInsert(lf, "-------------------------------")
-  tInsert(lf, "-- ADD targets for the lakefile\n")
-  tInsert(lf, "tInsert(buildTargets, target(")
-  tInsert(lf, "  'build/lakefile',")
-  tInsert(lf, "  docFiles,")
-  tInsert(lf, "  'cd "..build.docDir.." ; context --once "..build.mainDoc.."'")
-  tInsert(lf, "))\n")
-  tInsert(lf, "tInsert(diffTargets, target(")
-  tInsert(lf, "  'diff-lakefile',")
-  tInsert(lf, "  'build/lakefile',")
-  tInsert(lf, "  'diff build/lakefile lakefile'")
-  tInsert(lf, "))\n")
-  tInsert(lf, "tInsert(installTargets, target(")
-  tInsert(lf, "  'lakefile',")
-  tInsert(lf, "  'build/lakefile',")
-  tInsert(lf, " 'cp build/lakefile lakefile'")
-  tInsert(lf, "))\n")
-end
-
-local function compileLakefile(aCodeStream)
+local function compileLmsfile(aCodeStream)
   texio.write(lPPrint(build))
-  setCodeStream('Lakefile', aCodeStream)
-  markCodeOrigin('Lakefile')
-  local lf = {}
-  tInsert(lf, "local tInsert    = table.insert\n")
-  tInsert(lf, 'local docFiles = {')
-  tInsert(lf, "  '"..build.mainDoc.."',")
+  setCodeStream('Lmsfile', aCodeStream)
+  markCodeOrigin('Lmsfile')
+  local lmsfile = {}
+  tInsert(lmsfile, "require 'lms.litProgs'\n")
+  tInsert(lmsfile, "litProgs.targets{")
+  tInsert(lmsfile, "  mainDoc  = '"..build.mainDoc.."',")
+  tInsert(lmsfile, "  docFiles = {")
   for i, aSubDoc in ipairs(build.subDocs) do
-    tInsert(lf, "  '"..aSubDoc.."',")
+    tInsert(lmsfile, "    '"..aSubDoc.."',")
   end
-  tInsert(lf, '}\n')
-  tInsert(lf, "local srcFiles = {")
+  tInsert(lmsfile, "  },")
+  tInsert(lmsfile, "  srcFiles = {")
   for i, aSrcFile in ipairs(build.srcTargets) do
-    tInsert(lf, "  '"..aSrcFile.."',")
+    tInsert(lmsfile, "    '"..aSrcFile.."',")
   end
-  tInsert(lf, '}\n')
-  addBuildTargets(lf)
-  addDiffTargets(lf)
-  addInstallTargets(lf)
-  addLakefileTargets(lf)
-  setPrepend('Lakefile', aCodeStream, true)
-  addCodeDefault('Lakefile', tConcat(lf, '\n'))
-  lf = {}
-  tInsert(lf, "target('install', installTargets)")
-  tInsert(lf, "target('diff', diffTargets)")
-  tInsert(lf, "default(buildTargets)")
-  setPrepend('Lakefile', aCodeStream, false)
-  addCodeDefault('Lakefile', tConcat(lf, '\n'))
+  tInsert(lmsfile, "  },")
+  tInsert(lmsfile, "  buildDir  = 'build',")
+  tInsert(lmsfile, "  docDir    = '"..build.docDir.."',")
+  tInsert(lmsfile, "  moduleDir = '"..build.contextModuleDir.."',")
+  tInsert(lmsfile, "}")
+  setPrepend('Lmsfile', aCodeStream, true)
+  addCodeDefault('Lmsfile', tConcat(lmsfile, '\n'))
+  lmsfile = {}
+  tInsert(lmsfile, "target{'doc',     docTargets}")
+  tInsert(lmsfile, "target{'diff',    diffTargets}")
+  tInsert(lmsfile, "target{'install', installTargets}")
+  tInsert(lmsfile, "target{'default', buildTargets}")
+  setPrepend('Lmsfile', aCodeStream, false)
+  addCodeDefault('Lmsfile', tConcat(lmsfile, '\n'))
 end
 
-litProgs.compileLakefile = compileLakefile
+litProgs.compileLmsfile = compileLmsfile

@@ -52,16 +52,16 @@ program creation code.
 \addSubDocument{preamble.tex}
 \addSubDocument{rendering.tex}
 \addSubDocument{codeManipulation.tex}
-\addSubDocument{lakefiles.tex}
+\addSubDocument{lmsfiles.tex}
 \addSubDocument{conclusion.tex}
 \addConTeXtModuleDirectory%
   {t-literate-progs/tex/context/third/literateProgs}
 
-\compileLakefile{default}
+\compileLmsfile{default}
 
-\createLakefileFile%
+\createLmsfileFile%
   {default}%
-  {lakefile}%
-  {-- A Lua Lakefile}
+  {lmsfile}%
+  {-- A Lua Make System file}
   
 \stopchapter

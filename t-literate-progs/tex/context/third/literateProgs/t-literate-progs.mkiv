@@ -166,7 +166,7 @@
   ]
 
 \defineLitProgs%
-  [Lakefile]%
+  [Lmsfile]%
   [option=lua, numbering=line,
     before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
   ]
@@ -185,7 +185,7 @@
   }
 }
 
-% from file: lakefiles.tex after line: 0
+% from file: lmsfiles.tex after line: 0
 
 \def\addMainDocument#1{
   \directlua{
@@ -211,11 +211,11 @@
   }
 }
 
-% from file: lakefiles.tex after line: 50
+% from file: lmsfiles.tex after line: 50
 
-\def\compileLakefile#1{
+\def\compileLmsfile#1{
   \directlua{
-    thirddata.literateProgs.compileLakefile('#1')
+    thirddata.literateProgs.compileLmsfile('#1')
   }
 }
 

@@ -22,7 +22,7 @@ local templates         = litProgs.templates
 templates.mkiv          = {}
 templates.lua           = {}
 templates.templates     = {}
-templates.lakefile      = {}
+templates.lmsfile       = {}
 templates.litProgsTable = {}
 
 local table_insert = table.insert
