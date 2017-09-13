@@ -156,9 +156,9 @@ of files which can then be compiled using appropriate compilers.
 creates the code files which together implement the programming artefact 
 being described. It also creates Lunatest files with which to actively 
 test the implementation described in the code fragments. Finally, the 
-\type{t-literate-progs} module creates the Lua Lakefiles required to 
-orchestrate the overall creation, compilation, testing and installation of 
-the described module. 
+\type{t-literate-progs} module creates the Lua Make System files required 
+to orchestrate the overall creation, compilation, testing and installation 
+of the described module. 
 
 To capture a given programming artefact, we need, at the very least, 
 \type{typing} environments which capture the code as well as associated 
@@ -171,12 +171,9 @@ environments:
 
 \startitemize
   \item MkIV code
-  \item MkIV tests
   \item Lua code
-  \item Lua tests
   \item Lua templates
-  \item Lua template tests
-  \item Lakefiles
+  \item Lmsfiles
 \stopitemize 
 
 \stopchapter 
