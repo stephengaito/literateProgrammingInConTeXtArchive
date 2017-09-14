@@ -710,6 +710,13 @@ end
 
 litProgs.addSubDocument = addSubDocument
 
+local function ensureDirectoryExists(newDirectory)
+  build.existingDirs = build.existingDirs or { }
+  tInsert(build.existingDirs, newDirectory)
+end
+
+litProgs.ensureDirectoryExists = ensureDirectoryExists
+
 local function addDocumentDirectory(aDirectory)
   build.docDir   = aDirectory
   build.buildDir = aDirectory:gsub('[^/]+', '..')
@@ -730,6 +737,14 @@ local function compileLmsfile(aCodeStream)
   setCodeStream('Lmsfile', aCodeStream)
   markCodeOrigin('Lmsfile')
   local lmsfile = {}
+  tInsert(lmsfile, "lfs = require 'lfs'\n")
+  tInsert(lmsfile, "lfs.mkdir('build')")
+  if build.existingDirs then
+    for i, aNewDir in ipairs(build.existingDirs) do
+      tInsert(lmsfile, "lfs.mkdir('"..aNewDir.."')")
+    end
+  end
+  tInsert(lmsfile, "")
   tInsert(lmsfile, "require 'lms.litProgs'\n")
   tInsert(lmsfile, "litProgs.targets{")
   tInsert(lmsfile, "  mainDoc  = '"..build.mainDoc.."',")
@@ -745,7 +760,9 @@ local function compileLmsfile(aCodeStream)
   tInsert(lmsfile, "  },")
   tInsert(lmsfile, "  buildDir  = 'build',")
   tInsert(lmsfile, "  docDir    = '"..build.docDir.."',")
-  tInsert(lmsfile, "  moduleDir = '"..build.contextModuleDir.."',")
+  if build.contextModuleDir then
+    tInsert(lmsfile, "  moduleDir = '"..build.contextModuleDir.."',")
+  end
   tInsert(lmsfile, "}")
   setPrepend('Lmsfile', aCodeStream, true)
   addCodeDefault('Lmsfile', tConcat(lmsfile, '\n'))

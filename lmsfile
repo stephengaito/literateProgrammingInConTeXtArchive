@@ -1,5 +1,9 @@
 -- A Lua Make System file
 
+lfs = require 'lfs'
+
+lfs.mkdir('build')
+
 require 'lms.litProgs'
 
 litProgs.targets{
