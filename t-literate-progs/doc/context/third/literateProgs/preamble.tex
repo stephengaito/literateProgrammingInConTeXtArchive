@@ -84,14 +84,14 @@ thirddata               = thirddata               or {}
 thirddata.literateProgs = thirddata.literateProgs or {}
 
 local litProgs   = thirddata.literateProgs
-litProgs.code    = {}
+litProgs.code    = litProgs.code or {}
 local code       = litProgs.code
 code.mkiv        = {}
 code.lua         = {}
 code.templates   = {}
 code.lmsfile     = {}
 code.lineModulus = 50
-litProgs.build   = {}
+litProgs.build   = litProgs.build or {}
 local build      = litProgs.build
 
 local tInsert = table.insert
