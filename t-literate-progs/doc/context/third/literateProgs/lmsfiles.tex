@@ -87,6 +87,8 @@ local function compileLmsfile(aCodeStream)
   setCodeStream('Lmsfile', aCodeStream)
   markCodeOrigin('Lmsfile')
   local lmsfile = {}
+  tInsert(lmsfile, "local tConcat = table.concat")
+  tInsert(lmsfile, "local tInsert = table.insert\n")
   tInsert(lmsfile, "lfs = require 'lfs'\n")
   tInsert(lmsfile, "lfs.mkdir('build')")
   if build.existingDirs then
