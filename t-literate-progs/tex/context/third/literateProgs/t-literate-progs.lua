@@ -739,6 +739,9 @@ local function compileLmsfile(aCodeStream)
   local lmsfile = {}
   tInsert(lmsfile, "lfs = require 'lfs'\n")
   tInsert(lmsfile, "lfs.mkdir('build')")
+  tInsert(lmsfile, "lfs.mkdir('build/joylol')")
+  tInsert(lmsfile, "lfs.mkdir('install')")
+  tInsert(lmsfile, "lfs.mkdir('install/joylol')")
   if build.existingDirs then
     for i, aNewDir in ipairs(build.existingDirs) do
       tInsert(lmsfile, "lfs.mkdir('"..aNewDir.."')")
