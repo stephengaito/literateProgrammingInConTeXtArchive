@@ -83,19 +83,14 @@ litProgs.addConTeXtModuleDirectory = addConTeXtModuleDirectory
 
 \startLuaCode
 local function compileLmsfile(aCodeStream)
-  texio.write(lPPrint(build))
+  build.existingDirs = build.existingDirs or { }
+  tInsert(build.existingDirs, 1, 'build')
   setCodeStream('Lmsfile', aCodeStream)
   markCodeOrigin('Lmsfile')
   local lmsfile = {}
   tInsert(lmsfile, "lfs = require 'lfs'\n")
-  tInsert(lmsfile, "lfs.mkdir('build')")
-  tInsert(lmsfile, "lfs.mkdir('build/joylol')")
-  tInsert(lmsfile, "lfs.mkdir('install')")
-  tInsert(lmsfile, "lfs.mkdir('install/joylol')")
-  if build.existingDirs then
-    for i, aNewDir in ipairs(build.existingDirs) do
-      tInsert(lmsfile, "lfs.mkdir('"..aNewDir.."')")
-    end
+  for i, aNewDir in ipairs(build.existingDirs) do
+    tInsert(lmsfile, "lfs.mkdir('"..aNewDir.."')")
   end
   tInsert(lmsfile, "")
   tInsert(lmsfile, "require 'lms.litProgs'\n")
@@ -118,13 +113,6 @@ local function compileLmsfile(aCodeStream)
   end
   tInsert(lmsfile, "}")
   setPrepend('Lmsfile', aCodeStream, true)
-  addCodeDefault('Lmsfile', tConcat(lmsfile, '\n'))
-  lmsfile = {}
-  tInsert(lmsfile, "target{'doc',     docTargets}")
-  tInsert(lmsfile, "target{'diff',    diffTargets}")
-  tInsert(lmsfile, "target{'install', installTargets}")
-  tInsert(lmsfile, "target{'default', buildTargets}")
-  setPrepend('Lmsfile', aCodeStream, false)
   addCodeDefault('Lmsfile', tConcat(lmsfile, '\n'))
 end
 

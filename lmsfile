@@ -27,8 +27,3 @@ litProgs.targets{
 }
 
 -- some additional lua make file items
-
-target{'doc',     docTargets}
-target{'diff',    diffTargets}
-target{'install', installTargets}
-target{'default', buildTargets}
