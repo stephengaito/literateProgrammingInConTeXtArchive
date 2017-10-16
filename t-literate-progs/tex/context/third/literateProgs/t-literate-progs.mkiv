@@ -217,7 +217,19 @@
   }
 }
 
-% from file: lmsfiles.tex after line: 50
+\def\addCCodeLibDirectory#1{%
+  \directlua{
+    thirddata.literateProgs.addCCodeLibDirectory('#1')
+  }
+}
+
+\def\addCCodeLib#1{%
+  \directlua{
+    thirddata.literateProgs.addCCodeLib('#1')
+  }
+}
+
+% from file: lmsfiles.tex after line: 100
 
 \def\compileLmsfile#1{
   \directlua{

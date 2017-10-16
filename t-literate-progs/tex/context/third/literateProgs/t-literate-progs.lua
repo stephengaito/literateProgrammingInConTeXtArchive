@@ -695,7 +695,7 @@ end
 
 thirddata.literateProgs.cHeaderIncludeGuard = cHeaderIncludeGuard
 
--- from file: lmsfiles.tex after line: 0
+-- from file: lmsfiles.tex after line: 50
 
 local function addMainDocument(aDocument)
   build.mainDoc = aDocument
@@ -730,7 +730,21 @@ end
 
 litProgs.addConTeXtModuleDirectory = addConTeXtModuleDirectory
 
--- from file: lmsfiles.tex after line: 50
+local function addCCodeLibDirectory(aDirectory)
+  build.cCodeLibDirs = build.cCodeLibDirs or { }
+  tInsert(build.cCodeLibDirs, aDirectory)
+end
+
+litProgs.addCCodeLibDirectory = addCCodeLibDirectory
+
+local function addCCodeLib(aLib)
+  build.cCodeLibs = build.cCodeLibs or { }
+  tInsert(build.cCodeLibs, aLib)
+end
+
+litProgs.addCCodeLib = addCCodeLib
+
+-- from file: lmsfiles.tex after line: 100
 
 local function compileLmsfile(aCodeStream)
   build.existingDirs = build.existingDirs or { }
@@ -756,6 +770,20 @@ local function compileLmsfile(aCodeStream)
     tInsert(lmsfile, "    '"..aSrcFile.."',")
   end
   tInsert(lmsfile, "  },")
+  if build.cCodeLibDirs then
+    tInsert(lmsfile, "  cCodeLibDirs = {")
+    for i, aLibDir in ipairs(build.cCodeLibDirs) do
+      tInsert(lmsfile, "    '"..aLibDir.."',")
+    end
+    tInsert(lmsfile, "  },")
+  end
+  if build.cCodeLibs then
+    tInsert(lmsfile, "  cCodeLibs = {")
+    for i, aLib in ipairs(build.cCodeLibs) do
+      tInsert(lmsfile, "    '"..aLib.."',")
+    end
+    tInsert(lmsfile, "  },")
+  end
   tInsert(lmsfile, "  buildDir  = 'build',")
   tInsert(lmsfile, "  docDir    = '"..build.docDir.."',")
   if build.contextModuleDir then

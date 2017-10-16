@@ -36,6 +36,18 @@ drive the creation of the various files required by any given
     thirddata.literateProgs.addConTeXtModuleDirectory('#1')
   }
 }
+
+\def\addCCodeLibDirectory#1{%
+  \directlua{
+    thirddata.literateProgs.addCCodeLibDirectory('#1')
+  }
+}
+
+\def\addCCodeLib#1{%
+  \directlua{
+    thirddata.literateProgs.addCCodeLib('#1')
+  }
+}
 \stopMkIVCode
 
 \startLuaCode
@@ -71,6 +83,20 @@ local function addConTeXtModuleDirectory(aDirectory)
 end
 
 litProgs.addConTeXtModuleDirectory = addConTeXtModuleDirectory
+
+local function addCCodeLibDirectory(aDirectory)
+  build.cCodeLibDirs = build.cCodeLibDirs or { }
+  tInsert(build.cCodeLibDirs, aDirectory)
+end
+
+litProgs.addCCodeLibDirectory = addCCodeLibDirectory
+
+local function addCCodeLib(aLib)
+  build.cCodeLibs = build.cCodeLibs or { }
+  tInsert(build.cCodeLibs, aLib)
+end
+
+litProgs.addCCodeLib = addCCodeLib
 \stopLuaCode
 
 \startMkIVCode
@@ -106,6 +132,20 @@ local function compileLmsfile(aCodeStream)
     tInsert(lmsfile, "    '"..aSrcFile.."',")
   end
   tInsert(lmsfile, "  },")
+  if build.cCodeLibDirs then 
+    tInsert(lmsfile, "  cCodeLibDirs = {")
+    for i, aLibDir in ipairs(build.cCodeLibDirs) do
+      tInsert(lmsfile, "    '"..aLibDir.."',")
+    end
+    tInsert(lmsfile, "  },")
+  end
+  if build.cCodeLibs then 
+    tInsert(lmsfile, "  cCodeLibs = {")
+    for i, aLib in ipairs(build.cCodeLibs) do
+      tInsert(lmsfile, "    '"..aLib.."',")
+    end
+    tInsert(lmsfile, "  },")
+  end
   tInsert(lmsfile, "  buildDir  = 'build',")
   tInsert(lmsfile, "  docDir    = '"..build.docDir.."',")
   if build.contextModuleDir then
