@@ -65,6 +65,8 @@ end
 litProgs.addSubDocument = addSubDocument
 
 local function ensureDirectoryExists(newDirectory)
+  newDirectory =
+    newDirectory:gsub('<HOME>', os.getenv('HOME'))
   build.existingDirs = build.existingDirs or { }
   tInsert(build.existingDirs, newDirectory)
 end
