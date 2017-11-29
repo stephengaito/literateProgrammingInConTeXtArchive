@@ -364,11 +364,9 @@ collection of lua functions and code fragments respectively.
 \startLuaCode
 local function setOriginMarker(aCodeType, aCodeStream, anOriginMarker)
   if type(litProgs[anOriginMarker]) == 'function' then
-    code[aCodeType] = code[aCodeType] or { }
-    local codeType  = code[aCodeType]
+    local codeType  = setDefs(code, aCodeType)
     if aCodeStream then
-      codeType[aCodeStream] = codeType[aCodeStream] or { }
-      local codeStream = codeType[aCodeStream]
+      local codeStream = setDefs(codeType, aCodeStream)
       codeStream['markOrigin'] = litProgs[anOriginMarker]
     else
       codeType['markOrigin'] = litProgs[anOriginMarker]
@@ -379,12 +377,9 @@ end
 litProgs.setOriginMarker = setOriginMarker
 
 local function markCodeOrigin(aCodeType)
-  code[aCodeType]        = code[aCodeType] or { }
-  local codeType         = code[aCodeType]
-  codeType.curCodeStream = codeType.curCodeStream or 'default'
-  local aCodeStream      = codeType.curCodeStream
-  codeType[aCodeStream]  = codeType[aCodeStream] or { }
-  local codeStream       = codeType[aCodeStream]
+  local codeType         = setDefs(code, aCodeType)
+  local aCodeStream      = setDefs(codeType, 'curCodeStream', 'default')
+  local codeStream       = setDefs(codeType, aCodeStream)
   codeStream.fileName    = status.filename
   codeStream.startLine   = status.linenumber
   tex.print({
@@ -397,8 +392,7 @@ end
 litProgs.markCodeOrigin = markCodeOrigin
 
 local function setCodeStream(aCodeType, aCodeStream)
-  code[aCodeType]        = code[aCodeType] or { }
-  local codeType         = code[aCodeType]
+  local codeType         = setDefs(code, aCodeType)
   aCodeStream            = aCodeStream or 'default'
   codeType.curCodeStream = aCodeStream
 end
@@ -406,12 +400,10 @@ end
 litProgs.setCodeStream = setCodeStream
 
 local function setPrepend(aCodeType, aCodeStream, setValue)
-  code[aCodeType]        = code[aCodeType] or { }
-  local codeType         = code[aCodeType]
+  local codeType         = setDefs(code, aCodeType)
   aCodeStream            = aCodeStream or 'default'
   codeType.curCodeStream = aCodeStream
-  codeType[aCodeStream]  = codeType[aCodeStream] or { }
-  local codeStream       = codeType[aCodeStream]
+  local codeStream       = setDefs(codeType, aCodeStream)
   codeStream.prepend     = setValue
 end
 
@@ -429,11 +421,9 @@ local function addCodeDispatcher(aCodeType, bufferName)
 end
 
 local function addCodeDefault(aCodeType, bufferContents)
-  code[aCodeType]       = code[aCodeType] or { }
-  local codeType        = code[aCodeType]
-  local aCodeStream     = codeType.curCodeStream or 'default'
-  codeType[aCodeStream] = codeType[aCodeStream] or { }
-  local codeStream      = codeType[aCodeStream]
+  local codeType        = setDefs(code, aCodeType)
+  local aCodeStream     = setDefs(codeType, 'curCodeStream', 'default')
+  local codeStream      = setDefs(codeType, aCodeStream)
 
   local codeOrigin      = nil
     if type(codeStream['markOrigin']) == 'function' then

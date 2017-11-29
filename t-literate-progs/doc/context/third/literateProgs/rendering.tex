@@ -433,11 +433,9 @@ template if it exists.
 
 \startLuaCode
 local function navigateToTemplate(templatePath)
-  litProgs.templates = litProgs.templates or { }
-  local curTable = litProgs.templates
+  local curTable = setDefs(litProgs, 'templates')
   for i, templateDir in ipairs(templatePath) do
-    curTable[templateDir] = curTable[templateDir] or { }
-    curTable = curTable[templateDir]
+    curTable = setDefs(curTable, templateDir)
   end
   return curTable
 end
