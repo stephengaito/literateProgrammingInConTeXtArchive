@@ -136,6 +136,55 @@ litProgs.setDefs = setDefs
 \stopTestCase
 \stopTestSuite
 
+\startTestSuite[shouldExist]
+
+\startLuaCode
+local function shouldExist(varVal, selector, errorMessage)
+  local pp = require 'pl.pretty'
+  texio.write_nl(pp.write(varVal))
+  if not varVal[selector] then
+    if not errorMessage then
+      errorMessage = selector..' was not found but is required'
+    end
+    if type(errorMessage) == 'table' then
+      errorMessage = tConcat(errorMessage)
+    end
+    error(errorMessage)
+  end  
+end
+
+litProgs.shouldExist = shouldExist
+
+\stopLuaCode
+
+\startTestCase[should succeed if selector exists]
+\startLuaTest
+  local shouldExist = thirddata.literateProgs.shouldExist
+  local aVar = { }
+  aVar.aSelector = 'something'
+  assert.throwsNoError(
+    shouldExist,
+    'aSelector should exist',
+    aVar,
+    'aSelector'
+  )
+\stopLuaTest
+\stopTestCase
+
+\startTestCase[should require selector]
+\startLuaTest
+  local shouldExist = thirddata.literateProgs.shouldExist
+  local aVar = { }
+  assert.throwsError(
+    shouldExist,
+    'aSelector should NOT exist',
+    aVar,
+    'aSelector'
+  )
+\stopLuaTest
+\stopTestCase
+\stopTestSuite
+
 \startLuaCode
 local function markMkIVCodeOrigin()
   local codeType       = setDefs(code, 'MkIVCode')

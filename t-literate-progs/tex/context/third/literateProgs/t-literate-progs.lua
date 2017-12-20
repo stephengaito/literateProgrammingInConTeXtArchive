@@ -49,6 +49,24 @@ litProgs.setDefs = setDefs
 
 -- from file: preamble.tex after line: 100
 
+local function shouldExist(varVal, selector, errorMessage)
+  local pp = require 'pl.pretty'
+  texio.write_nl(pp.write(varVal))
+  if not varVal[selector] then
+    if not errorMessage then
+      errorMessage = selector..' was not found but is required'
+    end
+    if type(errorMessage) == 'table' then
+      errorMessage = tConcat(errorMessage)
+    end
+    error(errorMessage)
+  end
+end
+
+litProgs.shouldExist = shouldExist
+
+-- from file: preamble.tex after line: 150
+
 local function markMkIVCodeOrigin()
   local codeType       = setDefs(code, 'MkIVCode')
   local codeStream     = setDefs(codeType, 'curCodeStream', 'default')
