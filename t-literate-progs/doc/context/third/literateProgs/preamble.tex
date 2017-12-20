@@ -150,7 +150,8 @@ local function shouldExist(varVal, selector, errorMessage)
       errorMessage = tConcat(errorMessage)
     end
     error(errorMessage)
-  end  
+  end
+  return varVal[selector]
 end
 
 litProgs.shouldExist = shouldExist

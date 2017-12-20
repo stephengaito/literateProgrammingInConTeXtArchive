@@ -61,6 +61,7 @@ local function shouldExist(varVal, selector, errorMessage)
     end
     error(errorMessage)
   end
+  return varVal[selector]
 end
 
 litProgs.shouldExist = shouldExist
