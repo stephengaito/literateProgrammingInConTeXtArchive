@@ -50,8 +50,6 @@ litProgs.setDefs = setDefs
 -- from file: preamble.tex after line: 100
 
 local function shouldExist(varVal, selector, errorMessage)
-  local pp = require 'pl.pretty'
-  texio.write_nl(pp.write(varVal))
   if not varVal[selector] then
     if not errorMessage then
       errorMessage = selector..' was not found but is required'
