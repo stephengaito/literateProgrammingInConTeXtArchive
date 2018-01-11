@@ -535,6 +535,14 @@ captures its contents using a specific addTestCodeCode Lua function.
 \stopTestCase
 
 \startLuaCode
+
+build.srcTypes = build.srcTypes or { }
+build.srcTypes['MkIVCode'] = 'ctxModule'
+build.srcTypes['LuaCode']  = 'ctxModule'
+build.srcTypes['CHeader']  = 'cHeader'
+build.srcTypes['CCode']    = 'cCode'
+build.srcTypes['Lmsfile']  = 'lmsfile'
+
 local function createCodeFile(aCodeType,
                               aCodeStream,
                               aFilePath,
@@ -559,7 +567,13 @@ local function createCodeFile(aCodeType,
   end
 
   build.srcTargets = build.srcTargets or { }
-  tInsert(build.srcTargets, aFilePath)
+  local srcTargets = build.srcTargets
+
+  local srcType       = build.srcTypes[aCodeType] or 'default'
+  srcTargets[srcType] = srcTargets[srcType] or { }
+
+  tInsert(srcTargets[srcType], aFilePath)
+
   aFilePath = build.buildDir .. '/build/' .. aFilePath
   local outFile = io.open(aFilePath, 'w')
   if outFile then

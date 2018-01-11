@@ -635,6 +635,13 @@ litProgs.addCode.default   = addCodeDefault
 
 -- from file: codeManipulation.tex after line: 500
 
+build.srcTypes = build.srcTypes or { }
+build.srcTypes['MkIVCode'] = 'ctxModule'
+build.srcTypes['LuaCode']  = 'ctxModule'
+build.srcTypes['CHeader']  = 'cHeader'
+build.srcTypes['CCode']    = 'cCode'
+build.srcTypes['Lmsfile']  = 'lmsfile'
+
 local function createCodeFile(aCodeType,
                               aCodeStream,
                               aFilePath,
@@ -659,7 +666,13 @@ local function createCodeFile(aCodeType,
   end
 
   build.srcTargets = build.srcTargets or { }
-  tInsert(build.srcTargets, aFilePath)
+  local srcTargets = build.srcTargets
+
+  local srcType       = build.srcTypes[aCodeType] or 'default'
+  srcTargets[srcType] = srcTargets[srcType] or { }
+
+  tInsert(srcTargets[srcType], aFilePath)
+
   aFilePath = build.buildDir .. '/build/' .. aFilePath
   local outFile = io.open(aFilePath, 'w')
   if outFile then
@@ -765,38 +778,44 @@ local function compileLmsfile(aCodeStream)
   end
   tInsert(lmsfile, "")
   tInsert(lmsfile, "require 'lms.litProgs'\n")
-  tInsert(lmsfile, "litProgs.targets{")
+  tInsert(lmsfile, "lpTargets = litProgs.targets{")
   tInsert(lmsfile, "  mainDoc  = '"..build.mainDoc.."',")
   tInsert(lmsfile, "  docFiles = {")
   for i, aSubDoc in ipairs(build.subDocs) do
     tInsert(lmsfile, "    '"..aSubDoc.."',")
   end
   tInsert(lmsfile, "  },")
-  tInsert(lmsfile, "  srcFiles = {")
-  for i, aSrcFile in ipairs(build.srcTargets) do
-    tInsert(lmsfile, "    '"..aSrcFile.."',")
-  end
-  tInsert(lmsfile, "  },")
-  if build.cCodeLibDirs then
-    tInsert(lmsfile, "  cCodeLibDirs = {")
-    for i, aLibDir in ipairs(build.cCodeLibDirs) do
-      tInsert(lmsfile, "    '"..aLibDir.."',")
-    end
-    tInsert(lmsfile, "  },")
-  end
-  if build.cCodeLibs then
-    tInsert(lmsfile, "  cCodeLibs = {")
-    for i, aLib in ipairs(build.cCodeLibs) do
-      tInsert(lmsfile, "    '"..aLib.."',")
-    end
-    tInsert(lmsfile, "  },")
-  end
-  tInsert(lmsfile, "  buildDir  = 'build',")
+--  if build.cCodeLibDirs then
+--    tInsert(lmsfile, "  cCodeLibDirs = {")
+--    for i, aLibDir in ipairs(build.cCodeLibDirs) do
+--      tInsert(lmsfile, "    '"..aLibDir.."',")
+--    end
+--    tInsert(lmsfile, "  },")
+--  end
+--  if build.cCodeLibs then
+--    tInsert(lmsfile, "  cCodeLibs = {")
+--    for i, aLib in ipairs(build.cCodeLibs) do
+--      tInsert(lmsfile, "    '"..aLib.."',")
+--    end
+--    tInsert(lmsfile, "  },")
+--  end
   tInsert(lmsfile, "  docDir    = '"..build.docDir.."',")
-  if build.contextModuleDir then
-    tInsert(lmsfile, "  moduleDir = '"..build.contextModuleDir.."',")
-  end
   tInsert(lmsfile, "}")
+  if build.srcTargets.ctxModule and 0 < #build.srcTargets.ctxModule then
+    tInsert(lmsfile, "")
+    tInsert(lmsfile, "require 'lms.contextMod'")
+    tInsert(lmsfile, "")
+    tInsert(lmsfile, "contextMod.targets(lpTargets, {")
+      tInsert(lmsfile, "  moduleFiles = {")
+      for i, aModFile in ipairs(build.srcTargets.ctxModule) do
+        tInsert(lmsfile, "    '"..aModFile.."',")
+      end
+      tInsert(lmsfile, "  },")
+      if build.contextModuleDir then
+        tInsert(lmsfile, "  moduleDir = '"..build.contextModuleDir.."',")
+      end
+    tInsert(lmsfile, "})")
+  end
   setPrepend('Lmsfile', aCodeStream, true)
   addCodeDefault('Lmsfile', tConcat(lmsfile, '\n'))
 end
