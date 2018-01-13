@@ -767,12 +767,11 @@ litProgs.addCCodeLib = addCCodeLib
 -- from file: lmsfiles.tex after line: 100
 
 local function compileLmsfile(aCodeStream)
-  build.existingDirs = build.existingDirs or { }
-  tInsert(build.existingDirs, 1, 'build')
   setCodeStream('Lmsfile', aCodeStream)
   markCodeOrigin('Lmsfile')
   local lmsfile = {}
   tInsert(lmsfile, "lfs = require 'lfs'\n")
+  build.existingDirs = build.existingDirs or { }
   for i, aNewDir in ipairs(build.existingDirs) do
     tInsert(lmsfile, "lfs.mkdir('"..aNewDir.."')")
   end
@@ -785,20 +784,6 @@ local function compileLmsfile(aCodeStream)
     tInsert(lmsfile, "    '"..aSubDoc.."',")
   end
   tInsert(lmsfile, "  },")
---  if build.cCodeLibDirs then
---    tInsert(lmsfile, "  cCodeLibDirs = {")
---    for i, aLibDir in ipairs(build.cCodeLibDirs) do
---      tInsert(lmsfile, "    '"..aLibDir.."',")
---    end
---    tInsert(lmsfile, "  },")
---  end
---  if build.cCodeLibs then
---    tInsert(lmsfile, "  cCodeLibs = {")
---    for i, aLib in ipairs(build.cCodeLibs) do
---      tInsert(lmsfile, "    '"..aLib.."',")
---    end
---    tInsert(lmsfile, "  },")
---  end
   tInsert(lmsfile, "  docDir    = '"..build.docDir.."',")
   tInsert(lmsfile, "}")
   if build.srcTargets.ctxModule and 0 < #build.srcTargets.ctxModule then
