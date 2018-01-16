@@ -3,4 +3,4 @@
 *.pdf
 *.orig
 *.swp
-build
+buildDir

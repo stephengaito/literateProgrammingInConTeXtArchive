@@ -673,7 +673,7 @@ local function createCodeFile(aCodeType,
 
   tInsert(srcTargets[srcType], aFilePath)
 
-  aFilePath = build.buildDir .. '/build/' .. aFilePath
+  aFilePath = build.buildDir .. '/buildDir/' .. aFilePath
   local outFile = io.open(aFilePath, 'w')
   if outFile then
     texio.write('creating code file: ['..aFilePath..']\n')
@@ -729,9 +729,9 @@ end
 litProgs.addSubDocument = addSubDocument
 
 local function ensureDirectoryExists(newDirectory)
-  newDirectory =
-    newDirectory:gsub('<HOME>', os.getenv('HOME'))
-  build.existingDirs = build.existingDirs or { }
+--  newDirectory =
+--    newDirectory:gsub('<HOME>', os.getenv('HOME'))
+--  build.existingDirs = build.existingDirs or { }
   tInsert(build.existingDirs, newDirectory)
 end
 
@@ -770,12 +770,12 @@ local function compileLmsfile(aCodeStream)
   setCodeStream('Lmsfile', aCodeStream)
   markCodeOrigin('Lmsfile')
   local lmsfile = {}
-  tInsert(lmsfile, "lfs = require 'lfs'\n")
-  build.existingDirs = build.existingDirs or { }
-  for i, aNewDir in ipairs(build.existingDirs) do
-    tInsert(lmsfile, "lfs.mkdir('"..aNewDir.."')")
-  end
-  tInsert(lmsfile, "")
+--  tInsert(lmsfile, "lfs = require 'lfs'\n")
+--  build.existingDirs = build.existingDirs or { }
+--  for i, aNewDir in ipairs(build.existingDirs) do
+--    tInsert(lmsfile, "lfs.mkdir('"..aNewDir.."')")
+--  end
+--  tInsert(lmsfile, "")
   tInsert(lmsfile, "require 'lms.litProgs'\n")
   tInsert(lmsfile, "lpTargets = litProgs.targets{")
   tInsert(lmsfile, "  mainDoc  = '"..build.mainDoc.."',")
@@ -784,6 +784,7 @@ local function compileLmsfile(aCodeStream)
     tInsert(lmsfile, "    '"..aSubDoc.."',")
   end
   tInsert(lmsfile, "  },")
+
   tInsert(lmsfile, "  docDir    = '"..build.docDir.."',")
   tInsert(lmsfile, "}")
   if build.srcTargets.ctxModule and 0 < #build.srcTargets.ctxModule then

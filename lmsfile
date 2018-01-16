@@ -1,12 +1,8 @@
 -- A Lua Make System file
 
-lfs = require 'lfs'
-
-lfs.mkdir('build')
-
 require 'lms.litProgs'
 
-litProgs.targets{
+lpTargets = litProgs.targets{
   mainDoc  = 'literateProgs.tex',
   docFiles = {
     'overview.tex',
@@ -16,14 +12,17 @@ litProgs.targets{
     'lmsfiles.tex',
     'conclusion.tex',
   },
-  srcFiles = {
+  docDir    = 't-literate-progs/doc/context/third/literateProgs',
+}
+
+require 'lms.contextMod'
+
+contextMod.targets(lpTargets, {
+  moduleFiles = {
     't-literate-progs.mkiv',
     't-literate-progs.lua',
-    't-literate-progs-templates.lua',
   },
-  buildDir  = 'build',
-  docDir    = 't-literate-progs/doc/context/third/literateProgs',
   moduleDir = 't-literate-progs/tex/context/third/literateProgs',
-}
+})
 
 -- some additional lua make file items

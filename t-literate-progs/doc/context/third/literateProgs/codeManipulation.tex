@@ -574,7 +574,7 @@ local function createCodeFile(aCodeType,
 
   tInsert(srcTargets[srcType], aFilePath)
 
-  aFilePath = build.buildDir .. '/build/' .. aFilePath
+  aFilePath = build.buildDir .. '/buildDir/' .. aFilePath
   local outFile = io.open(aFilePath, 'w')
   if outFile then
     texio.write('creating code file: ['..aFilePath..']\n')
