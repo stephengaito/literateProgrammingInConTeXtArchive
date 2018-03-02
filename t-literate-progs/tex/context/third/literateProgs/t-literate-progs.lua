@@ -633,7 +633,7 @@ litProgs.addCodeDispatcher = addCodeDispatcher
 litProgs.addCode           = {}
 litProgs.addCode.default   = addCodeDefault
 
--- from file: codeManipulation.tex after line: 500
+-- from file: codeManipulation.tex after line: 550
 
 build.srcTypes = build.srcTypes or { }
 build.srcTypes['MkIVCode'] = 'ctxModule'

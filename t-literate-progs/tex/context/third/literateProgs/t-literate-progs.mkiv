@@ -90,6 +90,13 @@
   }
 }
 
+% from file: codeManipulation.tex after line: 100
+
+\unexpanded\def\buff_verbatim_type_block#1#2%
+  {\buff_pickup{_typing_}{#1}{#2}{}%
+  {\buff_verbatim_type_block_verbatim_indeed{#1}{#2}}%
+  \zerocount}
+
 % from file: codeManipulation.tex after line: 250
 
 \def\fixLitProgs#1{%

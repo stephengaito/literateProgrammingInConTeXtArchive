@@ -87,6 +87,29 @@ type out into a file.
 }
 \stopMkIVCode
 
+Unfortunately, \ConTeXt's current definition of its internal 
+\type{\buff_verbatim_type_block}, which is part of the 
+\type{\definetyping} environment, is hardwired to tell \type{\buff_pickup} 
+to strip leading spaces. We extract \type{\buff_verbatim_type_block}'s 
+definition from \ConTeXt's MkIV file \type{buff-ver.mkiv} and make the 
+smallest change needed to fix this for our needs by providing 
+\type{\zerocount} instead of \type{\plusone} as the last parameter to the 
+\type{\buff_pickup} \ConTeXt\ macro. This has the effect of preserving 
+leading spaces in \emph{all} \type{\definetyping} environments which use 
+the \type{t-literate-progs} module\footnote{Note, however, that the 
+\type{\setuptyping} \type{strip} option should now work.}\footnote{Note 
+also that this is a rather fragile fix which depends upon the internals of 
+the \type{\definetyping} environment not being changed by the authors of 
+\ConTeXt. We \emph{will} need to re-visit the justification and 
+applicability of this fix regularly.} 
+
+\startMkIVCode
+\unexpanded\def\buff_verbatim_type_block#1#2%
+  {\buff_pickup{_typing_}{#1}{#2}{}%
+  {\buff_verbatim_type_block_verbatim_indeed{#1}{#2}}%
+  \zerocount}
+\stopMkIVCode
+
 \startTestCase[should call all associated macros]
 
 We assert that the \type{\defineLitProgs} macro actually defines all of 
