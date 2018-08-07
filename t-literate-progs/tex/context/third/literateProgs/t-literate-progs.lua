@@ -20,6 +20,7 @@ local litProgs   = thirddata.literateProgs
 litProgs.code    = litProgs.code or {}
 local code       = litProgs.code
 code.mkiv        = {}
+code.mpiv        = {}
 code.lua         = {}
 code.templates   = {}
 code.lmsfile     = {}
@@ -81,6 +82,22 @@ local function markMkIVCodeOrigin()
 end
 
 litProgs.markMkIVCodeOrigin = markMkIVCodeOrigin
+
+local function markMpIVCodeOrigin()
+  local codeType       = setDefs(code, 'MpIVCode')
+  local codeStream     = setDefs(codeType, 'curCodeStream', 'default')
+  codeStream           = setDefs(codeType, codeStream)
+  return sFmt('%% from file: %s after line: %s',
+    codeStream.fileName,
+    toStr(
+      mFloor(
+        codeStream.startLine/code.lineModulus
+      )*code.lineModulus
+    )
+  )
+end
+
+litProgs.markMpIVCodeOrigin = markMpIVCodeOrigin
 
 local function markLuaCodeOrigin()
   local codeType       = setDefs(code, 'LuaCode')
@@ -637,6 +654,7 @@ litProgs.addCode.default   = addCodeDefault
 
 build.srcTypes = build.srcTypes or { }
 build.srcTypes['MkIVCode'] = 'ctxModule'
+build.srcTypes['MpIVCode'] = 'ctxModule'
 build.srcTypes['LuaCode']  = 'ctxModule'
 build.srcTypes['CHeader']  = 'cHeader'
 build.srcTypes['CCode']    = 'cCode'
@@ -695,7 +713,7 @@ end
 
 litProgs.createCodeFile = createCodeFile
 
--- from file: codeManipulation.tex after line: 650
+-- from file: codeManipulation.tex after line: 700
 
 local function cHeaderIncludeGuard(aCodeStream, aGuard)
   setCodeStream('CHeader', aCodeStream)

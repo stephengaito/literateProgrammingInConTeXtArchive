@@ -149,6 +149,12 @@
   ]
 
 \defineLitProgs%
+  [MpIVCode]%
+  [ option=mp, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+ 
+\defineLitProgs%
   [LuaCode]%
   [option=lua, numbering=line,
     before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
@@ -179,6 +185,7 @@
   ]
 
 \setLitProgsOriginMarker[MkIVCode][markMkIVCodeOrigin]
+\setLitProgsOriginMarker[MpIVCode][markMpIVCodeOrigin]
 \setLitProgsOriginMarker[LuaCode][markLuaCodeOrigin]
 \setLitProgsOriginMarker[LuaTemplate][markLuaTemplateOrigin]
 \setLitProgsOriginMarker[CHeader][markCHeaderOrigin]

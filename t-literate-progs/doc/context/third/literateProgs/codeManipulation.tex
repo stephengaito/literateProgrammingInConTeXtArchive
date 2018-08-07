@@ -561,6 +561,7 @@ captures its contents using a specific addTestCodeCode Lua function.
 
 build.srcTypes = build.srcTypes or { }
 build.srcTypes['MkIVCode'] = 'ctxModule'
+build.srcTypes['MpIVCode'] = 'ctxModule'
 build.srcTypes['LuaCode']  = 'ctxModule'
 build.srcTypes['CHeader']  = 'cHeader'
 build.srcTypes['CCode']    = 'cCode'
@@ -648,6 +649,12 @@ litterate programming environments.
   ]
 
 \defineLitProgs%
+  [MpIVCode]%
+  [ option=mp, numbering=line,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+  
+\defineLitProgs%
   [LuaCode]%
   [option=lua, numbering=line,
     before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
@@ -678,6 +685,7 @@ litterate programming environments.
   ]
 
 \setLitProgsOriginMarker[MkIVCode][markMkIVCodeOrigin]
+\setLitProgsOriginMarker[MpIVCode][markMpIVCodeOrigin]
 \setLitProgsOriginMarker[LuaCode][markLuaCodeOrigin]
 \setLitProgsOriginMarker[LuaTemplate][markLuaTemplateOrigin]
 \setLitProgsOriginMarker[CHeader][markCHeaderOrigin]

@@ -14,6 +14,7 @@ respective preambles provide:
 \stopitemize
 
 \defineLitProgs[MkIVCode][option=context]
+\defineLitProgs[MpIVCode][option=mp]
 \defineLitProgs[LuaCode][option=lua]
 \defineLitProgs[LuaTemplate][option=lua]
 
@@ -87,6 +88,7 @@ local litProgs   = thirddata.literateProgs
 litProgs.code    = litProgs.code or {}
 local code       = litProgs.code
 code.mkiv        = {}
+code.mpiv        = {}
 code.lua         = {}
 code.templates   = {}
 code.lmsfile     = {}
@@ -201,6 +203,22 @@ end
 
 litProgs.markMkIVCodeOrigin = markMkIVCodeOrigin
 
+local function markMpIVCodeOrigin()
+  local codeType       = setDefs(code, 'MpIVCode')
+  local codeStream     = setDefs(codeType, 'curCodeStream', 'default')
+  codeStream           = setDefs(codeType, codeStream)
+  return sFmt('%% from file: %s after line: %s',
+    codeStream.fileName,
+    toStr(
+      mFloor(
+        codeStream.startLine/code.lineModulus
+      )*code.lineModulus
+    )
+  )
+end
+
+litProgs.markMpIVCodeOrigin = markMpIVCodeOrigin
+
 local function markLuaCodeOrigin()
   local codeType       = setDefs(code, 'LuaCode')
   local codeStream     = setDefs(codeType, 'curCodeStream', 'default')
@@ -267,6 +285,7 @@ litProgs.markCCodeOrigin = markCCodeOrigin
 \stopLuaCode
 
 \setLitProgsOriginMarker[MkIVCode][markMkIVCodeOrigin]
+\setLitProgsOriginMarker[MpIVCode][markMpIVCodeOrigin]
 \setLitProgsOriginMarker[LuaCode][markLuaCodeOrigin]
 \setLitProgsOriginMarker[LuaTemplate][markLuaTemplateOrigin]
 
