@@ -660,6 +660,13 @@ build.srcTypes['CHeader']  = 'cHeader'
 build.srcTypes['CCode']    = 'cCode'
 build.srcTypes['Lmsfile']  = 'lmsfile'
 
+local function diSimpPrefix()
+  if thirddata.diSimp and thirddata.diSimp.lastDiSimpPath then
+    return thirddata.diSimp.lastDiSimpPath()
+  end
+  return ""
+end
+
 local function createCodeFile(aCodeType,
                               aCodeStream,
                               aFilePath,
@@ -691,7 +698,8 @@ local function createCodeFile(aCodeType,
 
   tInsert(srcTargets[srcType], aFilePath)
 
-  aFilePath = build.buildDir .. '/buildDir/' .. aFilePath
+  aFilePath = diSimpPrefix() .. build.buildDir .. '/buildDir/' .. aFilePath
+  aFilePath = file.collapsepath(aFilePath, true)
   local outFile = io.open(aFilePath, 'w')
   if outFile then
     texio.write('creating code file: ['..aFilePath..']\n')
