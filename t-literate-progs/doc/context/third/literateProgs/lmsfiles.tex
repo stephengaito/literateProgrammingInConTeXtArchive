@@ -37,6 +37,12 @@ drive the creation of the various files required by any given
   }
 }
 
+\def\addCCodeProgram#1{%
+  \directlua{
+    thirddata.literateProgs.addCCodeProgram('#1')
+  }
+}
+
 \def\addCCodeLibDirectory#1{%
   \directlua{
     thirddata.literateProgs.addCCodeLibDirectory('#1')
@@ -46,6 +52,12 @@ drive the creation of the various files required by any given
 \def\addCCodeLib#1{%
   \directlua{
     thirddata.literateProgs.addCCodeLib('#1')
+  }
+}
+
+\def\addCCodeTargets#1{%
+  \directlua{
+    thirddata.literateProgs.addCCodeTargets('#1')
   }
 }
 \stopMkIVCode
@@ -86,6 +98,13 @@ end
 
 litProgs.addConTeXtModuleDirectory = addConTeXtModuleDirectory
 
+local function addCCodeProgram(aProgram)
+  build.cCodePrograms = build.cCodePrograms or { }
+  tInsert(build.cCodePrograms, aProgram)
+end
+
+litProgs.addCCodeProgram = addCCodeProgram
+
 local function addCCodeLibDirectory(aDirectory)
   build.cCodeLibDirs = build.cCodeLibDirs or { }
   tInsert(build.cCodeLibDirs, aDirectory)
@@ -99,6 +118,72 @@ local function addCCodeLib(aLib)
 end
 
 litProgs.addCCodeLib = addCCodeLib
+
+local function addCCodeTargets(aCodeStream)
+  litProgs.setCodeStream('Lmsfile', aCodeStream)
+  litProgs.markCodeOrigin('Lmsfile')
+  local lmsfile = {}
+  tInsert(lmsfile, "require 'lms.c'\n")
+  tInsert(lmsfile, "c.targets(lpTargets, {")
+  tInsert(lmsfile, "  programs = {")
+  for i, aProgram in ipairs(build.cCodePrograms) do
+    tInsert(lmsfile, "    '"..aProgram.."',")
+  end
+  tInsert(lmsfile, "  },")
+  
+  build.srcTargets = build.srcTargets or { }
+  local srcTargets = build.srcTargets
+  
+  srcTargets.cHeader = srcTargets.cHeader or { }
+  local cHeader      = srcTargets.cHeader
+  tInsert(lmsfile, "  cHeaderFiles = {")
+  for i, aSrcFile in ipairs(cHeader) do
+    tInsert(lmsfile, "    '"..aSrcFile.."',")
+  end
+  tInsert(lmsfile, "  },")
+  
+  srcTargets.cCode = srcTargets.cCode or { }
+  local cCode      = srcTargets.cCode
+  tInsert(lmsfile, "  cCodeFiles = {")
+  for i, aSrcFile in ipairs(cCode) do
+    tInsert(lmsfile, "    '"..aSrcFile.."',")
+  end
+  tInsert(lmsfile, "  },")
+
+--  srcTargets.joylolCode = srcTargets.joylolCode or { }
+--  local joylolCode      = srcTargets.joylolCode
+--  tInsert(lmsfile, "  joylolCodeFiles = {")
+--  for i, aSrcFile in ipairs(joylolCode) do
+--    tInsert(lmsfile, "    '"..aSrcFile.."',")
+--  end
+--  tInsert(lmsfile, "  },")
+
+  if build.cCodeLibDirs then 
+    tInsert(lmsfile, "  cCodeLibDirs = {")
+    for i, aLibDir in ipairs(build.cCodeLibDirs) do
+      tInsert(lmsfile, "    '"..aLibDir.."',")
+    end
+    tInsert(lmsfile, "  },")
+  end
+  if build.cCodeLibs then 
+    tInsert(lmsfile, "  cCodeLibs = {")
+    for i, aLib in ipairs(build.cCodeLibs) do
+      tInsert(lmsfile, "    '"..aLib.."',")
+    end
+    tInsert(lmsfile, "  },")
+  end
+
+--  tInsert(lmsfile, "  coAlgLibs = {")
+--  for i, aCoAlgDependency in ipairs(build.coAlgDependencies) do
+--    tInsert(lmsfile, "    '"..aCoAlgDependency.."',")
+--  end
+--  tInsert(lmsfile, "  },")
+  tInsert(lmsfile, "})")
+  litProgs.setPrepend('Lmsfile', aCodeStream, true)
+  litProgs.addCode.default('Lmsfile', tConcat(lmsfile, '\n'))
+end
+
+litProgs.addCCodeTargets = addCCodeTargets
 \stopLuaCode
 
 \startMkIVCode
