@@ -2,6 +2,32 @@
 
 % from file: preamble.tex after line: 0
 
+%C Copyright 2019 PerceptiSys Ltd (Stephen Gaito)
+%C
+%C Permission is hereby granted, free of charge, to any person
+%C obtaining a copy of this software and associated documentation
+%C files (the "Software"), to deal in the Software without
+%C restriction, including without limitation the rights to use,
+%C copy, modify, merge, publish, distribute, sublicense, and/or sell
+%C copies of the Software, and to permit persons to whom the
+%C Software is furnished to do so, subject to the following
+%C conditions:
+%C
+%C    The above copyright notice and this permission notice shall
+%C    be included in all copies or substantial portions of the
+%C    Software.
+%C
+%C THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+%C EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+%C OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+%C NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+%C HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+%C WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+%C FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+%C OTHER DEALINGS IN THE SOFTWARE.
+
+% from file: preamble.tex after line: 0
+
 %D \module
 %D   [     file=t-literate-progs,
 %D      version=2017.05.10,
@@ -12,27 +38,6 @@
 %D    copyright=PerceptiSys Ltd (Stephen Gaito),
 %D        email=stephen@perceptisys.co.uk,
 %D      license=MIT License]
-
-%C Copyright (C) 2017 PerceptiSys Ltd (Stephen Gaito)
-%C
-%C Permission is hereby granted, free of charge, to any person obtaining a
-%C copy of this software and associated documentation files (the
-%C "Software"), to deal in the Software without restriction, including
-%C without limitation the rights to use, copy, modify, merge, publish,
-%C distribute, sublicense, and/or sell copies of the Software, and to
-%C permit persons to whom the Software is furnished to do so, subject to
-%C the following conditions:
-%C
-%C The above copyright notice and this permission notice shall be included
-%C in all copies or substantial portions of the Software.
-%C
-%C THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-%C OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-%C MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-%C IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-%C CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-%C TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-%C SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 % begin info
 %
@@ -103,7 +108,7 @@
   \directlua{thirddata.literateProgs.createFixLitProgs('#1')}
 }
 
-% from file: codeManipulation.tex after line: 450
+% from file: codeManipulation.tex after line: 550
 
 \unexpanded\def\setLitProgsOriginMarker{%
   \dotripleempty\doSetLitProgsOriginMarker%
@@ -133,14 +138,26 @@
   \fi\fi\fi%
 }
 
-% from file: codeManipulation.tex after line: 600
+\def\addMITLicense#1#2#3{
+  \directlua{
+    thirddata.literateProgs.addMITLicense('#1', '#2', '#3')
+  }
+}
+
+\def\addApacheLicense#1#2#3{
+  \directlua{
+    thirddata.literateProgs.addApacheLicense('#1', '#2', '#3')
+  }
+}
+
+% from file: codeManipulation.tex after line: 750
 
 \definetextbackground[LitProgFrame]
 \setuptextbackground%
   [LitProgFrame]%
   [location=paragraph, background=color, backgroundcolor=gray]
 
-% from file: codeManipulation.tex after line: 650
+% from file: codeManipulation.tex after line: 750
 
 \defineLitProgs%
   [MkIVCode]%
@@ -191,7 +208,7 @@
 \setLitProgsOriginMarker[CHeader][markCHeaderOrigin]
 \setLitProgsOriginMarker[CCode][markCCodeOrigin]
 
-% from file: codeManipulation.tex after line: 700
+% from file: codeManipulation.tex after line: 800
 
 \def\CHeaderIncludeGuard#1#2{
   \directlua{

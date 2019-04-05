@@ -2,6 +2,32 @@
 
 -- from file: preamble.tex after line: 50
 
+-- Copyright 2019 PerceptiSys Ltd (Stephen Gaito)
+--
+-- Permission is hereby granted, free of charge, to any person
+-- obtaining a copy of this software and associated documentation
+-- files (the "Software"), to deal in the Software without
+-- restriction, including without limitation the rights to use,
+-- copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the
+-- Software is furnished to do so, subject to the following
+-- conditions:
+--
+--    The above copyright notice and this permission notice shall
+--    be included in all copies or substantial portions of the
+--    Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+-- EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+-- OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+-- NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+-- HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+-- WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+-- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+-- OTHER DEALINGS IN THE SOFTWARE.
+
+-- from file: preamble.tex after line: 50
+
 -- This is the lua code associated with t-literate-progs.mkiv
 
 if not modules then modules = { } end
@@ -38,7 +64,7 @@ local sMatch  = string.match
 local mFloor  = math.floor
 local toStr   = tostring
 
--- from file: preamble.tex after line: 100
+-- from file: preamble.tex after line: 50
 
 local function setDefs(varVal, selector, defVal)
   if not defVal then defVal = { } end
@@ -650,7 +676,114 @@ litProgs.addCodeDispatcher = addCodeDispatcher
 litProgs.addCode           = {}
 litProgs.addCode.default   = addCodeDefault
 
--- from file: codeManipulation.tex after line: 550
+local function addMITLicense(aCodeType, commentStart, copyrightOwner)
+  litProgs.markCodeOrigin(aCodeType)
+  if (type(commentStart) == 'nil') or (string.len(commentStart) < 1) then
+    commentStart = '%C'
+  end
+  copyright = { }
+  tInsert(copyright, commentStart ..
+    ' Copyright '..os.date('%Y')..' '..copyrightOwner)
+  tInsert(copyright,  commentStart ..
+    '')
+  tInsert(copyright, commentStart ..
+    ' Permission is hereby granted, free of charge, to any person')
+  tInsert(copyright, commentStart ..
+    ' obtaining a copy of this software and associated documentation')
+  tInsert(copyright, commentStart ..
+    ' files (the "Software"), to deal in the Software without')
+  tInsert(copyright, commentStart ..
+    ' restriction, including without limitation the rights to use,')
+  tInsert(copyright, commentStart ..
+    ' copy, modify, merge, publish, distribute, sublicense, and/or sell')
+  tInsert(copyright, commentStart ..
+    ' copies of the Software, and to permit persons to whom the')
+  tInsert(copyright, commentStart ..
+    ' Software is furnished to do so, subject to the following')
+  tInsert(copyright, commentStart ..
+    ' conditions:')
+  tInsert(copyright, commentStart ..
+    '')
+  tInsert(copyright, commentStart ..
+    '    The above copyright notice and this permission notice shall')
+  tInsert(copyright, commentStart ..
+    '    be included in all copies or substantial portions of the')
+  tInsert(copyright, commentStart ..
+    '    Software.')
+  tInsert(copyright, commentStart ..
+    '')
+  tInsert(copyright, commentStart ..
+    ' THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,')
+  tInsert(copyright, commentStart ..
+    ' EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES')
+  tInsert(copyright, commentStart ..
+    ' OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND')
+  tInsert(copyright, commentStart ..
+    ' NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT')
+  tInsert(copyright, commentStart ..
+    ' HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,')
+  tInsert(copyright, commentStart ..
+    ' WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING')
+  tInsert(copyright, commentStart ..
+    ' FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR')
+  tInsert(copyright, commentStart ..
+    ' OTHER DEALINGS IN THE SOFTWARE.')
+
+  copyright = tConcat(copyright, "\n")
+
+  if litProgs.addCode[aCodeType] ~= nil then
+    litProgs.addCode[aCodeType](copyright)
+  else
+    litProgs.addCode.default(aCodeType, copyright)
+  end
+end
+
+litProgs.addMITLicense = addMITLicense
+
+local function addApacheLicense(aCodeType, commentStart, copyrightOwner)
+  litProgs.markCodeOrigin(aCodeType)
+  if (type(commentStart) == 'nil') or (string.len(commentStart) < 1) then
+    commentStart = '%C'
+  end
+  copyright = { }
+  tInsert(copyright, commentStart ..
+    ' Copyright '..os.date('%Y')..' '..copyrightOwner)
+  tInsert(copyright,  commentStart ..
+    '')
+  tInsert(copyright, commentStart ..
+    ' Licensed under the Apache License, Version 2.0 (the "License");')
+  tInsert(copyright, commentStart ..
+    ' you may not use this file except in compliance with the License.')
+  tInsert(copyright, commentStart ..
+    ' You may obtain a copy of the License at')
+  tInsert(copyright, commentStart ..
+    '')
+  tInsert(copyright, commentStart ..
+    '    http://www.apache.org/licenses/LICENSE-2.0')
+  tInsert(copyright, commentStart ..
+    '')
+  tInsert(copyright, commentStart ..
+    ' Unless required by applicable law or agreed to in writing,')
+  tInsert(copyright, commentStart ..
+    ' software distributed under the License is distributed on an "AS')
+  tInsert(copyright, commentStart ..
+    ' IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either')
+  tInsert(copyright, commentStart ..
+    ' express or implied. See the License for the specific language')
+  tInsert(copyright, commentStart ..
+    ' governing permissions and limitations under the License. end')
+  copyright = tConcat(copyright, "\n")
+
+  if litProgs.addCode[aCodeType] ~= nil then
+    litProgs.addCode[aCodeType](copyright)
+  else
+    litProgs.addCode.default(aCodeType, copyright)
+  end
+end
+
+litProgs.addApacheLicense = addApacheLicense
+
+-- from file: codeManipulation.tex after line: 650
 
 build.srcTypes = build.srcTypes or { }
 build.srcTypes['MkIVCode'] = 'ctxModule'
@@ -721,7 +854,7 @@ end
 
 litProgs.createCodeFile = createCodeFile
 
--- from file: codeManipulation.tex after line: 700
+-- from file: codeManipulation.tex after line: 800
 
 local function cHeaderIncludeGuard(aCodeStream, aGuard)
   setCodeStream('CHeader', aCodeStream)
