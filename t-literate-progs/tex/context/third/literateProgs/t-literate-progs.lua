@@ -1011,11 +1011,11 @@ local function compileLmsfile(aCodeStream)
   tInsert(lmsfile, "require 'lms.litProgs'\n")
   tInsert(lmsfile, "lpTargets = litProgs.targets{")
   tInsert(lmsfile, "  mainDoc  = '"..build.mainDoc.."',")
-  tInsert(lmsfile, "  docFiles = {")
-  for i, aSubDoc in ipairs(build.subDocs) do
-    tInsert(lmsfile, "    '"..aSubDoc.."',")
-  end
-  tInsert(lmsfile, "  },")
+--  tInsert(lmsfile, "  docFiles = {")
+--  for i, aSubDoc in ipairs(build.subDocs) do
+--    tInsert(lmsfile, "    '"..aSubDoc.."',")
+--  end
+--  tInsert(lmsfile, "  },")
 
   tInsert(lmsfile, "  docDir    = '"..build.docDir.."',")
   tInsert(lmsfile, "}")
