@@ -18,3 +18,7 @@ contextMod.targets(lpTargets, {
 })
 
 -- some additional lua make file items
+
+require 'lms.contextDoc'
+
+contextDoc.targets(lpTargets)

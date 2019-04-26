@@ -56,11 +56,11 @@
 
 % from file: codeManipulation.tex after line: 0
 
-\unexpanded\def\defineLitProgs{%
-  \dotripleempty\doDefineLitProgs%
+\unexpanded\def\defineLitProgs{
+  \dotripleempty\doDefineLitProgs
 }
 
-\unexpanded\def\doDefineLitProgs[#1][#2][#3]{%
+\unexpanded\def\doDefineLitProgs[#1][#2][#3]{
   \ifthirdargument%
     \doDefineLitProgsTriple{#1}{#2}{#3}%
   \else\ifsecondargument%
@@ -104,17 +104,17 @@
 
 % from file: codeManipulation.tex after line: 250
 
-\def\fixLitProgs#1{%
+\def\fixLitProgs#1{
   \directlua{thirddata.literateProgs.createFixLitProgs('#1')}
 }
 
 % from file: codeManipulation.tex after line: 550
 
-\unexpanded\def\setLitProgsOriginMarker{%
+\unexpanded\def\setLitProgsOriginMarker{
   \dotripleempty\doSetLitProgsOriginMarker%
 }
 
-\unexpanded\def\doSetLitProgsOriginMarker[#1][#2][#3]{%
+\unexpanded\def\doSetLitProgsOriginMarker[#1][#2][#3]{
   \ifthirdargument%
     \directlua{
       thirddata.literateProgs.setOriginMarker('#1', '#2', '#3')
@@ -248,25 +248,25 @@
   }
 }
 
-\def\addCCodeProgram#1{%
+\def\addCCodeProgram#1{
   \directlua{
     thirddata.literateProgs.addCCodeProgram('#1')
   }
 }
 
-\def\addCCodeLibDirectory#1{%
+\def\addCCodeLibDirectory#1{
   \directlua{
     thirddata.literateProgs.addCCodeLibDirectory('#1')
   }
 }
 
-\def\addCCodeLib#1{%
+\def\addCCodeLib#1{
   \directlua{
     thirddata.literateProgs.addCCodeLib('#1')
   }
 }
 
-\def\addCCodeTargets#1{%
+\def\addCCodeTargets#1{
   \directlua{
     thirddata.literateProgs.addCCodeTargets('#1')
   }

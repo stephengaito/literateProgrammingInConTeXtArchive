@@ -37,25 +37,25 @@ drive the creation of the various files required by any given
   }
 }
 
-\def\addCCodeProgram#1{%
+\def\addCCodeProgram#1{
   \directlua{
     thirddata.literateProgs.addCCodeProgram('#1')
   }
 }
 
-\def\addCCodeLibDirectory#1{%
+\def\addCCodeLibDirectory#1{
   \directlua{
     thirddata.literateProgs.addCCodeLibDirectory('#1')
   }
 }
 
-\def\addCCodeLib#1{%
+\def\addCCodeLib#1{
   \directlua{
     thirddata.literateProgs.addCCodeLib('#1')
   }
 }
 
-\def\addCCodeTargets#1{%
+\def\addCCodeTargets#1{
   \directlua{
     thirddata.literateProgs.addCCodeTargets('#1')
   }
@@ -240,6 +240,11 @@ litProgs.compileLmsfile = compileLmsfile
 
 \startLmsfile
 -- some additional lua make file items
+
+require 'lms.contextDoc'
+
+contextDoc.targets(lpTargets)
+
 \stopLmsfile
 
 \stopchapter

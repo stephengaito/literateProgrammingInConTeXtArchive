@@ -47,11 +47,11 @@ type out into a file.
 % see: http://wiki.contextgarden.net/Commands_with_optional_arguments
 
 \startMkIVCode
-\unexpanded\def\defineLitProgs{%
-  \dotripleempty\doDefineLitProgs%
+\unexpanded\def\defineLitProgs{
+  \dotripleempty\doDefineLitProgs
 }
 
-\unexpanded\def\doDefineLitProgs[#1][#2][#3]{%
+\unexpanded\def\doDefineLitProgs[#1][#2][#3]{
   \ifthirdargument%
     \doDefineLitProgsTriple{#1}{#2}{#3}%
   \else\ifsecondargument%
@@ -209,7 +209,7 @@ addTemplate(
   { 'litProgsName' },
 [=[
 \let\oldStart{{= litProgsName }}=\start{{= litProgsName }}
-\unexpanded\def\start{{= litProgsName }}{%
+\unexpanded\def\start{{= litProgsName }}{
   \directlua{
     thirddata.literateProgs.markCodeOrigin(
       '{{= litProgsName }}'
@@ -218,7 +218,7 @@ addTemplate(
   \oldStart{{= litProgsName }}%
 }
 \let\oldStop{{= litProgsName }}=\stop{{= litProgsName }}
-\unexpanded\def\stop{{= litProgsName }}{%
+\unexpanded\def\stop{{= litProgsName }}{
   \oldStop{{= litProgsName }}%
   \directlua{
     thirddata.literateProgs.addCodeDispatcher(
@@ -227,7 +227,7 @@ addTemplate(
     )
   }
 }
-\unexpanded\def\create{{= litProgsName }}File#1#2#3{%
+\unexpanded\def\create{{= litProgsName }}File#1#2#3{
   \directlua{
     thirddata.literateProgs.createCodeFile(
       '{{= litProgsName }}',
@@ -237,7 +237,7 @@ addTemplate(
     )
   }
 }
-\unexpanded\def\set{{= litProgsName }}Stream#1{%
+\unexpanded\def\set{{= litProgsName }}Stream#1{
   \directlua{
     thirddata.literateProgs.setCodeStream(
       '{{= litProgsName }}',
@@ -245,7 +245,7 @@ addTemplate(
     )
   }
 }
-\unexpanded\def\prepend{{= litProgsName}}#1{%
+\unexpanded\def\prepend{{= litProgsName}}#1{
   \directlua{
     thirddata.literateProgs.setPrepend(
       '{{= litProgsName }}',
@@ -254,7 +254,7 @@ addTemplate(
     )
   }
 }
-\unexpanded\def\append{{= litProgsName}}#1{%
+\unexpanded\def\append{{= litProgsName}}#1{
   \directlua{
     thirddata.literateProgs.setPrepend(
       '{{= litProgsName }}',
@@ -291,7 +291,7 @@ We now define the \ConTeXt\ macro which will drive the whole process
 required to fix a new Literate Programs environment. 
 
 \startMkIVCode
-\def\fixLitProgs#1{%
+\def\fixLitProgs#1{
   \directlua{thirddata.literateProgs.createFixLitProgs('#1')}
 }
 \stopMkIVCode
@@ -305,7 +305,7 @@ local macroBody = createFixLitProgs('Test')
 assert.isTable(macroBody)
 assert.length(macroBody, 55)
 assert.isEqual(macroBody[1],  "\\let\\oldStartTest=\\startTest")
-assert.isEqual(macroBody[2],  "\\unexpanded\\def\\startTest{%")
+assert.isEqual(macroBody[2],  "\\unexpanded\\def\\startTest{")
 assert.isEqual(macroBody[3],  "  \\directlua{")
 assert.isEqual(macroBody[4],  "    thirddata.literateProgs.markCodeOrigin(")
 assert.isEqual(macroBody[5],  "      'Test'")
@@ -314,7 +314,7 @@ assert.isEqual(macroBody[7],  "  }%")
 assert.isEqual(macroBody[8],  "  \\oldStartTest%")
 assert.isEqual(macroBody[9],  "}")
 assert.isEqual(macroBody[10], "\\let\\oldStopTest=\\stopTest")
-assert.isEqual(macroBody[11], "\\unexpanded\\def\\stopTest{%")
+assert.isEqual(macroBody[11], "\\unexpanded\\def\\stopTest{")
 assert.isEqual(macroBody[12], "  \\oldStopTest%")
 assert.isEqual(macroBody[13], "  \\directlua{")
 assert.isEqual(macroBody[14], "    thirddata.literateProgs.addCodeDispatcher(")
@@ -323,7 +323,7 @@ assert.isEqual(macroBody[16], "      '_typing_'")
 assert.isEqual(macroBody[17], "    )")
 assert.isEqual(macroBody[18], "  }")
 assert.isEqual(macroBody[19], "}")
-assert.isEqual(macroBody[20], "\\unexpanded\\def\\createTestFile#1#2#3{%")
+assert.isEqual(macroBody[20], "\\unexpanded\\def\\createTestFile#1#2#3{")
 assert.isEqual(macroBody[21], "  \\directlua{")
 assert.isEqual(macroBody[22], "    thirddata.literateProgs.createCodeFile(")
 assert.isEqual(macroBody[23], "      'Test',")
@@ -333,7 +333,7 @@ assert.isEqual(macroBody[26], "      '#3'")
 assert.isEqual(macroBody[27], "    )")
 assert.isEqual(macroBody[28], "  }")
 assert.isEqual(macroBody[29], "}")
-assert.isEqual(macroBody[30], "\\unexpanded\\def\\setTestStream#1{%")
+assert.isEqual(macroBody[30], "\\unexpanded\\def\\setTestStream#1{")
 assert.isEqual(macroBody[31], "  \\directlua{")
 assert.isEqual(macroBody[32], "    thirddata.literateProgs.setCodeStream(")
 assert.isEqual(macroBody[33], "      'Test',")
@@ -341,7 +341,7 @@ assert.isEqual(macroBody[34], "      '#1'")
 assert.isEqual(macroBody[35], "    )")
 assert.isEqual(macroBody[36], "  }")
 assert.isEqual(macroBody[37], "}")
-assert.isEqual(macroBody[38], "\\unexpanded\\def\\prependTest#1{%")
+assert.isEqual(macroBody[38], "\\unexpanded\\def\\prependTest#1{")
 assert.isEqual(macroBody[39], "  \\directlua{")
 assert.isEqual(macroBody[40], "    thirddata.literateProgs.setPrepend(")
 assert.isEqual(macroBody[41], "      'Test',")
@@ -350,7 +350,7 @@ assert.isEqual(macroBody[43], "      true")
 assert.isEqual(macroBody[44], "    )")
 assert.isEqual(macroBody[45], "  }")
 assert.isEqual(macroBody[46], "}")
-assert.isEqual(macroBody[47], "\\unexpanded\\def\\appendTest#1{%")
+assert.isEqual(macroBody[47], "\\unexpanded\\def\\appendTest#1{")
 assert.isEqual(macroBody[48], "  \\directlua{")
 assert.isEqual(macroBody[49], "    thirddata.literateProgs.setPrepend(")
 assert.isEqual(macroBody[50], "      'Test',")
@@ -589,11 +589,11 @@ litProgs.addApacheLicense = addApacheLicense
 \stopLuaCode
 
 \startMkIVCode
-\unexpanded\def\setLitProgsOriginMarker{%
+\unexpanded\def\setLitProgsOriginMarker{
   \dotripleempty\doSetLitProgsOriginMarker%
 }
 
-\unexpanded\def\doSetLitProgsOriginMarker[#1][#2][#3]{%
+\unexpanded\def\doSetLitProgsOriginMarker[#1][#2][#3]{
   \ifthirdargument%
     \directlua{
       thirddata.literateProgs.setOriginMarker('#1', '#2', '#3')
@@ -865,8 +865,8 @@ thirddata.literateProgs.cHeaderIncludeGuard = cHeaderIncludeGuard
 % \type{\setuptyping} options to be used by this code type. 
 
 %\startMkIVCode
-%\def\defineLitProgsSetup#1{%
-%  \def\csname setup#1\endcsname{%
+%\def\defineLitProgsSetup#1{
+%  \def\csname setup#1\endcsname{
 %    \setuptyping[#1]%
 %  }
 %}
