@@ -4,14 +4,6 @@ require 'lms.litProgs'
 
 lpTargets = litProgs.targets{
   mainDoc  = 'literateProgs.tex',
-  docFiles = {
-    'overview.tex',
-    'preamble.tex',
-    'rendering.tex',
-    'codeManipulation.tex',
-    'lmsfiles.tex',
-    'conclusion.tex',
-  },
   docDir    = 't-literate-progs/doc/context/third/literateProgs',
 }
 

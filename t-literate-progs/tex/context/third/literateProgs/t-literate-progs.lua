@@ -604,7 +604,12 @@ local function markCodeOrigin(aCodeType)
   local codeType         = setDefs(code, aCodeType)
   local aCodeStream      = setDefs(codeType, 'curCodeStream', 'default')
   local codeStream       = setDefs(codeType, aCodeStream)
-  codeStream.fileName    = status.filename
+  local homeDir          = os.getenv('HOME')
+  local fileName         = status.filename
+  if homeDir then
+    fileName = fileName:gsub(homeDir, '~')
+  end
+  codeStream.fileName    = fileName
   codeStream.startLine   = status.linenumber
   tex.print({
    '\\blank[medium]\\noindent',
