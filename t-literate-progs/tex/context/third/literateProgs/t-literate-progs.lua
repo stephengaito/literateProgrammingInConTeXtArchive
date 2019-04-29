@@ -828,6 +828,9 @@ local function createCodeFile(aCodeType,
     return
   end
 
+  theCodeStr = tConcat(theCode, '\n\n')
+  while 0 < #theCode do tRemove(theCode) end
+
   build.srcTargets = build.srcTargets or { }
   local srcTargets = build.srcTargets
 
@@ -850,7 +853,7 @@ local function createCodeFile(aCodeType,
       outFile:write(aFileHeader)
       outFile:write('\n\n')
     end
-    outFile:write(tConcat(theCode, '\n\n'))
+    outFile:write(theCodeStr)
     outFile:close()
   else
     texio.write("\nERROR: could NOT open ["..aFilePath.."]\n")
