@@ -747,6 +747,7 @@ local function createCodeFile(aCodeType,
       outFile:write('\n\n')
     end
     outFile:write(theCodeStr)
+    outFile:write('\n\n')
     outFile:close()
   else
     texio.write("\nERROR: could NOT open ["..aFilePath.."]\n")

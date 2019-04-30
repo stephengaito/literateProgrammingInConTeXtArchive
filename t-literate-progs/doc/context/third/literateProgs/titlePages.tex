@@ -1,0 +1,144 @@
+% A ConTeXt document
+
+\startmakeup
+
+\blank[5cm]
+  
+\startalignment[center]
+\dontleavehmode
+\tfd\bf
+Literate programming in \ConTeXt
+\stopalignment
+
+\blank[1cm]
+
+\startalignment[center]
+\dontleavehmode
+\tfc\bf
+\stopalignment
+
+\blank[1cm]
+
+\startalignment[center]
+\dontleavehmode
+\tfb\bf
+\stopalignment
+
+\blank[8cm]
+
+\startalignment[flushright]
+\dontleavehmode
+\tfa\bf
+\bTABLE
+  \setupTABLE[r][each][frame=off]
+  \bTR \bTD Dr Stephen Gaito \eTD \eTR
+  \bTR \bTD PerceptiSys Ltd \eTD \eTR
+  \bTR \bTD \date \eTD \eTR
+\eTABLE
+\stopalignment
+
+\blank[5cm]
+
+\startalignment[center]
+Perish \emph{then} Publish Press.
+\stopalignment
+
+\stopmakeup
+
+\startmakeup
+
+%\blank[10cm]
+\blank[6cm]
+
+\doifvariable{diSimp}{ISBN}{
+\bold{ISBN-13:} \getvariable{diSimp}{ISBN}
+\blank
+}
+
+\doifvariable{diSimp}{VERSION}{
+\bold{Version:} \getvariable{diSimp}{VERSION}
+\blank
+}
+
+This document was prepared using \ConTeXt\ and \LuaTeX\ on 
+\currentdate[month] \currentdate[day], \currentdate[year].
+
+
+\blank
+
+\hrule
+\blank[medium]
+
+Unless explicitly stated otherwise, all content contained in this
+document which is \emph{not software code} is
+
+\blank[small]
+
+\startcenteraligned
+\bold{Copyright © \currentdate[year] PerceptiSys Ltd (Stephen Gaito)}
+\stopcenteraligned
+
+\blank[small]
+
+and is licensed for release under the Creative Commons
+Attribution-ShareAlike 4.0 International License (CC-BY-SA 4.0 License).
+You may obtain a copy of the License at
+
+\blank[small]
+
+\startcenteraligned
+\bold{\type{http://creativecommons.org/licenses/by-sa/4.0/}}
+\stopcenteraligned
+
+\blank[small]
+
+Unless required by applicable law or agreed to in writing, all non-code
+content distributed under the above CC-BY-SA 4.0 License is distributed
+on an \quote{AS IS} BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the CC-BY-SA 4.0 License whose URL is
+listed above for the specific language governing permissions and
+limitations under the License.
+
+\blank[medium]
+\hrule
+\blank[medium]
+
+Again, unless explicitly stated otherwise, all content contained in this
+document which is \emph{software code} is
+
+\blank[small]
+
+\startcenteraligned
+\bold{Copyright © \currentdate[year] PerceptiSys Ltd (Stephen Gaito)}
+\stopcenteraligned
+
+\blank[small]
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+\blank[small]
+
+\startblockquote
+\noindent The above copyright notice and this permission notice shall
+be included in all copies or substantial portions of the Software.
+\stopblockquote
+
+\blank[small]
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+\stopmakeup

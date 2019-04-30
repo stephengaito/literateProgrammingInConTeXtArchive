@@ -32,16 +32,22 @@ program creation code.
 \addDocumentDirectory%
   {t-literate-progs/doc/context/third/literateProgs}
 
+\prependMkIVCode{default}
+\addMITLicense{MkIVCode}{}{PerceptiSys Ltd (Stephen Gaito)}
 \createMkIVCodeFile%
   {default}%
   {t-literate-progs.mkiv}%
   {A ConTeXt MkIV module}
 
+\prependLuaCode{default}
+\addMITLicense{LuaCode}{--}{PerceptiSys Ltd (Stephen Gaito)}
 \createLuaCodeFile%
   {default}%
   {t-literate-progs.lua}%
   {-- A Lua file}
 
+\prependLuaTemplate{default}
+\addMITLicense{LuaTemplate}{--}{PerceptiSys Ltd (Stephen Gaito)}
 \createLuaTemplateFile%
   {default}%
   {t-literate-progs-templates.lua}%
@@ -59,6 +65,8 @@ program creation code.
 
 \compileLmsfile{default}
 
+\prependLmsfile{default}
+\addMITLicense{Lmsfile}{--}{PerceptiSys Ltd (Stephen Gaito)}
 \createLmsfileFile%
   {default}%
   {lmsfile}%
