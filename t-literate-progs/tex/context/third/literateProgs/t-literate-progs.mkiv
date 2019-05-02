@@ -79,6 +79,7 @@
 
 \ctxloadluafile{t-literate-progs}
 \ctxloadluafile{t-literate-progs-templates}
+\ctxloadluafile{t-literate-progs-config}
 
 % from file: codeManipulation.tex after line: 0
 
@@ -239,6 +240,26 @@
 \def\CHeaderIncludeGuard#1#2{
   \directlua{
     thirddata.literateProgs.cHeaderIncludeGuard('#1', '#2')
+  }
+}
+
+% from file: pathManipulation.tex after line: 0
+
+\def\setEnvironment#1#2{
+  \directlua{
+    thirddata.literateProgs.setEnvironment('#1', '#2')
+  }
+}
+
+\def\setEnvironmentDefault#1#2{
+  \directlua{
+    thirddata.literateProgs.setEnvironmentDefault('#1', '#2')
+  }
+}
+
+\def\clearEnvironemtn#1{
+  \directlua{
+    thirddata.literateProgs.clearEnvironment('#1')
   }
 }
 

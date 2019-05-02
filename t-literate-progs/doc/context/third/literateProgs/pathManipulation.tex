@@ -1,0 +1,60 @@
+% A ConTeXt document [master document: literateProgs.tex]
+
+\startchapter[title=Manipulating of system paths]
+
+We will need to manipulate system paths to indicate where to load or save 
+code to or from the file system.
+
+\startMkIVCode
+\def\setEnvironment#1#2{
+  \directlua{
+    thirddata.literateProgs.setEnvironment('#1', '#2')
+  }
+}
+
+\def\setEnvironmentDefault#1#2{
+  \directlua{
+    thirddata.literateProgs.setEnvironmentDefault('#1', '#2')
+  }
+}
+
+\def\clearEnvironemtn#1{
+  \directlua{
+    thirddata.literateProgs.clearEnvironment('#1')
+  }
+}
+\stopMkIVCode
+
+
+\startLuaCode
+function setEnvironment(envKey, envValue)
+  os.setenv(envKey, envValue)
+end
+
+litProgs.setEnvironment = setEnvironment
+
+function setEnvironmentDefault(envKey, envValue)
+  if type(os.getenv(envKey)) == 'nil' then
+    os.setenv(envKey, envValue)
+  end
+end
+
+litProgs.setEnvironmentDefault = setEnvironmentDefault
+
+function clearEnvironment(envKey)
+  os.setenv(envKey, nil)
+end
+
+litProgs.clearEnvironment = clearEnvironment
+\stopLuaCode
+
+
+\startLuaCode
+function replaceEnvironmentVarsInPath( aPath )
+  aNewPath = aPath:gsub('<([^>]+)>', os.env)
+  return(aNewPath)
+end
+
+litProgs.replaceEnvironmentVarsInPath = replaceEnvironmentVarsInPath
+
+\stopLuaCode

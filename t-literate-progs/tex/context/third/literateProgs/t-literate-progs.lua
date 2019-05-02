@@ -907,6 +907,37 @@ end
 
 thirddata.literateProgs.cHeaderIncludeGuard = cHeaderIncludeGuard
 
+-- from file: pathManipulation.tex after line: 0
+
+function setEnvironment(envKey, envValue)
+  os.setenv(envKey, envValue)
+end
+
+litProgs.setEnvironment = setEnvironment
+
+function setEnvironmentDefault(envKey, envValue)
+  if type(os.getenv(envKey)) == 'nil' then
+    os.setenv(envKey, envValue)
+  end
+end
+
+litProgs.setEnvironmentDefault = setEnvironmentDefault
+
+function clearEnvironment(envKey)
+  os.setenv(envKey, nil)
+end
+
+litProgs.clearEnvironment = clearEnvironment
+
+-- from file: pathManipulation.tex after line: 50
+
+function replaceEnvironmentVarsInPath( aPath )
+  aNewPath = aPath:gsub('<([^>]+)>', os.env)
+  return(aNewPath)
+end
+
+litProgs.replaceEnvironmentVarsInPath = replaceEnvironmentVarsInPath
+
 -- from file: lmsfiles.tex after line: 50
 
 local function addMainDocument(aDocument)
