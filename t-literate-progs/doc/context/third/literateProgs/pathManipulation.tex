@@ -27,15 +27,32 @@ code to or from the file system.
 
 
 \startLuaCode
+directorySeparator = package.config:sub(1,1)
+
+function makePath(pathTable)
+  return tConcat(pathTable, directorySeparator)
+end
+
+function replaceEnvironmentVarsInString( aPath )
+  aNewPath = aPath:gsub('<([^>]+)>', os.env)
+  return(aNewPath)
+end
+
 function setEnvironment(envKey, envValue)
-  os.setenv(envKey, envValue)
+  os.setenv(
+    envKey,
+    replaceEnvironmentVarsInString(envValue)
+  )
 end
 
 litProgs.setEnvironment = setEnvironment
 
 function setEnvironmentDefault(envKey, envValue)
   if type(os.getenv(envKey)) == 'nil' then
-    os.setenv(envKey, envValue)
+    os.setenv(
+      envKey,
+      replaceEnvironmentVarsInString(envValue)
+    )
   end
 end
 
@@ -50,11 +67,22 @@ litProgs.clearEnvironment = clearEnvironment
 
 
 \startLuaCode
-function replaceEnvironmentVarsInPath( aPath )
-  aNewPath = aPath:gsub('<([^>]+)>', os.env)
-  return(aNewPath)
-end
 
+replaceEnvironmentVarsInPath = replaceEnvironmentVarsInString
 litProgs.replaceEnvironmentVarsInPath = replaceEnvironmentVarsInPath
+
+function recursivelyFindFiles(aDir, aFilePattern, actionBlock)
+  for aPath in lfs.dir(aDir) do
+--    texio.write_nl('looking at ['..aPath..']')
+    local fullPath = makePath{aDir, aPath}
+    if not aPath:match('^%.+$') then
+      if lfs.isdir(fullPath) then
+        recursivelyFindFiles(fullPath, aFilePattern, actionBlock)
+      elseif aPath:match(aFilePattern) then
+        actionBlock(fullPath)
+      end
+    end
+  end
+end
 
 \stopLuaCode

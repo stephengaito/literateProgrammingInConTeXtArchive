@@ -909,15 +909,32 @@ thirddata.literateProgs.cHeaderIncludeGuard = cHeaderIncludeGuard
 
 -- from file: pathManipulation.tex after line: 0
 
+directorySeparator = package.config:sub(1,1)
+
+function makePath(pathTable)
+  return tConcat(pathTable, directorySeparator)
+end
+
+function replaceEnvironmentVarsInString( aPath )
+  aNewPath = aPath:gsub('<([^>]+)>', os.env)
+  return(aNewPath)
+end
+
 function setEnvironment(envKey, envValue)
-  os.setenv(envKey, envValue)
+  os.setenv(
+    envKey,
+    replaceEnvironmentVarsInString(envValue)
+  )
 end
 
 litProgs.setEnvironment = setEnvironment
 
 function setEnvironmentDefault(envKey, envValue)
   if type(os.getenv(envKey)) == 'nil' then
-    os.setenv(envKey, envValue)
+    os.setenv(
+      envKey,
+      replaceEnvironmentVarsInString(envValue)
+    )
   end
 end
 
@@ -931,12 +948,22 @@ litProgs.clearEnvironment = clearEnvironment
 
 -- from file: pathManipulation.tex after line: 50
 
-function replaceEnvironmentVarsInPath( aPath )
-  aNewPath = aPath:gsub('<([^>]+)>', os.env)
-  return(aNewPath)
-end
-
+replaceEnvironmentVarsInPath = replaceEnvironmentVarsInString
 litProgs.replaceEnvironmentVarsInPath = replaceEnvironmentVarsInPath
+
+function recursivelyFindFiles(aDir, aFilePattern, actionBlock)
+  for aPath in lfs.dir(aDir) do
+--    texio.write_nl('looking at ['..aPath..']')
+    local fullPath = makePath{aDir, aPath}
+    if not aPath:match('^%.+$') then
+      if lfs.isdir(fullPath) then
+        recursivelyFindFiles(fullPath, aFilePattern, actionBlock)
+      elseif aPath:match(aFilePattern) then
+        actionBlock(fullPath)
+      end
+    end
+  end
+end
 
 -- from file: lmsfiles.tex after line: 50
 
