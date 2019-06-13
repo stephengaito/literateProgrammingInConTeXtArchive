@@ -31,6 +31,11 @@ lpTargets = litProgs.targets{
   docDir    = 't-literate-progs/doc/context/third/literateProgs',
 }
 
+require 'lms.contextDoc'
+
+contextDoc.targets(lpTargets)
+
+
 require 'lms.contextMod'
 
 contextMod.targets(lpTargets, {

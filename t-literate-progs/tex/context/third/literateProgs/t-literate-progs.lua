@@ -1028,7 +1028,7 @@ local function addCCodeTargets(aCodeStream)
   litProgs.markCodeOrigin('Lmsfile')
   local lmsfile = {}
   tInsert(lmsfile, "require 'lms.c'\n")
-  tInsert(lmsfile, "c.targets(lpTargets, {")
+  tInsert(lmsfile, "cTargets = c.targets(lpTargets, {")
   tInsert(lmsfile, "  programs = {")
   for i, aProgram in ipairs(build.cCodePrograms) do
     tInsert(lmsfile, "    '"..aProgram.."',")
@@ -1083,7 +1083,7 @@ local function addCCodeTargets(aCodeStream)
 --  end
 --  tInsert(lmsfile, "  },")
   tInsert(lmsfile, "})")
-  litProgs.setPrepend('Lmsfile', aCodeStream, true)
+--  litProgs.setPrepend('Lmsfile', aCodeStream, true)
   litProgs.addCode.default('Lmsfile', tConcat(lmsfile, '\n'))
 end
 
@@ -1112,6 +1112,11 @@ local function compileLmsfile(aCodeStream)
 
   tInsert(lmsfile, "  docDir    = '"..build.docDir.."',")
   tInsert(lmsfile, "}")
+ 
+  tInsert(lmsfile, "")
+  tInsert(lmsfile, "require 'lms.contextDoc'\n")
+  tInsert(lmsfile, "contextDoc.targets(lpTargets)\n")
+ 
   if build.srcTargets.ctxModule and 0 < #build.srcTargets.ctxModule then
     tInsert(lmsfile, "")
     tInsert(lmsfile, "require 'lms.contextMod'")
