@@ -121,6 +121,7 @@ litProgs.addCCodeLib = addCCodeLib
 
 local function addCCodeTargets(aCodeStream)
   litProgs.setCodeStream('Lmsfile', aCodeStream)
+  build.cCodePrograms = build.cCodePrograms or { }
   litProgs.markCodeOrigin('Lmsfile')
   local lmsfile = {}
   tInsert(lmsfile, "require 'lms.c'\n")
@@ -199,30 +200,18 @@ local function compileLmsfile(aCodeStream)
   setCodeStream('Lmsfile', aCodeStream)
   markCodeOrigin('Lmsfile')
   local lmsfile = {}
---  tInsert(lmsfile, "lfs = require 'lfs'\n")
---  build.existingDirs = build.existingDirs or { }
---  for i, aNewDir in ipairs(build.existingDirs) do
---    tInsert(lmsfile, "lfs.mkdir('"..aNewDir.."')")
---  end
---  tInsert(lmsfile, "")
-  tInsert(lmsfile, "require 'lms.litProgs'\n")
-  tInsert(lmsfile, "lpTargets = litProgs.targets{")
+  tInsert(lmsfile, "require 'lms.contextDoc'\n")
+  tInsert(lmsfile, "ctxTargets = contextDoc.targets{")
   tInsert(lmsfile, "  mainDoc  = '"..build.mainDoc.."',")
---  tInsert(lmsfile, "  docFiles = {")
---  for i, aSubDoc in ipairs(build.subDocs) do
---    tInsert(lmsfile, "    '"..aSubDoc.."',")
---  end
---  tInsert(lmsfile, "  },")
-
   tInsert(lmsfile, "  docDir    = '"..build.docDir.."',")
   tInsert(lmsfile, "}")
-  
   tInsert(lmsfile, "")
-  tInsert(lmsfile, "require 'lms.contextDoc'\n")
-  tInsert(lmsfile, "contextDoc.targets(lpTargets)\n")
   
+  tInsert(lmsfile, "require 'lms.litProgs'\n")
+  tInsert(lmsfile, "lpTargets = litProgs.targets(ctxTargets)")
+  tInsert(lmsfile, "")
+    
   if build.srcTargets.ctxModule and 0 < #build.srcTargets.ctxModule then
-    tInsert(lmsfile, "")
     tInsert(lmsfile, "require 'lms.contextMod'")
     tInsert(lmsfile, "")
     tInsert(lmsfile, "contextMod.targets(lpTargets, {")
@@ -242,14 +231,5 @@ end
 
 litProgs.compileLmsfile = compileLmsfile
 \stopLuaCode
-
-\startLmsfile
--- some additional lua make file items
-
-require 'lms.contextDoc'
-
-contextDoc.targets(lpTargets)
-
-\stopLmsfile
 
 \stopchapter
