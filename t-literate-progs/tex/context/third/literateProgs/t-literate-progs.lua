@@ -996,6 +996,15 @@ end
 
 litProgs.addDocumentDirectory = addDocumentDirectory
 
+local function addConTeXtModuleFile(aFile)
+  build.srcTargets = build.srcTargets or { }
+  local srcTargets = build.srcTargets
+  srcTargets['ctxModule'] = srcTargets['ctxModule'] or { }
+  tInsert(srcTargets['ctxModule'], aFile)
+end
+
+litProgs.addConTeXtModuleFile = addConTeXtModuleFile
+
 local function addConTeXtModuleDirectory(aDirectory)
   build.contextModuleDir = aDirectory
 end
@@ -1090,7 +1099,7 @@ end
 
 litProgs.addCCodeTargets = addCCodeTargets
 
--- from file: lmsfiles.tex after line: 150
+-- from file: lmsfiles.tex after line: 200
 
 local function compileLmsfile(aCodeStream)
   setCodeStream('Lmsfile', aCodeStream)

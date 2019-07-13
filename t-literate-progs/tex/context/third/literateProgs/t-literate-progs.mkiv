@@ -289,6 +289,12 @@
   }
 }
 
+\def\addConTeXtModuleFile#1{
+  \directlua{
+    thirddata.literateProgs.addConTeXtModuleFile('#1')
+  }
+}
+
 \def\addConTeXtModuleDirectory#1{
   \directlua{
     thirddata.literateProgs.addConTeXtModuleDirectory('#1')
@@ -319,7 +325,7 @@
   }
 }
 
-% from file: lmsfiles.tex after line: 150
+% from file: lmsfiles.tex after line: 200
 
 \def\compileLmsfile#1{
   \directlua{

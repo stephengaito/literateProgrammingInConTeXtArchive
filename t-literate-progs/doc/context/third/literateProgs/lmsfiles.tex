@@ -31,6 +31,12 @@ drive the creation of the various files required by any given
   }
 }
 
+\def\addConTeXtModuleFile#1{
+  \directlua{
+    thirddata.literateProgs.addConTeXtModuleFile('#1')
+  }
+}
+
 \def\addConTeXtModuleDirectory#1{
   \directlua{
     thirddata.literateProgs.addConTeXtModuleDirectory('#1')
@@ -91,6 +97,15 @@ local function addDocumentDirectory(aDirectory)
 end
 
 litProgs.addDocumentDirectory = addDocumentDirectory
+
+local function addConTeXtModuleFile(aFile)
+  build.srcTargets = build.srcTargets or { }
+  local srcTargets = build.srcTargets
+  srcTargets['ctxModule'] = srcTargets['ctxModule'] or { }
+  tInsert(srcTargets['ctxModule'], aFile)
+end
+
+litProgs.addConTeXtModuleFile = addConTeXtModuleFile
 
 local function addConTeXtModuleDirectory(aDirectory)
   build.contextModuleDir = aDirectory
