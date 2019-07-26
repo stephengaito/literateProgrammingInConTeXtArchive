@@ -732,6 +732,17 @@ local function createCodeFile(aCodeType,
 
   tInsert(srcTargets[srcType], aFilePath)
 
+  build.dirTargets = build.dirTargets or { }
+  local dirTargets = build.dirTargets
+  
+  for aPathSegment in aFilePath:gmatch('[^%'..directorySeparator..']+') do
+    tInsert(dirTargets, aPathSegment)
+  end
+  tRemove(dirTargets) -- remove the last item
+  
+  texio.write('directory targets:\n')
+  texio.write(prettyPrint(dirTargets)..'\n')
+
   aFilePath = diSimpPrefix() .. build.buildDir .. '/buildDir/' .. aFilePath
   aFilePath = file.collapsepath(aFilePath, true)
   local outFile = io.open(aFilePath, 'w')

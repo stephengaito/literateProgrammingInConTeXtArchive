@@ -90,6 +90,8 @@ local sMatch  = string.match
 local mFloor  = math.floor
 local toStr   = tostring
 
+local directorySeparator = package.config:sub(1,1)
+
 -- from file: preamble.tex after line: 50
 
 local function setDefs(varVal, selector, defVal)
@@ -865,6 +867,17 @@ local function createCodeFile(aCodeType,
 
   tInsert(srcTargets[srcType], aFilePath)
 
+  build.dirTargets = build.dirTargets or { }
+  local dirTargets = build.dirTargets
+ 
+  for aPathSegment in aFilePath:gmatch('[^%'..directorySeparator..']+') do
+    tInsert(dirTargets, aPathSegment)
+  end
+  tRemove(dirTargets) -- remove the last item
+ 
+  texio.write('directory targets:\n')
+  texio.write(prettyPrint(dirTargets)..'\n')
+
   aFilePath = diSimpPrefix() .. build.buildDir .. '/buildDir/' .. aFilePath
   aFilePath = file.collapsepath(aFilePath, true)
   local outFile = io.open(aFilePath, 'w')
@@ -889,7 +902,7 @@ end
 
 litProgs.createCodeFile = createCodeFile
 
--- from file: codeManipulation.tex after line: 800
+-- from file: codeManipulation.tex after line: 850
 
 local function cHeaderIncludeGuard(aCodeStream, aGuard)
   setCodeStream('CHeader', aCodeStream)
@@ -1044,7 +1057,7 @@ local function addCCodeTargets(aCodeStream)
     tInsert(lmsfile, "    '"..aProgram.."',")
   end
   tInsert(lmsfile, "  },")
- 
+
   build.srcTargets = build.srcTargets or { }
   local srcTargets = build.srcTargets
  
@@ -1113,7 +1126,18 @@ local function compileLmsfile(aCodeStream)
   tInsert(lmsfile, "")
  
   tInsert(lmsfile, "require 'lms.litProgs'\n")
-  tInsert(lmsfile, "lpTargets = litProgs.targets(ctxTargets)")
+  tInsert(lmsfile, "lpTargets = litProgs.targets(ctxTargets, {")
+ 
+  build.dirTargets = build.dirTargets or { }
+  local dirTargets = build.dirTargets
+ 
+  tInsert(lmsfile, "  directories = {")
+  for i, aDir in ipairs(dirTargets) do
+    tInsert(lmsfile, "    '"..aDir.."',")
+  end
+  tInsert(lmsfile, "  },")
+ 
+  tInsert(lmsfile, "})")
   tInsert(lmsfile, "")
  
   if build.srcTargets.ctxModule and 0 < #build.srcTargets.ctxModule then

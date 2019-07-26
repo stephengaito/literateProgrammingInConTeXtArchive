@@ -4,3 +4,4 @@
 *.orig
 *.swp
 buildDir
+lmsfileInfo

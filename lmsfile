@@ -33,7 +33,10 @@ ctxTargets = contextDoc.targets{
 
 require 'lms.litProgs'
 
-lpTargets = litProgs.targets(ctxTargets)
+lpTargets = litProgs.targets(ctxTargets, {
+  directories = {
+  },
+})
 
 require 'lms.contextMod'
 
