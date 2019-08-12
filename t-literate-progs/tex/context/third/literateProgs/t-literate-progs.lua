@@ -981,7 +981,8 @@ end
 -- from file: lmsfiles.tex after line: 50
 
 local function addMainDocument(aDocument)
-  build.mainDoc = aDocument
+  -- first mainDoc "wins"
+  build.mainDoc = build.mainDoc or aDocument
 end
 
 litProgs.addMainDocument = addMainDocument
@@ -1130,13 +1131,15 @@ local function compileLmsfile(aCodeStream)
     tInsert(lmsfile, "    },")
   end
  
-  build.cTestTargets = build.cTestTargets or { }
-  local cTestTargets = build.cTestTargets
-  tInsert(lmsfile, "    cTestFiles = {")
-  for i, aTestExec in ipairs(cTestTargets) do
-    tInsert(lmsfile, "      '"..aTestExec..".c',")
+  if build.cTestTargets then
+    local cTestTargets = build.cTestTargets
+    tInsert(lmsfile, "    cTestFiles = {")
+    for i, aTestExec in ipairs(cTestTargets) do
+      tInsert(lmsfile, "      '"..aTestExec..".c',")
+    end
+    tInsert(lmsfile, "    },")
   end
-  tInsert(lmsfile, "    },")
+ 
   tInsert(lmsfile, "    lmsfileFiles = {")
   tInsert(lmsfile, "      'lmsfile',")
   tInsert(lmsfile, "    },")

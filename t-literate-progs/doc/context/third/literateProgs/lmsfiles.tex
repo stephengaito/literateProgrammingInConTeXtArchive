@@ -70,7 +70,8 @@ drive the creation of the various files required by any given
 
 \startLuaCode
 local function addMainDocument(aDocument)
-  build.mainDoc = aDocument
+  -- first mainDoc "wins"
+  build.mainDoc = build.mainDoc or aDocument
 end
 
 litProgs.addMainDocument = addMainDocument
