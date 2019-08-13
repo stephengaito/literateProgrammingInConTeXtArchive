@@ -1010,6 +1010,13 @@ end
 
 litProgs.addDocumentDirectory = addDocumentDirectory
 
+local function addLmsfileSubDirectory(aDirectory)
+  build.lmsfileSubDirs = build.lmsfileSubDirs or { }
+  tInsert(build.lmsfileSubDirs, aDirectory)
+end
+
+litProgs.addLmsfileSubDirectory = addLmsfileSubDirectory
+
 local function addConTeXtModuleFile(aFile)
   build.srcTargets = build.srcTargets or { }
   local srcTargets = build.srcTargets
@@ -1094,7 +1101,7 @@ end
 
 litProgs.addCCodeTargets = addCCodeTargets
 
--- from file: lmsfiles.tex after line: 150
+-- from file: lmsfiles.tex after line: 200
 
 local function compileLmsfile(aCodeStream)
   setCodeStream('Lmsfile', aCodeStream)
@@ -1102,8 +1109,14 @@ local function compileLmsfile(aCodeStream)
   local lmsfile = {}
   tInsert(lmsfile, "require 'lms.contextDoc'\n")
   tInsert(lmsfile, "ctxTargets = contextDoc.targets{")
-  tInsert(lmsfile, "  mainDoc  = '"..build.mainDoc.."',")
-  tInsert(lmsfile, "  docDir    = '"..build.docDir.."',")
+  tInsert(lmsfile, "  mainDoc        = '"..build.mainDoc.."',")
+  tInsert(lmsfile, "  docDir         = '"..build.docDir.."',")
+  tInsert(lmsfile, "  lmsfileSubDirs = {")
+  build.lmsfileSubDirs = build.lmsfileSubDirs or { }
+  for i, anLmsfileSubDir in ipairs(build.lmsfileSubDirs) do
+    tInsert(lmsfile, "    '"..anLmsfileSubDir.."',")
+  end
+  tInsert(lmsfile, "  },")
   tInsert(lmsfile, "}")
   tInsert(lmsfile, "")
  
@@ -1161,4 +1174,12 @@ local function compileLmsfile(aCodeStream)
 end
 
 litProgs.compileLmsfile = compileLmsfile
+
+local function addRecurseTargetsToLmsfile(aCodeStream)
+  setCodeStream('Lmsfile', aCodeStream)
+  markCodeOrigin('Lmsfile')
+  addCodeDefault('Lmsfile', "\n\nrecurseTargets(ctxTargets)\n" )
+end
+
+litProgs.addRecurseTargetsToLmsfile = addRecurseTargetsToLmsfile
 

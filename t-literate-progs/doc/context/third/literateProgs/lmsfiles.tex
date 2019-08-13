@@ -31,6 +31,12 @@ drive the creation of the various files required by any given
   }
 }
 
+\def\addLmsfileSubDirectory#1{
+  \directlua{
+    thirddata.literateProgs.addLmsfileSubDirectory('#1')
+  }
+}
+
 \def\addConTeXtModuleFile#1{
   \directlua{
     thirddata.literateProgs.addConTeXtModuleFile('#1')
@@ -98,6 +104,13 @@ local function addDocumentDirectory(aDirectory)
 end
 
 litProgs.addDocumentDirectory = addDocumentDirectory
+
+local function addLmsfileSubDirectory(aDirectory)
+  build.lmsfileSubDirs = build.lmsfileSubDirs or { }
+  tInsert(build.lmsfileSubDirs, aDirectory)
+end
+
+litProgs.addLmsfileSubDirectory = addLmsfileSubDirectory
 
 local function addConTeXtModuleFile(aFile)
   build.srcTargets = build.srcTargets or { }
@@ -190,6 +203,12 @@ litProgs.addCCodeTargets = addCCodeTargets
     thirddata.literateProgs.compileLmsfile('#1')
   }
 }
+
+\def\addRecurseTargetsToLmsfile#1{
+  \directlua{
+    thirddata.literateProgs.addRecurseTargetsToLmsfile('#1')
+  }
+}
 \stopMkIVCode
 
 \startLuaCode
@@ -199,8 +218,14 @@ local function compileLmsfile(aCodeStream)
   local lmsfile = {}
   tInsert(lmsfile, "require 'lms.contextDoc'\n")
   tInsert(lmsfile, "ctxTargets = contextDoc.targets{")
-  tInsert(lmsfile, "  mainDoc  = '"..build.mainDoc.."',")
-  tInsert(lmsfile, "  docDir    = '"..build.docDir.."',")
+  tInsert(lmsfile, "  mainDoc        = '"..build.mainDoc.."',")
+  tInsert(lmsfile, "  docDir         = '"..build.docDir.."',")
+  tInsert(lmsfile, "  lmsfileSubDirs = {")
+  build.lmsfileSubDirs = build.lmsfileSubDirs or { }
+  for i, anLmsfileSubDir in ipairs(build.lmsfileSubDirs) do
+    tInsert(lmsfile, "    '"..anLmsfileSubDir.."',")
+  end
+  tInsert(lmsfile, "  },")
   tInsert(lmsfile, "}")
   tInsert(lmsfile, "")
   
@@ -258,6 +283,15 @@ local function compileLmsfile(aCodeStream)
 end
 
 litProgs.compileLmsfile = compileLmsfile
+
+local function addRecurseTargetsToLmsfile(aCodeStream)
+  setCodeStream('Lmsfile', aCodeStream)
+  markCodeOrigin('Lmsfile')
+  addCodeDefault('Lmsfile', "\n\nrecurseTargets(ctxTargets)\n" )
+end
+
+litProgs.addRecurseTargetsToLmsfile = addRecurseTargetsToLmsfile
+
 \stopLuaCode
 
 \stopchapter
