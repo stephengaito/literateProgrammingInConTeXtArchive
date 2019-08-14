@@ -612,7 +612,7 @@ end
 
 litProgs.createFixLitProgs = createFixLitProgs
 
--- from file: codeManipulation.tex after line: 350
+-- from file: codeManipulation.tex after line: 400
 
 local function setOriginMarker(aCodeType, aCodeStream, anOriginMarker)
   if type(litProgs[anOriginMarker]) == 'function' then
@@ -708,6 +708,16 @@ end
 litProgs.addCodeDispatcher = addCodeDispatcher
 litProgs.addCode           = {}
 litProgs.addCode.default   = addCodeDefault
+
+local function clearCodeStream(aCodeType, aCodeStream)
+  local codeType        = setDefs(code, aCodeType)
+  local aCodeStream     = setDefs(codeType, 'curCodeStream', 'default')
+  local codeStream      = setDefs(codeType, aCodeStream)
+
+  codeStream = { }
+end
+
+litProgs.clearCodeStream = clearCodeStream
 
 local function addMITLicense(aCodeType, commentStart, copyrightOwner)
   litProgs.markCodeOrigin(aCodeType)
@@ -816,15 +826,16 @@ end
 
 litProgs.addApacheLicense = addApacheLicense
 
--- from file: codeManipulation.tex after line: 650
+-- from file: codeManipulation.tex after line: 700
 
 build.srcTypes = build.srcTypes or { }
-build.srcTypes['MkIVCode'] = 'ctxModule'
-build.srcTypes['MpIVCode'] = 'ctxModule'
-build.srcTypes['LuaCode']  = 'ctxModule'
-build.srcTypes['CHeader']  = 'cHeader'
-build.srcTypes['CCode']    = 'cCode'
-build.srcTypes['Lmsfile']  = 'lmsfile'
+build.srcTypes['MkIVCode']    = 'ctxModule'
+build.srcTypes['MpIVCode']    = 'ctxModule'
+build.srcTypes['LuaCode']     = 'ctxModule'
+build.srcTypes['LuaTemplate'] = 'ctxModule'
+build.srcTypes['CHeader']     = 'cHeader'
+build.srcTypes['CCode']       = 'cCode'
+build.srcTypes['Lmsfile']     = 'lmsfile'
 
 local function diSimpPrefix()
   if thirddata.diSimp and thirddata.diSimp.lastDiSimpPath then

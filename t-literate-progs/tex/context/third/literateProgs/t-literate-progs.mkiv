@@ -129,13 +129,13 @@
   {\buff_verbatim_type_block_verbatim_indeed{#1}{#2}}%
   \zerocount}
 
-% from file: codeManipulation.tex after line: 250
+% from file: codeManipulation.tex after line: 300
 
 \def\fixLitProgs#1{
   \directlua{thirddata.literateProgs.createFixLitProgs('#1')}
 }
 
-% from file: codeManipulation.tex after line: 550
+% from file: codeManipulation.tex after line: 600
 
 \unexpanded\def\setLitProgsOriginMarker{
   \dotripleempty\doSetLitProgsOriginMarker%
@@ -177,14 +177,14 @@
   }
 }
 
-% from file: codeManipulation.tex after line: 750
+% from file: codeManipulation.tex after line: 800
 
 \definetextbackground[LitProgFrame]
 \setuptextbackground%
   [LitProgFrame]%
   [location=paragraph, background=color, backgroundcolor=gray]
 
-% from file: codeManipulation.tex after line: 750
+% from file: codeManipulation.tex after line: 800
 
 \defineLitProgs%
   [MkIVCode]%
@@ -235,7 +235,7 @@
 \setLitProgsOriginMarker[CHeader][markCHeaderOrigin]
 \setLitProgsOriginMarker[CCode][markCCodeOrigin]
 
-% from file: codeManipulation.tex after line: 800
+% from file: codeManipulation.tex after line: 850
 
 \def\CHeaderIncludeGuard#1#2{
   \directlua{

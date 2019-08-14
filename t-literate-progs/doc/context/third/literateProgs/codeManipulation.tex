@@ -237,6 +237,14 @@ addTemplate(
     )
   }
 }
+\unexpanded\def\clear{{= litProgsName }}#1{
+  \directlua{
+    thirddata.literateProgs.clearCodeStream(
+      '{{= litProgsName }}',
+      '#1'
+    )
+  }
+}
 \unexpanded\def\set{{= litProgsName }}Stream#1{
   \directlua{
     thirddata.literateProgs.setCodeStream(
@@ -303,7 +311,7 @@ local createFixLitProgs = thirddata.literateProgs.createFixLitProgs
 
 local macroBody = createFixLitProgs('Test')
 assert.isTable(macroBody)
-assert.length(macroBody, 55)
+assert.length(macroBody, 63)
 assert.isEqual(macroBody[1],  "\\let\\oldStartTest=\\startTest")
 assert.isEqual(macroBody[2],  "\\unexpanded\\def\\startTest{")
 assert.isEqual(macroBody[3],  "  \\directlua{")
@@ -333,32 +341,40 @@ assert.isEqual(macroBody[26], "      '#3'")
 assert.isEqual(macroBody[27], "    )")
 assert.isEqual(macroBody[28], "  }")
 assert.isEqual(macroBody[29], "}")
-assert.isEqual(macroBody[30], "\\unexpanded\\def\\setTestStream#1{")
+assert.isEqual(macroBody[30], "\\unexpanded\\def\\clearTest#1{")
 assert.isEqual(macroBody[31], "  \\directlua{")
-assert.isEqual(macroBody[32], "    thirddata.literateProgs.setCodeStream(")
+assert.isEqual(macroBody[32], "    thirddata.literateProgs.clearCodeStream(")
 assert.isEqual(macroBody[33], "      'Test',")
 assert.isEqual(macroBody[34], "      '#1'")
 assert.isEqual(macroBody[35], "    )")
 assert.isEqual(macroBody[36], "  }")
 assert.isEqual(macroBody[37], "}")
-assert.isEqual(macroBody[38], "\\unexpanded\\def\\prependTest#1{")
+assert.isEqual(macroBody[38], "\\unexpanded\\def\\setTestStream#1{")
 assert.isEqual(macroBody[39], "  \\directlua{")
-assert.isEqual(macroBody[40], "    thirddata.literateProgs.setPrepend(")
+assert.isEqual(macroBody[40], "    thirddata.literateProgs.setCodeStream(")
 assert.isEqual(macroBody[41], "      'Test',")
-assert.isEqual(macroBody[42], "      '#1',")
-assert.isEqual(macroBody[43], "      true")
-assert.isEqual(macroBody[44], "    )")
-assert.isEqual(macroBody[45], "  }")
-assert.isEqual(macroBody[46], "}")
-assert.isEqual(macroBody[47], "\\unexpanded\\def\\appendTest#1{")
-assert.isEqual(macroBody[48], "  \\directlua{")
-assert.isEqual(macroBody[49], "    thirddata.literateProgs.setPrepend(")
-assert.isEqual(macroBody[50], "      'Test',")
-assert.isEqual(macroBody[51], "      '#1',")
-assert.isEqual(macroBody[52], "      false")
-assert.isEqual(macroBody[53], "    )")
-assert.isEqual(macroBody[54], "  }")
-assert.isEqual(macroBody[55], "}")
+assert.isEqual(macroBody[42], "      '#1'")
+assert.isEqual(macroBody[43], "    )")
+assert.isEqual(macroBody[44], "  }")
+assert.isEqual(macroBody[45], "}")
+assert.isEqual(macroBody[46], "\\unexpanded\\def\\prependTest#1{")
+assert.isEqual(macroBody[47], "  \\directlua{")
+assert.isEqual(macroBody[48], "    thirddata.literateProgs.setPrepend(")
+assert.isEqual(macroBody[49], "      'Test',")
+assert.isEqual(macroBody[50], "      '#1',")
+assert.isEqual(macroBody[51], "      true")
+assert.isEqual(macroBody[52], "    )")
+assert.isEqual(macroBody[53], "  }")
+assert.isEqual(macroBody[54], "}")
+assert.isEqual(macroBody[55], "\\unexpanded\\def\\appendTest#1{")
+assert.isEqual(macroBody[56], "  \\directlua{")
+assert.isEqual(macroBody[57], "    thirddata.literateProgs.setPrepend(")
+assert.isEqual(macroBody[58], "      'Test',")
+assert.isEqual(macroBody[59], "      '#1',")
+assert.isEqual(macroBody[60], "      false")
+assert.isEqual(macroBody[61], "    )")
+assert.isEqual(macroBody[62], "  }")
+assert.isEqual(macroBody[63], "}")
 \stopLuaTest
 \stopTestCase
 
@@ -372,6 +388,7 @@ assert.isEqual(macroBody[55], "}")
   \assertDefined{oldStopTest}{}
   \assertDefined{stopTest}{}
   \assertDefined{createTestFile}{}
+  \assertDefined{clearTest}{}
   \assertDefined{setTestStream}{}
   \assertDefined{prependTest}{}
   \assertDefined{appendTest}{}
@@ -479,6 +496,16 @@ end
 litProgs.addCodeDispatcher = addCodeDispatcher
 litProgs.addCode           = {}
 litProgs.addCode.default   = addCodeDefault
+
+local function clearCodeStream(aCodeType, aCodeStream)
+  local codeType        = setDefs(code, aCodeType)
+  local aCodeStream     = setDefs(codeType, 'curCodeStream', 'default')
+  local codeStream      = setDefs(codeType, aCodeStream)
+
+  codeStream = { }
+end
+
+litProgs.clearCodeStream = clearCodeStream
 
 local function addMITLicense(aCodeType, commentStart, copyrightOwner)
   litProgs.markCodeOrigin(aCodeType)
@@ -650,7 +677,7 @@ captures its contents.
     assert.isNotNil(code['default'], 'TestCode')
     code = code['default']
     assert.length(code, 1)
-    assert.isEqual(code[1], 'this is some test "code"')
+    assert.isEqual(code[1], '    this is some test "code"')
   \stopLuaConTest
 \endgroup
 \stopConTest
@@ -684,12 +711,13 @@ captures its contents using a specific addTestCodeCode Lua function.
 \startLuaCode
 
 build.srcTypes = build.srcTypes or { }
-build.srcTypes['MkIVCode'] = 'ctxModule'
-build.srcTypes['MpIVCode'] = 'ctxModule'
-build.srcTypes['LuaCode']  = 'ctxModule'
-build.srcTypes['CHeader']  = 'cHeader'
-build.srcTypes['CCode']    = 'cCode'
-build.srcTypes['Lmsfile']  = 'lmsfile'
+build.srcTypes['MkIVCode']    = 'ctxModule'
+build.srcTypes['MpIVCode']    = 'ctxModule'
+build.srcTypes['LuaCode']     = 'ctxModule'
+build.srcTypes['LuaTemplate'] = 'ctxModule'
+build.srcTypes['CHeader']     = 'cHeader'
+build.srcTypes['CCode']       = 'cCode'
+build.srcTypes['Lmsfile']     = 'lmsfile'
 
 local function diSimpPrefix()
   if thirddata.diSimp and thirddata.diSimp.lastDiSimpPath then
