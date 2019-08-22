@@ -81,13 +81,12 @@ addTemplate(
     )
   }
 }
-\unexpanded\def\create{{= litProgsName }}File#1#2#3{
+\unexpanded\def\add{{= litProgsName }}Dependency#1#2{
   \directlua{
-    thirddata.literateProgs.createCodeFile(
+    thirddata.literateProgs.addCodeStreamDependency(
       '{{= litProgsName }}',
       '#1',
-      '#2',
-      '#3'
+      '#2'
     )
   }
 }
@@ -96,6 +95,16 @@ addTemplate(
     thirddata.literateProgs.clearCodeStream(
       '{{= litProgsName }}',
       '#1'
+    )
+  }
+}
+\unexpanded\def\create{{= litProgsName }}File#1#2#3{
+  \directlua{
+    thirddata.literateProgs.createCodeFile(
+      '{{= litProgsName }}',
+      '#1',
+      '#2',
+      '#3'
     )
   }
 }

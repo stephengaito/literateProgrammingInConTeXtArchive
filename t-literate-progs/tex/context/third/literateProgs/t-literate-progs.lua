@@ -709,6 +709,17 @@ litProgs.addCodeDispatcher = addCodeDispatcher
 litProgs.addCode           = {}
 litProgs.addCode.default   = addCodeDefault
 
+local function addCodeStreamDependency(aCodeType, aCodeStream, aDependent)
+  local codeType        = setDefs(code, aCodeType)
+  local aCodeStream     = setDefs(codeType, 'curCodeStream', 'default')
+  local codeStream      = setDefs(codeType, aCodeStream)
+  local dependents      = setDefs(codeStream, 'dependents')
+ 
+  tInsert(dependents, aDependent)
+end
+
+litProgs.addCodeStreamDependent = addCodeStreamDependent
+
 local function clearCodeStream(aCodeType, aCodeStream)
   local codeType        = setDefs(code, aCodeType)
   local aCodeStream     = setDefs(codeType, 'curCodeStream', 'default')
@@ -886,8 +897,11 @@ local function createCodeFile(aCodeType,
   end
   tRemove(dirTargets) -- remove the last item
  
-  texio.write('directory targets:\n')
-  texio.write(prettyPrint(dirTargets)..'\n')
+  texio.write_nl('directory targets:')
+  texio.write_nl(prettyPrint(dirTargets))
+  texio.write_nl('diSimpPrefix: ['..diSimpPrefix()..']')
+  texio.write_nl('buildDir: ['..build.buildDir..']')
+  texio.write_nl('aFilePath: ['..aFilePath..']')
 
   aFilePath = diSimpPrefix() .. build.buildDir .. '/buildDir/' .. aFilePath
   aFilePath = file.collapsepath(aFilePath, true)
@@ -913,7 +927,7 @@ end
 
 litProgs.createCodeFile = createCodeFile
 
--- from file: codeManipulation.tex after line: 850
+-- from file: codeManipulation.tex after line: 900
 
 local function cHeaderIncludeGuard(aCodeStream, aGuard)
   setCodeStream('CHeader', aCodeStream)

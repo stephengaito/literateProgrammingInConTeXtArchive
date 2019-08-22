@@ -227,13 +227,12 @@ addTemplate(
     )
   }
 }
-\unexpanded\def\create{{= litProgsName }}File#1#2#3{
+\unexpanded\def\add{{= litProgsName }}Dependency#1#2{
   \directlua{
-    thirddata.literateProgs.createCodeFile(
+    thirddata.literateProgs.addCodeStreamDependency(
       '{{= litProgsName }}',
       '#1',
-      '#2',
-      '#3'
+      '#2'
     )
   }
 }
@@ -242,6 +241,16 @@ addTemplate(
     thirddata.literateProgs.clearCodeStream(
       '{{= litProgsName }}',
       '#1'
+    )
+  }
+}
+\unexpanded\def\create{{= litProgsName }}File#1#2#3{
+  \directlua{
+    thirddata.literateProgs.createCodeFile(
+      '{{= litProgsName }}',
+      '#1',
+      '#2',
+      '#3'
     )
   }
 }
@@ -311,7 +320,7 @@ local createFixLitProgs = thirddata.literateProgs.createFixLitProgs
 
 local macroBody = createFixLitProgs('Test')
 assert.isTable(macroBody)
-assert.length(macroBody, 63)
+assert.length(macroBody, 72)
 assert.isEqual(macroBody[1],  "\\let\\oldStartTest=\\startTest")
 assert.isEqual(macroBody[2],  "\\unexpanded\\def\\startTest{")
 assert.isEqual(macroBody[3],  "  \\directlua{")
@@ -331,50 +340,59 @@ assert.isEqual(macroBody[16], "      '_typing_'")
 assert.isEqual(macroBody[17], "    )")
 assert.isEqual(macroBody[18], "  }")
 assert.isEqual(macroBody[19], "}")
-assert.isEqual(macroBody[20], "\\unexpanded\\def\\createTestFile#1#2#3{")
+assert.isEqual(macroBody[20], "\\unexpanded\\def\\addTestDependency#1#2{")
 assert.isEqual(macroBody[21], "  \\directlua{")
-assert.isEqual(macroBody[22], "    thirddata.literateProgs.createCodeFile(")
+assert.isEqual(macroBody[22], "    thirddata.literateProgs.addCodeStreamDependency(")
 assert.isEqual(macroBody[23], "      'Test',")
 assert.isEqual(macroBody[24], "      '#1',")
-assert.isEqual(macroBody[25], "      '#2',")
-assert.isEqual(macroBody[26], "      '#3'")
-assert.isEqual(macroBody[27], "    )")
-assert.isEqual(macroBody[28], "  }")
-assert.isEqual(macroBody[29], "}")
-assert.isEqual(macroBody[30], "\\unexpanded\\def\\clearTest#1{")
-assert.isEqual(macroBody[31], "  \\directlua{")
-assert.isEqual(macroBody[32], "    thirddata.literateProgs.clearCodeStream(")
-assert.isEqual(macroBody[33], "      'Test',")
-assert.isEqual(macroBody[34], "      '#1'")
-assert.isEqual(macroBody[35], "    )")
-assert.isEqual(macroBody[36], "  }")
-assert.isEqual(macroBody[37], "}")
-assert.isEqual(macroBody[38], "\\unexpanded\\def\\setTestStream#1{")
-assert.isEqual(macroBody[39], "  \\directlua{")
-assert.isEqual(macroBody[40], "    thirddata.literateProgs.setCodeStream(")
-assert.isEqual(macroBody[41], "      'Test',")
-assert.isEqual(macroBody[42], "      '#1'")
-assert.isEqual(macroBody[43], "    )")
-assert.isEqual(macroBody[44], "  }")
-assert.isEqual(macroBody[45], "}")
-assert.isEqual(macroBody[46], "\\unexpanded\\def\\prependTest#1{")
-assert.isEqual(macroBody[47], "  \\directlua{")
-assert.isEqual(macroBody[48], "    thirddata.literateProgs.setPrepend(")
-assert.isEqual(macroBody[49], "      'Test',")
-assert.isEqual(macroBody[50], "      '#1',")
-assert.isEqual(macroBody[51], "      true")
+assert.isEqual(macroBody[25], "      '#2'")
+assert.isEqual(macroBody[26], "    )")
+assert.isEqual(macroBody[27], "  }")
+assert.isEqual(macroBody[28], "}")
+assert.isEqual(macroBody[29], "\\unexpanded\\def\\clearTest#1{")
+assert.isEqual(macroBody[30], "  \\directlua{")
+assert.isEqual(macroBody[31], "    thirddata.literateProgs.clearCodeStream(")
+assert.isEqual(macroBody[32], "      'Test',")
+assert.isEqual(macroBody[33], "      '#1'")
+assert.isEqual(macroBody[34], "    )")
+assert.isEqual(macroBody[35], "  }")
+assert.isEqual(macroBody[36], "}")
+assert.isEqual(macroBody[37], "\\unexpanded\\def\\createTestFile#1#2#3{")
+assert.isEqual(macroBody[38], "  \\directlua{")
+assert.isEqual(macroBody[39], "    thirddata.literateProgs.createCodeFile(")
+assert.isEqual(macroBody[40], "      'Test',")
+assert.isEqual(macroBody[41], "      '#1',")
+assert.isEqual(macroBody[42], "      '#2',")
+assert.isEqual(macroBody[43], "      '#3'")
+assert.isEqual(macroBody[44], "    )")
+assert.isEqual(macroBody[45], "  }")
+assert.isEqual(macroBody[46], "}")
+assert.isEqual(macroBody[47], "\\unexpanded\\def\\setTestStream#1{")
+assert.isEqual(macroBody[48], "  \\directlua{")
+assert.isEqual(macroBody[49], "    thirddata.literateProgs.setCodeStream(")
+assert.isEqual(macroBody[50], "      'Test',")
+assert.isEqual(macroBody[51], "      '#1'")
 assert.isEqual(macroBody[52], "    )")
 assert.isEqual(macroBody[53], "  }")
 assert.isEqual(macroBody[54], "}")
-assert.isEqual(macroBody[55], "\\unexpanded\\def\\appendTest#1{")
+assert.isEqual(macroBody[55], "\\unexpanded\\def\\prependTest#1{")
 assert.isEqual(macroBody[56], "  \\directlua{")
 assert.isEqual(macroBody[57], "    thirddata.literateProgs.setPrepend(")
 assert.isEqual(macroBody[58], "      'Test',")
 assert.isEqual(macroBody[59], "      '#1',")
-assert.isEqual(macroBody[60], "      false")
+assert.isEqual(macroBody[60], "      true")
 assert.isEqual(macroBody[61], "    )")
 assert.isEqual(macroBody[62], "  }")
 assert.isEqual(macroBody[63], "}")
+assert.isEqual(macroBody[64], "\\unexpanded\\def\\appendTest#1{")
+assert.isEqual(macroBody[65], "  \\directlua{")
+assert.isEqual(macroBody[66], "    thirddata.literateProgs.setPrepend(")
+assert.isEqual(macroBody[67], "      'Test',")
+assert.isEqual(macroBody[68], "      '#1',")
+assert.isEqual(macroBody[69], "      false")
+assert.isEqual(macroBody[70], "    )")
+assert.isEqual(macroBody[71], "  }")
+assert.isEqual(macroBody[72], "}")
 \stopLuaTest
 \stopTestCase
 
@@ -387,8 +405,9 @@ assert.isEqual(macroBody[63], "}")
   \assertDefined{startTest}{}
   \assertDefined{oldStopTest}{}
   \assertDefined{stopTest}{}
-  \assertDefined{createTestFile}{}
   \assertDefined{clearTest}{}
+  \assertDefined{addTestDependency}{}
+  \assertDefined{createTestFile}{}
   \assertDefined{setTestStream}{}
   \assertDefined{prependTest}{}
   \assertDefined{appendTest}{}
@@ -496,6 +515,17 @@ end
 litProgs.addCodeDispatcher = addCodeDispatcher
 litProgs.addCode           = {}
 litProgs.addCode.default   = addCodeDefault
+
+local function addCodeStreamDependency(aCodeType, aCodeStream, aDependent)
+  local codeType        = setDefs(code, aCodeType)
+  local aCodeStream     = setDefs(codeType, 'curCodeStream', 'default')
+  local codeStream      = setDefs(codeType, aCodeStream)
+  local dependents      = setDefs(codeStream, 'dependents')
+  
+  tInsert(dependents, aDependent)
+end
+
+litProgs.addCodeStreamDependent = addCodeStreamDependent
 
 local function clearCodeStream(aCodeType, aCodeStream)
   local codeType        = setDefs(code, aCodeType)
@@ -768,8 +798,11 @@ local function createCodeFile(aCodeType,
   end
   tRemove(dirTargets) -- remove the last item
   
-  texio.write('directory targets:\n')
-  texio.write(prettyPrint(dirTargets)..'\n')
+  texio.write_nl('directory targets:')
+  texio.write_nl(prettyPrint(dirTargets))
+  texio.write_nl('diSimpPrefix: ['..diSimpPrefix()..']')
+  texio.write_nl('buildDir: ['..build.buildDir..']')
+  texio.write_nl('aFilePath: ['..aFilePath..']')
 
   aFilePath = diSimpPrefix() .. build.buildDir .. '/buildDir/' .. aFilePath
   aFilePath = file.collapsepath(aFilePath, true)
