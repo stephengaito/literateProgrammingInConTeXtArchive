@@ -1029,6 +1029,7 @@ end
 litProgs.ensureDirectoryExists = ensureDirectoryExists
 
 local function addDocumentDirectory(aDirectory)
+  texio.write_nl('addDocumentDir: curDir: ['..lfs.currentdir()..']')
   build.docDir   = aDirectory
   build.buildDir = aDirectory:gsub('[^/]+', '..')
 end

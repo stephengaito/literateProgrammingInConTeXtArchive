@@ -808,7 +808,7 @@ local function createCodeFile(aCodeType,
   aFilePath = file.collapsepath(aFilePath, true)
   local outFile = io.open(aFilePath, 'w')
   if outFile then
-    texio.write('creating code file: ['..aFilePath..']\n')
+    texio.write_nl('creating code file: ['..aFilePath..']')
     if 0 < #aFileHeader then
       if aFileHeader:match('[Cc][Oo][Nn][Tt][Ee][Xx][Tt]') then
         outFile:write('% ')
