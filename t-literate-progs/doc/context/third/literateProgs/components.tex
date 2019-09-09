@@ -1,0 +1,366 @@
+% A ConTeXt document [master document literateProgs.tex]
+
+\chapter[title=Working with ConTeXt Components]
+
+We start by determining whether or not we want to generate the whole 
+typeset document or just the auto-generated code. We do this by asserting 
+the \ConTeXt\ \quote{mode} \quote{codeOnly}. This can be set in the 
+document, before any line containing \type{\usemodule[t-litProgs]}, by using 
+the command, \type{\enablemode[codeOnly]}, to ensure only the \ConTeXt\ 
+document is only run in order to generate the auto-generated code. 
+Alternatively you can use the command, \type{\disablemode[codeOnly]}, to 
+ensure the whole document is type set. 
+
+\startMkIVCode
+\doifmodeelse{codeOnly}{
+  \directlua{
+    thirddata.literateProgs.setCodeOnly(true)
+  }
+} {
+  \directlua{
+    thirddata.literateProgs.setCodeOnly(false)
+  }
+}
+
+\stopMkIVCode
+
+\startLuaCode
+local function setCodeOnly(codeOnlyBoolean)
+  if codeOnlyBoolean then
+    texio.write_nl('setCodeOnly to true')
+  else
+    texio.write_nl('setCodeOnly to false')
+  end
+  litProgs.codeOnly = codeOnlyBoolean
+  if litProgs.codeOnly then
+    texio.write_nl('setCodeOnly now true')
+  else
+    texio.write_nl('setCodeOnly now false')
+  end
+end
+
+litProgs.setCodeOnly = setCodeOnly
+\stopLuaCode
+
+\section[title=LitProgslex document Environments and Components macros]
+
+We specialize the standard \type{\environment} and \type{\component} macros 
+to ensure two things:
+
+\startitemize[n]
+
+\item \bold{complex collections of sub-components found in \quote{relative} 
+paths}. LitProgs documents may be built using multiple associated artifacts 
+such as, for example, CoAlgebras. We need the ability to specify 
+components which might not be in the traditional \ConTeXt\ hierarchical 
+directory structures.
+
+\item \bold{knowledge of \quote{doc} directories}. LitProgs documents usually 
+produce computational artifacts which might need separate compilation. To 
+keep these \emph{derived} computational artefacts separate from the main 
+document, we keep \ConTeXt\ files in \quote{doc} directories and any 
+derived computational artefacts in \quote{buildDir} directories.
+
+\stopitemize
+
+We implement \type{\startLitProgsComponent} and \type{\stopLitProgsComponent} 
+in order to ensure that our complex collection of nested components does 
+not break \ConTeXt's native \quote{project}, \quote{product}, and 
+\quote{component} system. We effectively only make use of 
+\quote{components}, but we explicitly allow them to be nested multiple 
+levels deep. To do this we only actually let \ConTeXt\ \quote{see} the 
+outer most start/stop \quote{component} declaration.
+
+\startMkIVCode
+
+%% repeat after me.... this WILL break!!!
+%%
+%% this call pattern has been modeled upon the
+%% definition of \environment in file-job.mkvi
+%% on 2018/Nov/07 (experimental distribution)
+%%
+\unexpanded\def\litProgsEnvironment{
+  \doifelsenextoptionalcs%
+    \useLitProgsEnvironment%
+    \syst_structure_arg_litprogs_environment%
+}
+
+\def\syst_structure_arg_litprogs_environment  #1 {\useLitProgsEnvironment  [#1]}
+
+\unexpanded\def\useLitProgsEnvironment  [#1]{
+  \directlua{
+    thirddata.literateProgs.litProgsComponent('environment', '#1')
+  }
+}
+
+%% repeat after me.... this WILL break!!!
+%%
+%% this call pattern has been modeled upon the
+%% definition of \startcomponent in file-job.mkvi
+%% on 2018/Nov/07 (experimental distribution)
+%%
+\unexpanded\def\startLitProgsComponent{
+  \doifelsenextoptionalcs%
+    \useStartLitProgsComponent%
+    \syst_structure_arg_start_litprogs_component%
+}
+
+\def\syst_structure_arg_start_litprogs_component  #1 {\useStartLitProgsComponent[#1]}
+
+\unexpanded\def\useStartLitProgsComponent  [#1]{
+  \directlua{
+    thirddata.literateProgs.startLitProgsComponent('component', '#1')
+  }
+}
+
+\def\stopLitProgsComponent{
+  \directlua{
+    thirddata.literateProgs.stopLitProgsComponent('component')
+  }
+}
+
+%% repeat after me.... this WILL break!!!
+%%
+%% this call pattern has been modeled upon the
+%% definition of \component in file-job.mkvi
+%% on 2018/Nov/07 (experimental distribution)
+%%
+\unexpanded\def\litProgsComponent{
+  \doifelsenextoptionalcs%
+    \useLitProgsComponent%
+    \syst_structure_arg_litprogs_component%
+}
+
+\def\syst_structure_arg_litprogs_component  #1 {  \useLitProgsComponent  [#1]}
+
+\unexpanded\def\useLitProgsComponent  [#1]{
+  \directlua{
+    thirddata.literateProgs.litProgsComponent('component', '#1')
+  }
+}
+
+\def\popLitProgsPath{
+  \directlua{
+    thirddata.literateProgs.popLitProgsPath()
+  }
+}
+
+\def\currentLitProgsPath{
+  \directlua{
+    tex.print(thirddata.literateProgs.lastLitProgsPath())
+  }
+}
+
+\def\showLitProgsMessages{
+  \directlua{
+    thirddata.literateProgs.showLitProgsMessages(true)
+  }
+}
+
+\def\hideLitProgsMessages{
+  \directlua{
+    thirddata.literateProgs.showLitProgsMessages(false)
+  }
+}
+\stopMkIVCode
+
+\startLuaCode
+local showMessages = false
+
+local function showLitProgsMessages(aShowMessages)
+  showMessages = aShowMessages
+end
+
+litProgs.showLitProgsMessages = showLitProgsMessages
+
+local insideComponent = {}
+insideComponent['component']   = 0
+insideComponent['environment'] = 0
+insideComponent['product']     = 0
+insideComponent['project']     = 0
+
+local litProgsPaths   = {}
+local pathSeparator = package.config:sub(1, 1)
+
+local function lastLitProgsPath()
+  return litProgsPaths[#litProgsPaths] or ""
+end
+
+litProgs.lastLitProgsPath = lastLitProgsPath
+
+local function pushLitProgsPath(aFullPath)
+  if showMessages then
+    texio.write_nl('pushLitProgsPath('..aFullPath..')')
+  end
+  local aFullPathDir =
+    aFullPath:gsub('[^'..pathSeparator..']+$', '')
+  if showMessages then
+    texio.write_nl('  aFullPathDir: ['..aFullPathDir..']')
+  end
+  if aFullPathDir:sub(-1) ~= '/' then
+    aFullPathDir = aFullPathDir..pathSeparator
+  end
+  tInsert(litProgsPaths, aFullPathDir)
+  if showMessages then
+    for i, aPath in ipairs(litProgsPaths) do
+      texio.write_nl('litProgsPaths['..toStr(i)..']: ['..aPath..']')
+    end
+  end
+end
+
+-- repeat after me... this WILL break!!!
+--
+-- the use of environments.arguments.fulljobname
+-- was infered from grep'ing the experimental distribution
+-- for fulljobname and finding it defined in the
+-- the environment table. 
+-- (defined in core-sys.lua)
+--
+pushLitProgsPath(file.collapsepath(environment.arguments.fulljobname,true))
+
+local function popLitProgsPath()
+  if showMessages then
+    texio.write_nl('popLitProgsPath()')
+  end
+  tRemove(litProgsPaths)
+  if showMessages then
+    for i, aPath in ipairs(litProgsPaths) do
+      texio.write_nl('litProgsPaths['..toStr(i)..']: ['..aPath..']')
+    end
+  end
+  if showMessages then
+    texio.write_nl('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+  end
+end
+
+litProgs.popLitProgsPath = popLitProgsPath
+
+local function findLitProgsPath(curBasePath, componentPath, origBasePath)
+  if showMessages then
+    texio.write_nl('findLitProgsPath(['..curBasePath..'],['..componentPath..'],['..origBasePath..'])')
+  end
+  local potentialPath =
+    file.collapsepath(curBasePath..componentPath, true)
+  if lfs.attributes(potentialPath..'.tex', 'mode') == 'file' then
+    if showMessages then
+      texio.write_nl('found: ['..potentialPath..']')
+    end
+    return potentialPath
+  end
+  potentialPath =
+    file.collapsepath(curBasePath..'doc/'..componentPath, true)
+  if lfs.attributes(potentialPath..'.tex', 'mode') == 'file' then
+    if showMessages then
+      texio.write_nl('found: ['..potentialPath..']')
+    end
+    return potentialPath
+  end
+  if curBasePath == '' or curBasePath == pathSeparator then
+    texio.write_nl('no path found using: ['..origBasePath..componentPath..']')
+    return file.collapsepath(origBasePath..componentPath, true)
+  end
+  local newCurBasePath =
+    curBasePath:gsub('[^'..pathSeparator..']+'..pathSeparator..'$','')
+  return findLitProgsPath(newCurBasePath, componentPath, origBasePath)
+end
+
+local function litProgsComponent(componentType, componentPath)
+  if showMessages then
+    texio.write_nl('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+    texio.write_nl('litProgsComponent(['..componentType..'],['..componentPath..'])')
+  end
+  if componentType == 'environment' and 1 < insideComponent['component'] then
+    -- do nothing
+  else
+    -- we are either NOT an environment
+    -- OR we are an environment but inside the first start/stop component pair
+    local basePath = lastLitProgsPath()
+    local thisComponentPath = findLitProgsPath(basePath, componentPath, basePath)
+    if showMessages then
+      texio.write_nl(' thisComponentPath: ['..thisComponentPath..']')
+    end
+    pushLitProgsPath(thisComponentPath)
+    tex.print({
+      '\\'..componentType..' '..thisComponentPath,
+      '\\popLitProgsPath'
+    })
+  end
+end
+
+litProgs.litProgsComponent = litProgsComponent
+
+local function startLitProgsComponent(componentType, componentName)
+  if showMessages then
+    texio.write_nl('startLitProgsComponent(['..componentType..'],['..componentName..']')
+    for k,v in pairs(insideComponent) do
+      texio.write_nl('insideComponent['..k..'] = '..toStr(v))
+    end
+  end
+  if insideComponent[componentType] < 1 then
+    tex.print('\\start'..componentType..' '..componentName..'\\relax')
+  end
+  insideComponent[componentType] = insideComponent[componentType] + 1
+  if showMessages then
+    texio.write_nl(
+      '\\startLitProgsComponent('..componentType..')'..
+      '['..toStr(insideComponent[componentType])..']'
+    )
+  end
+end
+
+litProgs.startLitProgsComponent = startLitProgsComponent
+
+local function stopLitProgsComponent(componentType)
+  if showMessages then
+    texio.write_nl('stopLitProgsComponent(['..componentType..']')
+    texio.write_nl(
+      '\\stopLitProgsComponent('..componentType..')'..
+      '['..toStr(insideComponent[componentType])..']'
+    )
+  end
+  insideComponent[componentType] = insideComponent[componentType] - 1
+  if showMessages then
+    for k,v in pairs(insideComponent) do
+      texio.write_nl('insideComponent['..k..'] = '..toStr(v))
+    end
+  end
+  if insideComponent[componentType] < 1 then
+    if insideComponent[componentType] < 0 then
+      texio.write_nl('ERRROR: unbalanced number of \\stop'..componentType)
+    end
+    if showMessages then
+      texio.write_nl('CALLING \\stop'..componentType)
+    end
+    tex.print('\\stop'..componentType..'\\relax')
+  end
+end
+
+litProgs.stopLitProgsComponent = stopLitProgsComponent
+
+\stopLuaCode
+
+Now we deal with recursive descent into sub-documents.
+
+\startMkIVCode
+\def\litProgsRecurseComponent#1#2#3{
+  \directlua{
+    thirddata.literateProgs.litProgsRecurseComponent('component', '#1', '#2', '#3')
+  }
+}
+\stopMkIVCode
+
+\startLuaCode
+local function litProgsRecurseComponent(componentType, basePath, docDir, componentName)
+  if litProgs and litProgs.addLmsfileSubDirectory then
+    litProgs.addLmsfileSubDirectory(basePath)
+  end
+  if not litProgs.codeOnly then
+    litProgsComponent(
+      componentType,
+      makePath{ '..', basePath, docDir, componentName}
+    )
+  end
+end
+
+litProgs.litProgsRecurseComponent = litProgsRecurseComponent
+\stopLuaCode

@@ -3,6 +3,10 @@
 \usemodule[t-literate-progs]
 \usemodule[t-contests]
 
+\showLitProgsMessages
+
+\startLitProgsComponent literateProgs
+
 \setupinteraction[
   state=start,
   color=green,
@@ -33,23 +37,27 @@
   margin=3em % hanging list
 ]
 
+%%\let\litProgsComponent\component
+
 \starttext
 
-\component titlePages
+\litProgsComponent titlePages
 
-\component overview
+\litProgsComponent overview
 
-\component preamble
+\litProgsComponent preamble
 
-\component rendering
+\litProgsComponent components
 
-\component codeManipulation
+\litProgsComponent rendering
 
-\component pathManipulation
+\litProgsComponent codeManipulation
 
-\component lmsfiles
+\litProgsComponent pathManipulation
 
-\component conclusion
+\litProgsComponent lmsfiles
+
+\litProgsComponent conclusion
 
 \startbackmatter
   \startchapter[title=Bibliography]
@@ -58,3 +66,5 @@
 \stopbackmatter
 
 \stoptext
+
+\stopLitProgsComponent

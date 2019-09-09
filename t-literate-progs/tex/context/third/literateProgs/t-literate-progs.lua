@@ -1,6 +1,6 @@
 -- A Lua file
 
--- from file: conclusion.tex after line: 0
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/conclusion.tex after line: 0
 
 -- Copyright 2019 PerceptiSys Ltd (Stephen Gaito)
 --
@@ -26,7 +26,7 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE.
 
--- from file: preamble.tex after line: 50
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 50
 
 -- Copyright 2019 PerceptiSys Ltd (Stephen Gaito)
 --
@@ -52,7 +52,7 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE.
 
--- from file: preamble.tex after line: 50
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 50
 
 -- This is the lua code associated with t-literate-progs.mkiv
 
@@ -92,7 +92,7 @@ local toStr   = tostring
 
 local directorySeparator = package.config:sub(1,1)
 
--- from file: preamble.tex after line: 50
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 50
 
 local function setDefs(varVal, selector, defVal)
   if not defVal then defVal = { } end
@@ -102,7 +102,7 @@ end
 
 litProgs.setDefs = setDefs
 
--- from file: preamble.tex after line: 100
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 100
 
 local function shouldExist(varVal, selector, errorMessage)
   if not varVal[selector] then
@@ -119,7 +119,7 @@ end
 
 litProgs.shouldExist = shouldExist
 
--- from file: preamble.tex after line: 150
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 150
 
 local function markMkIVCodeOrigin()
   local codeType       = setDefs(code, 'MkIVCode')
@@ -217,7 +217,215 @@ end
 
 litProgs.markCCodeOrigin = markCCodeOrigin
 
--- from file: rendering.tex after line: 50
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/components.tex after line: 0
+
+local function setCodeOnly(codeOnlyBoolean)
+  if codeOnlyBoolean then
+    texio.write_nl('setCodeOnly to true')
+  else
+    texio.write_nl('setCodeOnly to false')
+  end
+  litProgs.codeOnly = codeOnlyBoolean
+  if litProgs.codeOnly then
+    texio.write_nl('setCodeOnly now true')
+  else
+    texio.write_nl('setCodeOnly now false')
+  end
+end
+
+litProgs.setCodeOnly = setCodeOnly
+
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/components.tex after line: 150
+
+local showMessages = false
+
+local function showLitProgsMessages(aShowMessages)
+  showMessages = aShowMessages
+end
+
+litProgs.showLitProgsMessages = showLitProgsMessages
+
+local insideComponent = {}
+insideComponent['component']   = 0
+insideComponent['environment'] = 0
+insideComponent['product']     = 0
+insideComponent['project']     = 0
+
+local litProgsPaths   = {}
+local pathSeparator = package.config:sub(1, 1)
+
+local function lastLitProgsPath()
+  return litProgsPaths[#litProgsPaths] or ""
+end
+
+litProgs.lastLitProgsPath = lastLitProgsPath
+
+local function pushLitProgsPath(aFullPath)
+  if showMessages then
+    texio.write_nl('pushLitProgsPath('..aFullPath..')')
+  end
+  local aFullPathDir =
+    aFullPath:gsub('[^'..pathSeparator..']+$', '')
+  if showMessages then
+    texio.write_nl('  aFullPathDir: ['..aFullPathDir..']')
+  end
+  if aFullPathDir:sub(-1) ~= '/' then
+    aFullPathDir = aFullPathDir..pathSeparator
+  end
+  tInsert(litProgsPaths, aFullPathDir)
+  if showMessages then
+    for i, aPath in ipairs(litProgsPaths) do
+      texio.write_nl('litProgsPaths['..toStr(i)..']: ['..aPath..']')
+    end
+  end
+end
+
+-- repeat after me... this WILL break!!!
+--
+-- the use of environments.arguments.fulljobname
+-- was infered from grep'ing the experimental distribution
+-- for fulljobname and finding it defined in the
+-- the environment table.
+-- (defined in core-sys.lua)
+--
+pushLitProgsPath(file.collapsepath(environment.arguments.fulljobname,true))
+
+local function popLitProgsPath()
+  if showMessages then
+    texio.write_nl('popLitProgsPath()')
+  end
+  tRemove(litProgsPaths)
+  if showMessages then
+    for i, aPath in ipairs(litProgsPaths) do
+      texio.write_nl('litProgsPaths['..toStr(i)..']: ['..aPath..']')
+    end
+  end
+  if showMessages then
+    texio.write_nl('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+  end
+end
+
+litProgs.popLitProgsPath = popLitProgsPath
+
+local function findLitProgsPath(curBasePath, componentPath, origBasePath)
+  if showMessages then
+    texio.write_nl('findLitProgsPath(['..curBasePath..'],['..componentPath..'],['..origBasePath..'])')
+  end
+  local potentialPath =
+    file.collapsepath(curBasePath..componentPath, true)
+  if lfs.attributes(potentialPath..'.tex', 'mode') == 'file' then
+    if showMessages then
+      texio.write_nl('found: ['..potentialPath..']')
+    end
+    return potentialPath
+  end
+  potentialPath =
+    file.collapsepath(curBasePath..'doc/'..componentPath, true)
+  if lfs.attributes(potentialPath..'.tex', 'mode') == 'file' then
+    if showMessages then
+      texio.write_nl('found: ['..potentialPath..']')
+    end
+    return potentialPath
+  end
+  if curBasePath == '' or curBasePath == pathSeparator then
+    texio.write_nl('no path found using: ['..origBasePath..componentPath..']')
+    return file.collapsepath(origBasePath..componentPath, true)
+  end
+  local newCurBasePath =
+    curBasePath:gsub('[^'..pathSeparator..']+'..pathSeparator..'$','')
+  return findLitProgsPath(newCurBasePath, componentPath, origBasePath)
+end
+
+local function litProgsComponent(componentType, componentPath)
+  if showMessages then
+    texio.write_nl('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+    texio.write_nl('litProgsComponent(['..componentType..'],['..componentPath..'])')
+  end
+  if componentType == 'environment' and 1 < insideComponent['component'] then
+    -- do nothing
+  else
+    -- we are either NOT an environment
+    -- OR we are an environment but inside the first start/stop component pair
+    local basePath = lastLitProgsPath()
+    local thisComponentPath = findLitProgsPath(basePath, componentPath, basePath)
+    if showMessages then
+      texio.write_nl(' thisComponentPath: ['..thisComponentPath..']')
+    end
+    pushLitProgsPath(thisComponentPath)
+    tex.print({
+      '\\'..componentType..' '..thisComponentPath,
+      '\\popLitProgsPath'
+    })
+  end
+end
+
+litProgs.litProgsComponent = litProgsComponent
+
+local function startLitProgsComponent(componentType, componentName)
+  if showMessages then
+    texio.write_nl('startLitProgsComponent(['..componentType..'],['..componentName..']')
+    for k,v in pairs(insideComponent) do
+      texio.write_nl('insideComponent['..k..'] = '..toStr(v))
+    end
+  end
+  if insideComponent[componentType] < 1 then
+    tex.print('\\start'..componentType..' '..componentName..'\\relax')
+  end
+  insideComponent[componentType] = insideComponent[componentType] + 1
+  if showMessages then
+    texio.write_nl(
+      '\\startLitProgsComponent('..componentType..')'..
+      '['..toStr(insideComponent[componentType])..']'
+    )
+  end
+end
+
+litProgs.startLitProgsComponent = startLitProgsComponent
+
+local function stopLitProgsComponent(componentType)
+  if showMessages then
+    texio.write_nl('stopLitProgsComponent(['..componentType..']')
+    texio.write_nl(
+      '\\stopLitProgsComponent('..componentType..')'..
+      '['..toStr(insideComponent[componentType])..']'
+    )
+  end
+  insideComponent[componentType] = insideComponent[componentType] - 1
+  if showMessages then
+    for k,v in pairs(insideComponent) do
+      texio.write_nl('insideComponent['..k..'] = '..toStr(v))
+    end
+  end
+  if insideComponent[componentType] < 1 then
+    if insideComponent[componentType] < 0 then
+      texio.write_nl('ERRROR: unbalanced number of \\stop'..componentType)
+    end
+    if showMessages then
+      texio.write_nl('CALLING \\stop'..componentType)
+    end
+    tex.print('\\stop'..componentType..'\\relax')
+  end
+end
+
+litProgs.stopLitProgsComponent = stopLitProgsComponent
+
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/components.tex after line: 350
+
+local function litProgsRecurseComponent(componentType, basePath, docDir, componentName)
+  if litProgs and litProgs.addLmsfileSubDirectory then
+    litProgs.addLmsfileSubDirectory(basePath)
+  end
+  if not litProgs.codeOnly then
+    litProgsComponent(
+      componentType,
+      makePath{ '..', basePath, docDir, componentName}
+    )
+  end
+end
+
+litProgs.litProgsRecurseComponent = litProgsRecurseComponent
+
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 50
 
 local function compareKeyValues(a, b)
   return (a[1] < b[1])
@@ -269,7 +477,7 @@ litProgs.prettyPrint = prettyPrint
 
 lPPrint = prettyPrint
 
--- from file: rendering.tex after line: 150
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 150
 
 local function reportTemplateError(aTemplateStr, errMessage)
   texio.write_nl('---------------------------')
@@ -352,7 +560,7 @@ end
 
 litProgs.parseTemplate = parseTemplate
 
--- from file: rendering.tex after line: 300
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 300
 
 local function getReference(aReference, anEnv)
   if type(aReference) ~= 'string' then return nil end
@@ -372,7 +580,7 @@ end
 
 litProgs.getReference = getReference
 
--- from file: rendering.tex after line: 350
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 350
 
 local function parseTemplatePath(templatePathStr, anEnv)
   if type(templatePathStr) ~= 'string' then
@@ -401,7 +609,7 @@ end
 
 litProgs.parseTemplatePath = parseTemplatePath
 
--- from file: rendering.tex after line: 400
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 400
 
 local function navigateToTemplate(templatePath)
   local curTable = setDefs(litProgs, 'templates')
@@ -413,7 +621,7 @@ end
 
 litProgs.navigateToTemplate = navigateToTemplate
 
--- from file: rendering.tex after line: 450
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 450
 
 local function addTemplate(templatePathStr, templateArgs, templateStr)
   local templatePath = parseTemplatePath(templatePathStr)
@@ -426,7 +634,7 @@ end
 
 litProgs.addTemplate = addTemplate
 
--- from file: rendering.tex after line: 550
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 550
 
 local function buildNewEnv(template, arguments, anEnv)
   if anEnv and anEnv.tracingOn then
@@ -461,7 +669,7 @@ end
 
 litProgs.buildNewEnv = buildNewEnv
 
--- from file: rendering.tex after line: 600
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 600
 
 local function renderer(aTemplate, anEnv)
   if anEnv.tracingOn then
@@ -575,7 +783,7 @@ end
 
 litProgs.renderer = renderer
 
--- from file: rendering.tex after line: 800
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 800
 
 local function splitString(aString)
   local theSplitStr = { }
@@ -587,7 +795,7 @@ end
 
 litProgs.splitString = splitString
 
--- from file: rendering.tex after line: 800
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 800
 
 local function renderCodeFile(aFilePath, codeTable)
   local outFile = io.open(aFilePath, 'w')
@@ -595,7 +803,7 @@ local function renderCodeFile(aFilePath, codeTable)
   outFile:close()
 end
 
--- from file: codeManipulation.tex after line: 250
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 250
 
 local function createFixLitProgs(theLitProgsName, aTracingOn)
   local theEnv = {
@@ -612,7 +820,7 @@ end
 
 litProgs.createFixLitProgs = createFixLitProgs
 
--- from file: codeManipulation.tex after line: 400
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 400
 
 local function setOriginMarker(aCodeType, aCodeStream, anOriginMarker)
   if type(litProgs[anOriginMarker]) == 'function' then
@@ -837,7 +1045,7 @@ end
 
 litProgs.addApacheLicense = addApacheLicense
 
--- from file: codeManipulation.tex after line: 700
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 700
 
 build.srcTypes = build.srcTypes or { }
 build.srcTypes['MkIVCode']    = 'ctxModule'
@@ -859,12 +1067,6 @@ local function createCodeFile(aCodeType,
                               aCodeStream,
                               aFilePath,
                               aFileHeader)
-  if not build.buildDir then
-    texio.write('\nERROR: document directory NOT yet defined\n')
-    texio.write('       NOT creating code file ['..aFilePath..']\n\n')
-    return
-  end
-
   local theCode = code[aCodeType]
   if #aCodeStream < 1 then aCodeStream = 'default' end
   if theCode then theCode = theCode[aCodeStream] end
@@ -900,14 +1102,12 @@ local function createCodeFile(aCodeType,
   texio.write_nl('directory targets:')
   texio.write_nl(prettyPrint(dirTargets))
   texio.write_nl('diSimpPrefix: ['..diSimpPrefix()..']')
-  texio.write_nl('buildDir: ['..build.buildDir..']')
   texio.write_nl('aFilePath: ['..aFilePath..']')
 
-  aFilePath = diSimpPrefix() .. build.buildDir .. '/buildDir/' .. aFilePath
   aFilePath = file.collapsepath(aFilePath, true)
   local outFile = io.open(aFilePath, 'w')
   if outFile then
-    texio.write('creating code file: ['..aFilePath..']\n')
+    texio.write_nl('creating code file: ['..aFilePath..']')
     if 0 < #aFileHeader then
       if aFileHeader:match('[Cc][Oo][Nn][Tt][Ee][Xx][Tt]') then
         outFile:write('% ')
@@ -927,7 +1127,7 @@ end
 
 litProgs.createCodeFile = createCodeFile
 
--- from file: codeManipulation.tex after line: 900
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 900
 
 local function cHeaderIncludeGuard(aCodeStream, aGuard)
   setCodeStream('CHeader', aCodeStream)
@@ -945,7 +1145,7 @@ end
 
 thirddata.literateProgs.cHeaderIncludeGuard = cHeaderIncludeGuard
 
--- from file: pathManipulation.tex after line: 0
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/pathManipulation.tex after line: 0
 
 directorySeparator = package.config:sub(1,1)
 
@@ -984,7 +1184,7 @@ end
 
 litProgs.clearEnvironment = clearEnvironment
 
--- from file: pathManipulation.tex after line: 50
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/pathManipulation.tex after line: 50
 
 replaceEnvironmentVarsInPath = replaceEnvironmentVarsInString
 litProgs.replaceEnvironmentVarsInPath = replaceEnvironmentVarsInPath
@@ -1003,7 +1203,7 @@ function recursivelyFindFiles(aDir, aFilePattern, actionBlock)
   end
 end
 
--- from file: lmsfiles.tex after line: 50
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/lmsfiles.tex after line: 50
 
 local function addMainDocument(aDocument)
   -- first mainDoc "wins"
@@ -1031,7 +1231,6 @@ litProgs.ensureDirectoryExists = ensureDirectoryExists
 local function addDocumentDirectory(aDirectory)
   texio.write_nl('addDocumentDir: curDir: ['..lfs.currentdir()..']')
   build.docDir   = aDirectory
-  build.buildDir = aDirectory:gsub('[^/]+', '..')
 end
 
 litProgs.addDocumentDirectory = addDocumentDirectory
@@ -1127,7 +1326,7 @@ end
 
 litProgs.addCCodeTargets = addCCodeTargets
 
--- from file: lmsfiles.tex after line: 200
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/lmsfiles.tex after line: 200
 
 local function compileLmsfile(aCodeStream)
   setCodeStream('Lmsfile', aCodeStream)

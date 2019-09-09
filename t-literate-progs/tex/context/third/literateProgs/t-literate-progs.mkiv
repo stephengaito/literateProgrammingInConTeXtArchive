@@ -1,6 +1,6 @@
 % A ConTeXt MkIV module
 
-% from file: conclusion.tex after line: 0
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/conclusion.tex after line: 0
 
 %C Copyright 2019 PerceptiSys Ltd (Stephen Gaito)
 %C
@@ -26,7 +26,7 @@
 %C FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 %C OTHER DEALINGS IN THE SOFTWARE.
 
-% from file: preamble.tex after line: 0
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 0
 
 %C Copyright 2019 PerceptiSys Ltd (Stephen Gaito)
 %C
@@ -52,7 +52,7 @@
 %C FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 %C OTHER DEALINGS IN THE SOFTWARE.
 
-% from file: preamble.tex after line: 0
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 0
 
 %D \module
 %D   [     file=t-literate-progs,
@@ -81,7 +81,119 @@
 \ctxloadluafile{t-literate-progs-templates}
 \ctxloadluafile{t-literate-progs-config}
 
-% from file: codeManipulation.tex after line: 0
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/components.tex after line: 0
+
+\doifmodeelse{codeOnly}{
+  \directlua{
+    thirddata.literateProgs.setCodeOnly(true)
+  }
+} {
+  \directlua{
+    thirddata.literateProgs.setCodeOnly(false)
+  }
+}
+
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/components.tex after line: 50
+
+%% repeat after me.... this WILL break!!!
+%%
+%% this call pattern has been modeled upon the
+%% definition of \environment in file-job.mkvi
+%% on 2018/Nov/07 (experimental distribution)
+%%
+\unexpanded\def\litProgsEnvironment{
+  \doifelsenextoptionalcs%
+    \useLitProgsEnvironment%
+    \syst_structure_arg_litprogs_environment%
+}
+
+\def\syst_structure_arg_litprogs_environment  #1 {\useLitProgsEnvironment  [#1]}
+
+\unexpanded\def\useLitProgsEnvironment  [#1]{
+  \directlua{
+    thirddata.literateProgs.litProgsComponent('environment', '#1')
+  }
+}
+
+%% repeat after me.... this WILL break!!!
+%%
+%% this call pattern has been modeled upon the
+%% definition of \startcomponent in file-job.mkvi
+%% on 2018/Nov/07 (experimental distribution)
+%%
+\unexpanded\def\startLitProgsComponent{
+  \doifelsenextoptionalcs%
+    \useStartLitProgsComponent%
+    \syst_structure_arg_start_litprogs_component%
+}
+
+\def\syst_structure_arg_start_litprogs_component  #1 {\useStartLitProgsComponent[#1]}
+
+\unexpanded\def\useStartLitProgsComponent  [#1]{
+  \directlua{
+    thirddata.literateProgs.startLitProgsComponent('component', '#1')
+  }
+}
+
+\def\stopLitProgsComponent{
+  \directlua{
+    thirddata.literateProgs.stopLitProgsComponent('component')
+  }
+}
+
+%% repeat after me.... this WILL break!!!
+%%
+%% this call pattern has been modeled upon the
+%% definition of \component in file-job.mkvi
+%% on 2018/Nov/07 (experimental distribution)
+%%
+\unexpanded\def\litProgsComponent{
+  \doifelsenextoptionalcs%
+    \useLitProgsComponent%
+    \syst_structure_arg_litprogs_component%
+}
+
+\def\syst_structure_arg_litprogs_component  #1 {  \useLitProgsComponent  [#1]}
+
+\unexpanded\def\useLitProgsComponent  [#1]{
+  \directlua{
+    thirddata.literateProgs.litProgsComponent('component', '#1')
+  }
+}
+
+\def\popLitProgsPath{
+  \directlua{
+    thirddata.literateProgs.popLitProgsPath()
+  }
+}
+
+\def\currentLitProgsPath{
+  \directlua{
+    tex.print(thirddata.literateProgs.lastLitProgsPath())
+  }
+}
+
+\def\showLitProgsMessages{
+  \directlua{
+    thirddata.literateProgs.showLitProgsMessages(true)
+  }
+}
+
+\def\hideLitProgsMessages{
+  \directlua{
+    thirddata.literateProgs.showLitProgsMessages(false)
+  }
+}
+
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/components.tex after line: 300
+
+\def\litProgsRecurseComponent#1#2#3{
+  \directlua{
+    thirddata.literateProgs.litProgsRecurseComponent('component', '#1', '#2', '#3')
+  }
+}
+
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 0
 
 \unexpanded\def\defineLitProgs{
   \dotripleempty\doDefineLitProgs
@@ -122,20 +234,20 @@
   }
 }
 
-% from file: codeManipulation.tex after line: 100
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 100
 
 \unexpanded\def\buff_verbatim_type_block#1#2%
   {\buff_pickup{_typing_}{#1}{#2}{}%
   {\buff_verbatim_type_block_verbatim_indeed{#1}{#2}}%
   \zerocount}
 
-% from file: codeManipulation.tex after line: 300
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 300
 
 \def\fixLitProgs#1{
   \directlua{thirddata.literateProgs.createFixLitProgs('#1')}
 }
 
-% from file: codeManipulation.tex after line: 600
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 600
 
 \unexpanded\def\setLitProgsOriginMarker{
   \dotripleempty\doSetLitProgsOriginMarker%
@@ -177,14 +289,14 @@
   }
 }
 
-% from file: codeManipulation.tex after line: 800
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 800
 
 \definetextbackground[LitProgFrame]
 \setuptextbackground%
   [LitProgFrame]%
   [location=paragraph, background=color, backgroundcolor=gray]
 
-% from file: codeManipulation.tex after line: 850
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 800
 
 \defineLitProgs%
   [MkIVCode]%
@@ -235,7 +347,7 @@
 \setLitProgsOriginMarker[CHeader][markCHeaderOrigin]
 \setLitProgsOriginMarker[CCode][markCCodeOrigin]
 
-% from file: codeManipulation.tex after line: 900
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 850
 
 \def\CHeaderIncludeGuard#1#2{
   \directlua{
@@ -243,7 +355,7 @@
   }
 }
 
-% from file: pathManipulation.tex after line: 0
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/pathManipulation.tex after line: 0
 
 \def\setEnvironment#1#2{
   \directlua{
@@ -263,7 +375,7 @@
   }
 }
 
-% from file: lmsfiles.tex after line: 0
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/lmsfiles.tex after line: 0
 
 \def\addMainDocument#1{
   \directlua{
@@ -331,7 +443,7 @@
   }
 }
 
-% from file: lmsfiles.tex after line: 200
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/lmsfiles.tex after line: 200
 
 \def\compileLmsfile#1{
   \directlua{
@@ -345,7 +457,7 @@
   }
 }
 
-% from file: conclusion.tex after line: 0
+% from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/conclusion.tex after line: 0
 
 \protect \endinput
 

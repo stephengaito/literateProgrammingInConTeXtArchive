@@ -760,12 +760,6 @@ local function createCodeFile(aCodeType,
                               aCodeStream,
                               aFilePath,
                               aFileHeader)
-  if not build.buildDir then
-    texio.write('\nERROR: document directory NOT yet defined\n')
-    texio.write('       NOT creating code file ['..aFilePath..']\n\n')
-    return
-  end
-
   local theCode = code[aCodeType]
   if #aCodeStream < 1 then aCodeStream = 'default' end
   if theCode then theCode = theCode[aCodeStream] end
@@ -801,10 +795,8 @@ local function createCodeFile(aCodeType,
   texio.write_nl('directory targets:')
   texio.write_nl(prettyPrint(dirTargets))
   texio.write_nl('diSimpPrefix: ['..diSimpPrefix()..']')
-  texio.write_nl('buildDir: ['..build.buildDir..']')
   texio.write_nl('aFilePath: ['..aFilePath..']')
 
-  aFilePath = diSimpPrefix() .. build.buildDir .. '/buildDir/' .. aFilePath
   aFilePath = file.collapsepath(aFilePath, true)
   local outFile = io.open(aFilePath, 'w')
   if outFile then

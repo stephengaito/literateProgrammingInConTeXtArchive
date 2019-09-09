@@ -1,6 +1,6 @@
 -- A Lua template file
 
--- from file: conclusion.tex after line: 50
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/conclusion.tex after line: 50
 
 -- Copyright 2019 PerceptiSys Ltd (Stephen Gaito)
 --
@@ -26,7 +26,7 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE.
 
--- from file: preamble.tex after line: 250
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 250
 
 -- t-literate-progs templates
 
@@ -56,7 +56,7 @@ local table_concat = table.concat
 
 local addTemplate = litProgs.addTemplate
 
--- from file: codeManipulation.tex after line: 200
+-- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 200
 
 addTemplate(
   'fixLitProgs',
