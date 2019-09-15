@@ -262,9 +262,12 @@ local function compileLmsfile(aCodeStream)
     tInsert(lmsfile, "    },")
   end
   
-  tInsert(lmsfile, "    lmsfileFiles = {")
-  tInsert(lmsfile, "      'lmsfile',")
-  tInsert(lmsfile, "    },")
+  if not srcTargets['lmsfile'] then
+    tInsert(lmsfile, "    lmsfileFiles = {")
+    tInsert(lmsfile, "      'lmsfile',")
+    tInsert(lmsfile, "    },")
+  end
+  
   tInsert(lmsfile, "  },")
   tInsert(lmsfile, "})")
   tInsert(lmsfile, "")

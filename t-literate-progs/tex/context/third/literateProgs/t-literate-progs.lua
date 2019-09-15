@@ -1,6 +1,6 @@
 -- A Lua file
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/conclusion.tex after line: 0
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/conclusion.tex after line: 0
 
 -- Copyright 2019 PerceptiSys Ltd (Stephen Gaito)
 --
@@ -26,7 +26,7 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE.
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 50
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 50
 
 -- Copyright 2019 PerceptiSys Ltd (Stephen Gaito)
 --
@@ -52,7 +52,7 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE.
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 50
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 50
 
 -- This is the lua code associated with t-literate-progs.mkiv
 
@@ -92,7 +92,7 @@ local toStr   = tostring
 
 local directorySeparator = package.config:sub(1,1)
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 50
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 50
 
 local function setDefs(varVal, selector, defVal)
   if not defVal then defVal = { } end
@@ -102,7 +102,7 @@ end
 
 litProgs.setDefs = setDefs
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 100
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 100
 
 local function shouldExist(varVal, selector, errorMessage)
   if not varVal[selector] then
@@ -119,7 +119,7 @@ end
 
 litProgs.shouldExist = shouldExist
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 150
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/preamble.tex after line: 150
 
 local function markMkIVCodeOrigin()
   local codeType       = setDefs(code, 'MkIVCode')
@@ -217,7 +217,7 @@ end
 
 litProgs.markCCodeOrigin = markCCodeOrigin
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/components.tex after line: 0
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/components.tex after line: 0
 
 local function setCodeOnly(codeOnlyBoolean)
   if codeOnlyBoolean then
@@ -235,7 +235,7 @@ end
 
 litProgs.setCodeOnly = setCodeOnly
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/components.tex after line: 150
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/components.tex after line: 150
 
 local showMessages = false
 
@@ -409,7 +409,7 @@ end
 
 litProgs.stopLitProgsComponent = stopLitProgsComponent
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/components.tex after line: 350
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/components.tex after line: 350
 
 local function litProgsRecurseComponent(componentType, basePath, docDir, componentName)
   if litProgs and litProgs.addLmsfileSubDirectory then
@@ -425,7 +425,7 @@ end
 
 litProgs.litProgsRecurseComponent = litProgsRecurseComponent
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 50
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 50
 
 local function compareKeyValues(a, b)
   return (a[1] < b[1])
@@ -477,7 +477,7 @@ litProgs.prettyPrint = prettyPrint
 
 lPPrint = prettyPrint
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 150
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 150
 
 local function reportTemplateError(aTemplateStr, errMessage)
   texio.write_nl('---------------------------')
@@ -560,7 +560,7 @@ end
 
 litProgs.parseTemplate = parseTemplate
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 300
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 300
 
 local function getReference(aReference, anEnv)
   if type(aReference) ~= 'string' then return nil end
@@ -580,7 +580,7 @@ end
 
 litProgs.getReference = getReference
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 350
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 350
 
 local function parseTemplatePath(templatePathStr, anEnv)
   if type(templatePathStr) ~= 'string' then
@@ -609,7 +609,7 @@ end
 
 litProgs.parseTemplatePath = parseTemplatePath
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 400
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 400
 
 local function navigateToTemplate(templatePath)
   local curTable = setDefs(litProgs, 'templates')
@@ -621,7 +621,7 @@ end
 
 litProgs.navigateToTemplate = navigateToTemplate
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 450
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 450
 
 local function addTemplate(templatePathStr, templateArgs, templateStr)
   local templatePath = parseTemplatePath(templatePathStr)
@@ -634,7 +634,7 @@ end
 
 litProgs.addTemplate = addTemplate
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 550
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 550
 
 local function buildNewEnv(template, arguments, anEnv)
   if anEnv and anEnv.tracingOn then
@@ -669,7 +669,7 @@ end
 
 litProgs.buildNewEnv = buildNewEnv
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 600
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 600
 
 local function renderer(aTemplate, anEnv)
   if anEnv.tracingOn then
@@ -783,7 +783,7 @@ end
 
 litProgs.renderer = renderer
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 800
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 800
 
 local function splitString(aString)
   local theSplitStr = { }
@@ -795,7 +795,7 @@ end
 
 litProgs.splitString = splitString
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 800
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/rendering.tex after line: 800
 
 local function renderCodeFile(aFilePath, codeTable)
   local outFile = io.open(aFilePath, 'w')
@@ -803,7 +803,7 @@ local function renderCodeFile(aFilePath, codeTable)
   outFile:close()
 end
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 250
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 250
 
 local function createFixLitProgs(theLitProgsName, aTracingOn)
   local theEnv = {
@@ -820,7 +820,7 @@ end
 
 litProgs.createFixLitProgs = createFixLitProgs
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 400
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 400
 
 local function setOriginMarker(aCodeType, aCodeStream, anOriginMarker)
   if type(litProgs[anOriginMarker]) == 'function' then
@@ -1045,7 +1045,7 @@ end
 
 litProgs.addApacheLicense = addApacheLicense
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 700
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 700
 
 build.srcTypes = build.srcTypes or { }
 build.srcTypes['MkIVCode']    = 'ctxModule'
@@ -1127,7 +1127,7 @@ end
 
 litProgs.createCodeFile = createCodeFile
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 900
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/codeManipulation.tex after line: 900
 
 local function cHeaderIncludeGuard(aCodeStream, aGuard)
   setCodeStream('CHeader', aCodeStream)
@@ -1145,7 +1145,7 @@ end
 
 thirddata.literateProgs.cHeaderIncludeGuard = cHeaderIncludeGuard
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/pathManipulation.tex after line: 0
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/pathManipulation.tex after line: 0
 
 directorySeparator = package.config:sub(1,1)
 
@@ -1184,7 +1184,7 @@ end
 
 litProgs.clearEnvironment = clearEnvironment
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/pathManipulation.tex after line: 50
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/pathManipulation.tex after line: 50
 
 replaceEnvironmentVarsInPath = replaceEnvironmentVarsInString
 litProgs.replaceEnvironmentVarsInPath = replaceEnvironmentVarsInPath
@@ -1203,7 +1203,7 @@ function recursivelyFindFiles(aDir, aFilePattern, actionBlock)
   end
 end
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/lmsfiles.tex after line: 50
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/lmsfiles.tex after line: 50
 
 local function addMainDocument(aDocument)
   -- first mainDoc "wins"
@@ -1326,7 +1326,7 @@ end
 
 litProgs.addCCodeTargets = addCCodeTargets
 
--- from file: ~/ExpositionGit/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/lmsfiles.tex after line: 200
+-- from file: /home/compileFarm/tools/conTeXt/literateProgrammingInConTeXt/t-literate-progs/doc/context/third/literateProgs/lmsfiles.tex after line: 200
 
 local function compileLmsfile(aCodeStream)
   setCodeStream('Lmsfile', aCodeStream)
@@ -1378,9 +1378,12 @@ local function compileLmsfile(aCodeStream)
     tInsert(lmsfile, "    },")
   end
  
-  tInsert(lmsfile, "    lmsfileFiles = {")
-  tInsert(lmsfile, "      'lmsfile',")
-  tInsert(lmsfile, "    },")
+  if not srcTargets['lmsfile'] then
+    tInsert(lmsfile, "    lmsfileFiles = {")
+    tInsert(lmsfile, "      'lmsfile',")
+    tInsert(lmsfile, "    },")
+  end
+ 
   tInsert(lmsfile, "  },")
   tInsert(lmsfile, "})")
   tInsert(lmsfile, "")
