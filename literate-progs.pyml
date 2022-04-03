@@ -1,0 +1,6 @@
+# This is a YAML description of the literate-progs project.
+
+projects:
+  literate-progs:
+    description: ConTeXt macros for defining and documenting literate programs.
+
