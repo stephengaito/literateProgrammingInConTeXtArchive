@@ -7,8 +7,8 @@ projects:
     targets:
       defaults:
         uses:
-          - literate-prog
-          - contests
+          - literate-progs:module
+          - contests:module
         dependencies:
           - t-literate-progs/doc/context/third/literateProgs/literateProgs.tex
         outputDir: buildDir
