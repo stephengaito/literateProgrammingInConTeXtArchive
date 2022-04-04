@@ -12,6 +12,7 @@ projects:
         dependencies:
           - t-literate-progs/doc/context/third/literateProgs/literateProgs.tex
         outputDir: buildDir
+        worker: context
 
       doc:
         help: Typeset the Literate Programming module documentation
