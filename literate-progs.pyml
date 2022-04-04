@@ -4,3 +4,26 @@ projects:
   literate-progs:
     description: ConTeXt macros for defining and documenting literate programs.
 
+    targets:
+      defaults:
+        uses:
+          - literate-prog
+          - contests
+        dependencies:
+          - t-literate-progs/doc/context/third/literateProgs/literateProgs.tex
+        outputDir: buildDir
+
+      doc:
+        help: Typeset the Literate Programming module documentation
+
+        outputs:
+          - literateProgs.pdf
+
+      module:
+        help: Typeset the Literate Proramming module
+
+        outputs:
+          - t-literate-progs.lua
+          - t-literate-progs.mkiv
+          - t-literate-progs-templates.lua
+
