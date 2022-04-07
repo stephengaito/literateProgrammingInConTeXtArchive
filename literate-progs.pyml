@@ -28,3 +28,7 @@ projects:
           - t-literate-progs.mkiv
           - t-literate-progs-templates.lua
 
+        install:
+          dir: t-literate-progs/tex/context/third/literateProgs
+          manualUpdate: True
+
