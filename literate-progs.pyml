@@ -7,6 +7,7 @@ projects:
     targets:
       defaults:
         uses:
+          - contextModules:module
           - literate-progs:module
           - contests:module
         srcDir: t-literate-progs/doc/context/third/literateProgs

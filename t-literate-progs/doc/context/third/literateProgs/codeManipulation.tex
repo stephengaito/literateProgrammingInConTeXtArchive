@@ -2,47 +2,47 @@
 
 \startchapter[title=The capture and manipulation of code]
 
-All of our literate programming code capture environments are enhanced 
-versions of the \ConTeXt\ \type{typing} environment. When creating 
-\quote{standard} \ConTeXt\ environments the two commands, 
-\type{\defineXXX} and \type{\setupXXX}, are critical to their overall use. 
+All of our literate programming code capture environments are enhanced
+versions of the \ConTeXt\ \type{typing} environment. When creating
+\quote{standard} \ConTeXt\ environments the two commands,
+\type{\defineXXX} and \type{\setupXXX}, are critical to their overall use.
 
 \startTestSuite[defineLitProgs]
 
-We begin by defining the \type{\defineLitProgs} command. This command is a 
-simple enhancement of the \type{\definetyping} command, so we, 
-essentially, define the \type{\defineLitProgs} command to call the 
+We begin by defining the \type{\defineLitProgs} command. This command is a
+simple enhancement of the \type{\definetyping} command, so we,
+essentially, define the \type{\defineLitProgs} command to call the
 \type{\definetyping} command.
 
-However, the \type{\definetyping} command takes a variable number of up to 
-three of arguments. This means that our definition of 
-\type{\defineLitProgs} must also be able to deal with the same number of 
-variable arguments. We use \ConTeXt's \type{\dotripleempty} command to 
-provide the simplest and most explicit way of dealing with up to three 
-variable arguments. A side-effect of our explicit pattern is that we 
-provide the user with more appropriate error messages. 
+However, the \type{\definetyping} command takes a variable number of up to
+three of arguments. This means that our definition of
+\type{\defineLitProgs} must also be able to deal with the same number of
+variable arguments. We use \ConTeXt's \type{\dotripleempty} command to
+provide the simplest and most explicit way of dealing with up to three
+variable arguments. A side-effect of our explicit pattern is that we
+provide the user with more appropriate error messages.
 
-The \type{\dotripleempty} command scans the token stream expecting a 
-command plus up to three \quote{[} \quote{]} delimited arguments. It then 
-sets one of the \type{\ifXXXargument} tests to true, depending upon how 
-many arguments it has found. The \quote{real} work gets done in either the 
-\type{\doDefineLitProgsSingle}, \type{\doDefineLitProgsDouble} or 
-\type{\doDefineLitProgsTriple} commands, which explicitly expect either 
-one, two or three arguments respectively. The \type{\doDefineLitProgsZero} 
-command provides an appropriate error message, if the user has provided no 
-arguments. The \type{\doDefineLitProgs} command simply manages the choice 
-of the appropriate \type{\doDefineLitProgsXXX} command. 
+The \type{\dotripleempty} command scans the token stream expecting a
+command plus up to three \quote{[} \quote{]} delimited arguments. It then
+sets one of the \type{\ifXXXargument} tests to true, depending upon how
+many arguments it has found. The \quote{real} work gets done in either the
+\type{\doDefineLitProgsSingle}, \type{\doDefineLitProgsDouble} or
+\type{\doDefineLitProgsTriple} commands, which explicitly expect either
+one, two or three arguments respectively. The \type{\doDefineLitProgsZero}
+command provides an appropriate error message, if the user has provided no
+arguments. The \type{\doDefineLitProgs} command simply manages the choice
+of the appropriate \type{\doDefineLitProgsXXX} command.
 
-Since we are enhancing the \type{typing} environment using lua code, the 
-\type{\doDfineLitProgsSingle}, \type{\doDefineLitProgsDouble} and 
-\type{\doDefineLitProgsTriple} commands make use of the 
-\type{\fixStartLitProgs} and \type{\fixStopLitProgs} commands to layer in 
-our enhancements. These two commands will be defined below. Similarly, we 
-need to define a setup command corresponding to our new code type. We do 
-this using the \type{defineLitProgsSetup} command, also to be defined 
-below. Finally for each code type we would like a corresponding 
-\type{createXXXFile} macro to write the accumulated text for a given code 
-type out into a file. 
+Since we are enhancing the \type{typing} environment using lua code, the
+\type{\doDfineLitProgsSingle}, \type{\doDefineLitProgsDouble} and
+\type{\doDefineLitProgsTriple} commands make use of the
+\type{\fixStartLitProgs} and \type{\fixStopLitProgs} commands to layer in
+our enhancements. These two commands will be defined below. Similarly, we
+need to define a setup command corresponding to our new code type. We do
+this using the \type{defineLitProgsSetup} command, also to be defined
+below. Finally for each code type we would like a corresponding
+\type{createXXXFile} macro to write the accumulated text for a given code
+type out into a file.
 
 % see: http://wiki.contextgarden.net/Commands_with_optional_arguments
 
@@ -87,21 +87,21 @@ type out into a file.
 }
 \stopMkIVCode
 
-Unfortunately, \ConTeXt's current definition of its internal 
-\type{\buff_verbatim_type_block}, which is part of the 
-\type{\definetyping} environment, is hardwired to tell \type{\buff_pickup} 
-to strip leading spaces. We extract \type{\buff_verbatim_type_block}'s 
-definition from \ConTeXt's MkIV file \type{buff-ver.mkiv} and make the 
-smallest change needed to fix this for our needs by providing 
-\type{\zerocount} instead of \type{\plusone} as the last parameter to the 
-\type{\buff_pickup} \ConTeXt\ macro. This has the effect of preserving 
-leading spaces in \emph{all} \type{\definetyping} environments which use 
-the \type{t-literate-progs} module\footnote{Note, however, that the 
-\type{\setuptyping} \type{strip} option should now work.}\footnote{Note 
-also that this is a rather fragile fix which depends upon the internals of 
-the \type{\definetyping} environment not being changed by the authors of 
-\ConTeXt. We \emph{will} need to re-visit the justification and 
-applicability of this fix regularly.} 
+Unfortunately, \ConTeXt's current definition of its internal
+\type{\buff_verbatim_type_block}, which is part of the
+\type{\definetyping} environment, is hardwired to tell \type{\buff_pickup}
+to strip leading spaces. We extract \type{\buff_verbatim_type_block}'s
+definition from \ConTeXt's MkIV file \type{buff-ver.mkiv} and make the
+smallest change needed to fix this for our needs by providing
+\type{\zerocount} instead of \type{\plusone} as the last parameter to the
+\type{\buff_pickup} \ConTeXt\ macro. This has the effect of preserving
+leading spaces in \emph{all} \type{\definetyping} environments which use
+the \type{t-literate-progs} module\footnote{Note, however, that the
+\type{\setuptyping} \type{strip} option should now work.}\footnote{Note
+also that this is a rather fragile fix which depends upon the internals of
+the \type{\definetyping} environment not being changed by the authors of
+\ConTeXt. We \emph{will} need to re-visit the justification and
+applicability of this fix regularly.}
 
 \startMkIVCode
 \unexpanded\def\buff_verbatim_type_block#1#2%
@@ -112,8 +112,8 @@ applicability of this fix regularly.}
 
 \startTestCase[should call all associated macros]
 
-We assert that the \type{\defineLitProgs} macro actually defines all of 
-the required macros. 
+We assert that the \type{\defineLitProgs} macro actually defines all of
+the required macros.
 
 \startConTest
 \begingroup
@@ -171,35 +171,35 @@ the required macros.
 
 \startTestSuite[fixing literate programming environments]
 
-Having provided the \ConTeXt\ code required to deal with variable 
-arguments, we now need to provide the code required to \quote{fix} the 
-\type{\startXXX} and \type{\stopXXX} commands automatically generated by 
-the \type{\defintyping} command. We do this with the \type{\fixLitProgs} 
-command. 
+Having provided the \ConTeXt\ code required to deal with variable
+arguments, we now need to provide the code required to \quote{fix} the
+\type{\startXXX} and \type{\stopXXX} commands automatically generated by
+the \type{\defintyping} command. We do this with the \type{\fixLitProgs}
+command.
 
-This command essentially \quote{wraps} the original \type{\startXXX} and 
-\type{\stopXXX} commands with calls to an appropriate lua function 
-(defined below). To do this our \quote{fix} command \type{\let}'s an 
-\type{\oldXXX} command to \emph{be} the original command, and then 
-redefine the original command to make the call into the lua code and then 
-call the new \type{\oldXXX} command. Order here is critical as the 
-\type{typing} environment is scanning for the exact token \type{\stopXXX}. 
-Since all of these new commands are generated from the user's supplied 
-code name, we make use of the Literate Programming Lua Renderer to 
-dynamically build the required commands. 
+This command essentially \quote{wraps} the original \type{\startXXX} and
+\type{\stopXXX} commands with calls to an appropriate lua function
+(defined below). To do this our \quote{fix} command \type{\let}'s an
+\type{\oldXXX} command to \emph{be} the original command, and then
+redefine the original command to make the call into the lua code and then
+call the new \type{\oldXXX} command. Order here is critical as the
+\type{typing} environment is scanning for the exact token \type{\stopXXX}.
+Since all of these new commands are generated from the user's supplied
+code name, we make use of the Literate Programming Lua Renderer to
+dynamically build the required commands.
 
-A final complication is that our \type{\startXXX} command can take an 
-optional argument which specifies a particular stream of code. If this 
-optional argument is not provided, the 'default' stream will be used. We 
-use an explicit variable argument pattern similar to that used to define 
-\type{\defineLitProgs} above. Note that for the \type{\stopXXX} command 
-things are simpler since the \type{\stopXXX} command takes no arguments. 
+A final complication is that our \type{\startXXX} command can take an
+optional argument which specifies a particular stream of code. If this
+optional argument is not provided, the 'default' stream will be used. We
+use an explicit variable argument pattern similar to that used to define
+\type{\defineLitProgs} above. Note that for the \type{\stopXXX} command
+things are simpler since the \type{\stopXXX} command takes no arguments.
 
-Finally, we need a code file creation command for each code type, 
-\type{\createXXXFile}. This command takes two explicit arguments, the 
-first argument is the name of the code stream, this is the same string as 
-used in any of the corresponding \type{\startXXX} commands. The second 
-argument is the name of the code file to be created. 
+Finally, we need a code file creation command for each code type,
+\type{\createXXXFile}. This command takes two explicit arguments, the
+first argument is the name of the code stream, this is the same string as
+used in any of the corresponding \type{\startXXX} commands. The second
+argument is the name of the code file to be created.
 
 With these objectives in mind, we define the following Lua Template:
 
@@ -284,8 +284,8 @@ addTemplate(
 )
 \stopLuaTemplate
 
-We now define the Lua method, \type{createFixLitProgs}, which is required 
-to drive the renderer. 
+We now define the Lua method, \type{createFixLitProgs}, which is required
+to drive the renderer.
 
 \startLuaCode
 local function createFixLitProgs(theLitProgsName, aTracingOn)
@@ -304,8 +304,8 @@ end
 litProgs.createFixLitProgs = createFixLitProgs
 \stopLuaCode
 
-We now define the \ConTeXt\ macro which will drive the whole process 
-required to fix a new Literate Programs environment. 
+We now define the \ConTeXt\ macro which will drive the whole process
+required to fix a new Literate Programs environment.
 
 \startMkIVCode
 \def\fixLitProgs#1{
@@ -415,10 +415,10 @@ assert.isEqual(macroBody[72], "}")
 \stopConTest
 \stopTestCase
 
-We now turn to the lua code used in the \type{\directlua} commands above. 
-As defined in the preamble, \type{litProgs} and \type{code} are variables 
-local to the \type{t-literateProgs.lua} file. They provide access to the 
-collection of lua functions and code fragments respectively. 
+We now turn to the lua code used in the \type{\directlua} commands above.
+As defined in the preamble, \type{litProgs} and \type{code} are variables
+local to the \type{t-literateProgs.lua} file. They provide access to the
+collection of lua functions and code fragments respectively.
 
 \startLuaCode
 local function setOriginMarker(aCodeType, aCodeStream, anOriginMarker)
@@ -445,7 +445,7 @@ local function markCodeOrigin(aCodeType)
     fileName = fileName:gsub(homeDir, '~')
   end
   codeStream.fileName    = fileName
-  codeStream.startLine   = status.linenumber
+  codeStream.startLine   = status.linenumber or 0
   tex.print({
    '\\blank[medium]\\noindent',
    '{\\darkgray '..aCodeType..' : '..aCodeStream..'}',
@@ -500,7 +500,7 @@ local function addCodeDefault(aCodeType, bufferContents)
 
   if codeStream.prepend then
     tInsert(codeStream, 1, bufferContents)
-    if codeOrigin then 
+    if codeOrigin then
       tInsert(codeStream, 1, codeOrigin)
     end
   else
@@ -521,7 +521,7 @@ local function addCodeStreamDependency(aCodeType, aCodeStream, aDependent)
   local aCodeStream     = setDefs(codeType, 'curCodeStream', 'default')
   local codeStream      = setDefs(codeType, aCodeStream)
   local dependents      = setDefs(codeStream, 'dependents')
-  
+
   tInsert(dependents, aDependent)
 end
 
@@ -545,7 +545,7 @@ local function addMITLicense(aCodeType, commentStart, copyrightOwner)
   copyright = { }
   tInsert(copyright, commentStart ..
     ' Copyright '..os.date('%Y')..' '..copyrightOwner)
-  tInsert(copyright,  commentStart .. 
+  tInsert(copyright,  commentStart ..
     '')
   tInsert(copyright, commentStart ..
     ' Permission is hereby granted, free of charge, to any person')
@@ -609,7 +609,7 @@ local function addApacheLicense(aCodeType, commentStart, copyrightOwner)
   copyright = { }
   tInsert(copyright, commentStart ..
     ' Copyright '..os.date('%Y')..' '..copyrightOwner)
-  tInsert(copyright,  commentStart .. 
+  tInsert(copyright,  commentStart ..
     '')
   tInsert(copyright, commentStart ..
     ' Licensed under the Apache License, Version 2.0 (the "License");')
@@ -689,8 +689,8 @@ litProgs.addApacheLicense = addApacheLicense
 
 \startTestCase[should be able to collect code]
 
-We use a LuaConTest to ensure that the \type{TestCode} environment 
-captures its contents. 
+We use a LuaConTest to ensure that the \type{TestCode} environment
+captures its contents.
 
 \startConTest
 \begingroup
@@ -715,8 +715,8 @@ captures its contents.
 
 \startTestCase[should be able to collect code using addTestCodeCode]
 
-We use a LuaConTest to ensure that the \type{TestCode} environment 
-captures its contents using a specific addTestCodeCode Lua function. 
+We use a LuaConTest to ensure that the \type{TestCode} environment
+captures its contents using a specific addTestCodeCode Lua function.
 
 \startConTest
 \begingroup
@@ -786,12 +786,12 @@ local function createCodeFile(aCodeType,
 
   build.dirTargets = build.dirTargets or { }
   local dirTargets = build.dirTargets
-  
+
   for aPathSegment in aFilePath:gmatch('[^%'..directorySeparator..']+') do
     tInsert(dirTargets, aPathSegment)
   end
   tRemove(dirTargets) -- remove the last item
-  
+
   texio.write_nl('directory targets:')
   texio.write_nl(prettyPrint(dirTargets))
   texio.write_nl('diSimpPrefix: ['..diSimpPrefix()..']')
@@ -823,13 +823,13 @@ litProgs.createCodeFile = createCodeFile
 
 \stopTestSuite
 
-We now make use of the newly defined \type{\defineLitProgs} macro to 
-define a number of standard litterate programming environments: 
-\type{MkIVCode}, \type{LuaCode}, \type{LuaTemplate}, \type{CHeader}, 
-\type{CCode} and \type{Lmsfile}. 
+We now make use of the newly defined \type{\defineLitProgs} macro to
+define a number of standard litterate programming environments:
+\type{MkIVCode}, \type{LuaCode}, \type{LuaTemplate}, \type{CHeader},
+\type{CCode} and \type{Lmsfile}.
 
-However before we do this we need to provide a uniform way to denote code 
-contexts by using \ConTeXt\ text backgrounds. 
+However before we do this we need to provide a uniform way to denote code
+contexts by using \ConTeXt\ text backgrounds.
 
 \startMkIVCode
 \definetextbackground[LitProgFrame]
@@ -838,8 +838,8 @@ contexts by using \ConTeXt\ text backgrounds.
   [location=paragraph, background=color, backgroundcolor=gray]
 \stopMkIVCode
 
-Using this newly defined \type{LitProgFrame} we now define our standard 
-litterate programming environments. 
+Using this newly defined \type{LitProgFrame} we now define our standard
+litterate programming environments.
 
 \startMkIVCode
 \defineLitProgs%
@@ -853,7 +853,7 @@ litterate programming environments.
   [ option=mp, numbering=line,
     before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
   ]
-  
+
 \defineLitProgs%
   [LuaCode]%
   [option=lua, numbering=line,
@@ -892,8 +892,8 @@ litterate programming environments.
 \setLitProgsOriginMarker[CCode][markCCodeOrigin]
 \stopMkIVCode
 
-For \type{CHeader}s, we need to create the standard \type{#include} guard. 
-We do this using the \type{\CHeaderIncludeGuard} macro as follows. 
+For \type{CHeader}s, we need to create the standard \type{#include} guard.
+We do this using the \type{\CHeaderIncludeGuard} macro as follows.
 
 \startMkIVCode
 \def\CHeaderIncludeGuard#1#2{
@@ -923,14 +923,14 @@ thirddata.literateProgs.cHeaderIncludeGuard = cHeaderIncludeGuard
 
 % Do we need the following?
 
-% Having defined a new code type in the previous section, we now have the 
-% very much simpler task of providing a \type{\setupXXX} command. At the 
-% moment we do not provide any extra options other than those provided by 
-% the \type{\setuptyping} command. This means that all we have to do is to 
-% define the \type{\setupXXX} to be a simple call to the 
-% \type{\setuptyping} command. In all cases the \type{\setupXXX} will have 
-% a single manditory argument which provides the collection 
-% \type{\setuptyping} options to be used by this code type. 
+% Having defined a new code type in the previous section, we now have the
+% very much simpler task of providing a \type{\setupXXX} command. At the
+% moment we do not provide any extra options other than those provided by
+% the \type{\setuptyping} command. This means that all we have to do is to
+% define the \type{\setupXXX} to be a simple call to the
+% \type{\setuptyping} command. In all cases the \type{\setupXXX} will have
+% a single manditory argument which provides the collection
+% \type{\setuptyping} options to be used by this code type.
 
 %\startMkIVCode
 %\def\defineLitProgsSetup#1{
